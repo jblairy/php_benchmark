@@ -7,7 +7,7 @@ parameters:
         - tests/
 
     symfony:
-        containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
+        containerXmlPath: var/cache/dev/Jblairy_PhpBenchmark_KernelDevDebugContainer.xml
 
     excludePaths:
         - var/
