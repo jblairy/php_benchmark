@@ -4,24 +4,15 @@ declare(strict_types=1);
 
 namespace Jblairy\PhpBenchmark\Benchmark\ScriptBuilder;
 
-final class ScriptBuilder implements WithIterations, BuilderInterface
+final class ScriptBuilder implements BuilderInterface
 {
-    private int $iterations = 1;
-
     private function __construct(private string $methodBody)
     {
     }
 
-    public static function fromMethodBody(string $methodBody): WithIterations
+    public static function fromMethodBody(string $methodBody): BuilderInterface
     {
         return new self($methodBody);
-    }
-
-    public function withIterations(int $iterations): BuilderInterface
-    {
-        $this->iterations = $iterations;
-
-        return $this;
     }
 
     public function build(): string
@@ -35,14 +26,12 @@ final class ScriptBuilder implements WithIterations, BuilderInterface
                 \$mem_peak_after = memory_get_peak_usage(true);
                 \$end_time = microtime(true);
                 echo json_encode([
-                    "execution_time_ms" => round(((\$end_time - \$start_time) * 1000)/{$this->iterations}, 4),
-                    "memory_used_bytes" => (\$mem_after - \$mem_before)/{$this->iterations},
-                    "memory_peak_bytes" => (\$mem_peak_after - \$mem_peak_before)/{$this->iterations},
+                    "execution_time_ms" => round(((\$end_time - \$start_time) * 1000), 4),
+                    "memory_used_bytes" => (\$mem_after - \$mem_before),
+                    "memory_peak_bytes" => (\$mem_peak_after - \$mem_peak_before),
                 ]);
             PHP;
 
-        $oneLineBody = mb_trim((string) preg_replace('/[\r\n]+/', ' ', $bodyScript));
-
-        return str_replace("'", "\\'", $oneLineBody);
+        return mb_trim((string) preg_replace('/[\r\n]+/', ' ', $bodyScript));
     }
 }

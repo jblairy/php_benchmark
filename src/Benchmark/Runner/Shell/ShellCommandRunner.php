@@ -34,11 +34,19 @@ final class ShellCommandRunner
         $output = [];
         $exitCode = 0;
 
+        $tempFile = sprintf(
+            './var/tmp/benchmark_script_%s.php',
+            uniqid(),
+        );
+        file_put_contents($tempFile, '<?php ' . $this->script);
+
         exec(sprintf(
-            'docker-compose exec -T %s php -r \'%s\'', // TODO escape problem
+            'docker-compose exec -T %s php %s',
             $this->phpVersion->value,
-            $this->script,
+            $tempFile,
         ), $output, $exitCode);
+
+        unlink($tempFile);
 
         if (0 !== $exitCode) {
             throw new RuntimeException('Errored while executing script.');

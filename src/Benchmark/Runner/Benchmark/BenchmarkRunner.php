@@ -16,12 +16,10 @@ use Jblairy\PhpBenchmark\PhpVersion\Enum\PhpVersion;
 class BenchmarkRunner
 {
     private BenchmarkResultCollection $results;
-    private SchellCommandResultAggregator $resultAggregator;
 
     public function __construct(
         private Configurator $configurator,
     ) {
-        $this->resultAggregator = new SchellCommandResultAggregator();
         $this->results = new BenchmarkResultCollection();
     }
 
@@ -35,15 +33,16 @@ class BenchmarkRunner
     public function runBenchmark(Benchmark $benchmark): void
     {
         foreach ($this->configurator->getPhpVersion() as $phpVersion) {
+            $resultAggregator = new SchellCommandResultAggregator();
             $commandRunner = $this->getCommandRunner($benchmark->getMethodBody($phpVersion), $phpVersion);
 
             for ($i = 0; $i < $this->configurator->getIterations(); ++$i) {
-                $this->resultAggregator->addResult($commandRunner->executeScript());
+                $resultAggregator->addResult($commandRunner->executeScript());
             }
 
             $this->results->append(
                 new BenchmarkResult(
-                    $this->resultAggregator->getResult($this->configurator->getIterations()),
+                    $resultAggregator->getResult($this->configurator->getIterations()),
                     $phpVersion,
                     $benchmark::class,
                 ),
@@ -59,7 +58,6 @@ class BenchmarkRunner
     private function getCommandRunner(string $methodBody, PhpVersion $phpVersion): ShellCommandRunner
     {
         $script = ScriptBuilder::fromMethodBody($methodBody)
-            ->withIterations($this->configurator->getIterations())
             ->build();
 
         return ShellCommandRunner::fromPhpVersion($phpVersion)

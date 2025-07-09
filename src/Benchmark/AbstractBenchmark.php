@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jblairy\PhpBenchmark\Benchmark;
 
 use Jblairy\PhpBenchmark\Benchmark\Exception\ReflexionMethodNotFound;
+use Jblairy\PhpBenchmark\PhpVersion\Attribute\All;
 use Jblairy\PhpBenchmark\PhpVersion\Enum\PhpVersion;
 use ReflectionClass;
 use ReflectionMethod;
@@ -30,7 +31,7 @@ abstract class AbstractBenchmark implements Benchmark
 
         foreach ($reflection->getMethods() as $method) {
             foreach ($method->getAttributes() as $attribute) {
-                if (str_ends_with(mb_strtolower($attribute->getName()), $phpVersion->value)) {
+                if (All::class === $attribute->getName() || str_ends_with(mb_strtolower($attribute->getName()), $phpVersion->value)) {
                     return $method;
                 }
             }
