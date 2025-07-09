@@ -1,0 +1,54 @@
+parameters:
+    level: max
+    paths:
+        - bin/
+        - config/
+        - src/
+        - tests/
+
+    symfony:
+        containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
+
+    excludePaths:
+        - var/
+        - vendor/
+        - tests/bootstrap.php
+
+    checkMissingCallableSignature: true
+    checkMissingVarTagTypehint: true
+    checkTooWideReturnTypesInProtectedAndPublicMethods: true
+    checkUninitializedProperties: true
+    checkDynamicProperties: true
+    checkImplicitMixed: true
+    checkBenevolentUnionTypes: true
+
+    reportUnmatchedIgnoredErrors: true
+    reportStaticMethodSignatures: true
+    reportMaybes: true
+    reportMagicMethods: true
+    reportMagicProperties: true
+    reportAnyTypeWideningInVarTag: true
+    reportPossiblyNonexistentConstantArrayOffset: true
+    reportPossiblyNonexistentGeneralArrayOffset: true
+
+    treatPhpDocTypesAsCertain: false
+
+    checkExplicitMixedMissingReturn: true
+    checkFunctionNameCase: true
+    checkInternalClassCaseSensitivity: true
+
+    polluteScopeWithLoopInitialAssignments: false
+    polluteScopeWithAlwaysIterableForeach: false
+
+    tmpDir: var/cache/phpstan
+
+    parallel:
+        jobSize: 20
+        maximumNumberOfProcesses: 32
+        minimumNumberOfJobsPerProcess: 2
+
+includes:
+    - vendor/phpstan/phpstan-symfony/extension.neon
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
