@@ -87,3 +87,12 @@ services:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
     command: tail -f /dev/null
+
+  php85:
+      build:
+          context: .
+          dockerfile: Dockerfile.php85
+      volumes:
+          - ./:/srv/php_benchmark
+      working_dir: /srv/php_benchmark
+      command: tail -f /dev/null

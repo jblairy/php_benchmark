@@ -17,4 +17,5 @@ enum PhpVersion: string
     case PHP_8_2 = 'php82';
     case PHP_8_3 = 'php83';
     case PHP_8_4 = 'php84';
+    case PHP_8_5 = 'php85';
 }

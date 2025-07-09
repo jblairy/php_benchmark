@@ -1,0 +1,44 @@
+FROM debian:bullseye
+
+# 📦 Installer les dépendances nécessaires
+RUN apt update && apt install -y \
+    build-essential \
+    libxml2-dev \
+    libsqlite3-dev \
+    libcurl4-openssl-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libonig-dev \
+    libzip-dev \
+    libssl-dev \
+    pkg-config \
+    libicu-dev \
+    wget \
+    ca-certificates \
+    tar \
+    xz-utils \
+    bzip2 \
+    git
+
+# 📥 Télécharger et extraire PHP 8.5.0 Alpha 1
+WORKDIR /usr/src
+RUN wget https://downloads.php.net/~daniels/php-8.5.0alpha1.tar.xz && \
+    tar -xf php-8.5.0alpha1.tar.xz && \
+    rm php-8.5.0alpha1.tar.xz
+
+WORKDIR /usr/src/php-8.5.0alpha1
+
+# ⚙️ Configurer, compiler et installer
+RUN ./configure --prefix=/usr/local/php8.5 \
+    --with-openssl \
+    --enable-mbstring \
+    --enable-soap \
+    --enable-intl && \
+    make -j$(nproc) && \
+    make install
+
+# 🧪 Ajouter PHP au PATH
+ENV PATH="/usr/local/php8.5/bin:${PATH}"
+
+# 🔍 Vérification
+CMD ["php", "-v"]
