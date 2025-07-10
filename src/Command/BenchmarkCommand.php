@@ -29,6 +29,8 @@ final class BenchmarkCommand extends Command
         InputInterface $input,
         SymfonyStyle $io,
     ): int {
+        $io->title('🚀 PHP Benchmark Runner');
+
         $testName = $input->getOption('test');
         if (is_string($testName) && '' !== $testName) {
             $this->configurator->setBenchmarkName($testName);
