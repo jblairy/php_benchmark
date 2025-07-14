@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jblairy\PhpBenchmark\Benchmark\Runner\Benchmark;
 
-use Jblairy\PhpBenchmark\Benchmark\Benchmark;
 use Jblairy\PhpBenchmark\Benchmark\Runner\Benchmark\Configurator\Configurator;
 use Jblairy\PhpBenchmark\Benchmark\Runner\Benchmark\Result\BenchmarkResult;
 use Jblairy\PhpBenchmark\Benchmark\Runner\Benchmark\Result\BenchmarkResultCollection;
@@ -12,52 +11,43 @@ use Jblairy\PhpBenchmark\Benchmark\Runner\Shell\Result\Aggregator\SchellCommandR
 use Jblairy\PhpBenchmark\Benchmark\Runner\Shell\Result\SchellCommandResult;
 use Jblairy\PhpBenchmark\Benchmark\Runner\Shell\ShellCommandRunner;
 use Jblairy\PhpBenchmark\Benchmark\ScriptBuilder\ScriptBuilder;
-use Jblairy\PhpBenchmark\PhpVersion\Enum\PhpVersion;
 use Spatie\Async\Pool;
 
 class BenchmarkRunner
 {
     private BenchmarkResultCollection $results;
+    private Configurator $configurator;
 
     public function __construct(
-        private Configurator $configurator,
     ) {
+        $this->configurator = new Configurator([]);
         $this->results = new BenchmarkResultCollection();
     }
 
     public function execute(): void
     {
-        foreach ($this->configurator->getBenchmarks() as $benchmark) {
-            $this->runBenchmark($benchmark);
+        $resultAggregator = new SchellCommandResultAggregator();
+        $commandRunner = $this->getCommandRunner();
+
+        $pool = Pool::create()->concurrency(100);
+
+        for ($i = 0; $i < $this->configurator->getIterations(); ++$i) {
+            $pool->add(function () use ($commandRunner) {
+                return $commandRunner->executeScript();
+            })->then(function (SchellCommandResult $result) use (&$resultAggregator) {
+                $resultAggregator->addResult($result);
+            });
         }
-    }
 
-    public function runBenchmark(Benchmark $benchmark): void
-    {
-        foreach ($this->configurator->getPhpVersion() as $phpVersion) {
-            $resultAggregator = new SchellCommandResultAggregator();
-            $commandRunner = $this->getCommandRunner($benchmark->getMethodBody($phpVersion), $phpVersion);
+        $pool->wait();
 
-            $pool = Pool::create()->concurrency(100);
-
-            for ($i = 0; $i < $this->configurator->getIterations(); ++$i) {
-                $pool->add(function () use ($commandRunner) {
-                    return $commandRunner->executeScript();
-                })->then(function (SchellCommandResult $result) use (&$resultAggregator) {
-                    $resultAggregator->addResult($result);
-                });
-            }
-
-            $pool->wait();
-
-            $this->results->append(
-                new BenchmarkResult(
-                    $resultAggregator->getResult($this->configurator->getIterations()),
-                    $phpVersion,
-                    $benchmark::class,
-                ),
-            );
-        }
+        $this->results->append(
+            new BenchmarkResult(
+                $resultAggregator->getResult($this->configurator->getIterations()),
+                $this->configurator->getPhpVersion(),
+                $this->configurator->getBenchmark()::class,
+            ),
+        );
     }
 
     public function getResults(): BenchmarkResultCollection
@@ -65,8 +55,16 @@ class BenchmarkRunner
         return $this->results;
     }
 
-    private function getCommandRunner(string $methodBody, PhpVersion $phpVersion): ShellCommandRunner
+    public function configure(Configurator $configurator): void
     {
+        $this->configurator = $configurator;
+    }
+
+    private function getCommandRunner(): ShellCommandRunner
+    {
+        $methodBody = $this->configurator->getBenchmarkMethodBody();
+        $phpVersion = $this->configurator->getPhpVersion();
+
         $script = ScriptBuilder::fromMethodBody($methodBody)
             ->build();
 

@@ -20,6 +20,7 @@ final class BenchmarkCommand
 {
     public function __construct(
         private Configurator $configurator,
+        private BenchmarkRunner $benchmarkRunner,
         private SerializerInterface $serializer,
     ) {
     }
@@ -35,7 +36,7 @@ final class BenchmarkCommand
     ): int {
         $this->configure($test, $iterations, $phpVersion);
 
-        if (1 < count($this->configurator->getPhpVersion()) || 1 < count($this->configurator->getBenchmarks())) {
+        if (!$this->configurator->isNotConfiguratedForSingleRun()) {
             $io->title('🚀 PHP Benchmark Runner');
             $this->createAndRunMultipleProcess();
             $io->success('Benchmark finished.');
@@ -51,7 +52,7 @@ final class BenchmarkCommand
     private function configure(?string $test, int $iterations, ?string $phpVersion): void
     {
         if (null !== $test) {
-            $this->configurator->setBenchmarkName($test);
+            $this->configurator->setBenchmark($test);
         }
 
         $this->configurator->setIterations($iterations);
@@ -59,28 +60,17 @@ final class BenchmarkCommand
         if (null !== $phpVersion) {
             $this->configurator->setPhpVersion(PhpVersion::from($phpVersion));
         }
+
+        $this->benchmarkRunner->configure($this->configurator);
     }
 
     private function createAndRunMultipleProcess(): void
     {
-        $processes = [];
         if (file_exists('benchmark.csv')) {
             unlink('benchmark.csv');
         }
-        if (file_exists('debug.log')) {
-            unlink('debug.log');
-        }
 
-        foreach ($this->configurator->getBenchmarks() as $benchmark) {
-            foreach ($this->configurator->getPhpVersion() as $phpVersion) {
-                $benchmarkName = explode('/', $benchmark::class);
-                $process = new Process(['php', 'bin/console', 'benchmark:run', '--test=' . end($benchmarkName), '--php-version=' . $phpVersion->value, '--iterations=' . $this->configurator->getIterations()]);
-                $process->start();
-                $processes[] = $process;
-            }
-        }
-
-        foreach ($processes as $process) {
+        foreach ($this->generateProcesses() as $process) {
             while ($process->isRunning()) {
                 // TODO log
             }
@@ -91,14 +81,29 @@ final class BenchmarkCommand
         }
     }
 
+    /**
+     * @return iterable<Process>
+     */
+    private function generateProcesses(): iterable
+    {
+        foreach ($this->configurator->getAllBenchmarks() as $benchmark) {
+            foreach ($this->configurator->getAllPhpVersions() as $phpVersion) {
+                $benchmarkName = explode('/', $benchmark::class);
+                $process = new Process(['php', 'bin/console', 'benchmark:run', '--test=' . end($benchmarkName), '--php-version=' . $phpVersion->value, '--iterations=' . $this->configurator->getIterations()]);
+                $process->start();
+
+                yield $process;
+            }
+        }
+    }
+
     private function executeBenchmarkRunnerAndAppendToCsv(): void
     {
-        $runner = new BenchmarkRunner($this->configurator);
-        $runner->execute();
+        $this->benchmarkRunner->execute();
 
         file_put_contents(
             'benchmark.csv',
-            $this->serializer->serialize($runner->getResults(), CsvEncoder::FORMAT),
+            $this->serializer->serialize($this->benchmarkRunner->getResults(), CsvEncoder::FORMAT),
             flags: FILE_APPEND,
         );
     }
