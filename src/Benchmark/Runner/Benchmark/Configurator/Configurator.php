@@ -63,9 +63,9 @@ final class Configurator
         return iterator_to_array($this->benchmarks);
     }
 
-    public function setIterations(string $iterations): void
+    public function setIterations(int $iterations): void
     {
-        $this->iterations = (int) $iterations;
+        $this->iterations = $iterations;
     }
 
     public function getIterations(): int
