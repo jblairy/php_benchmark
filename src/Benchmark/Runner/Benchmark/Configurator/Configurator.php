@@ -7,14 +7,16 @@ namespace Jblairy\PhpBenchmark\Benchmark\Runner\Benchmark\Configurator;
 use Jblairy\PhpBenchmark\Benchmark\Benchmark;
 use Jblairy\PhpBenchmark\Benchmark\Exception\BenchmarkNotFound;
 use Jblairy\PhpBenchmark\PhpVersion\Enum\PhpVersion;
+use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final class Configurator
 {
-    public ?PhpVersion $phpVersion = null;
-    private int $iterations = 1;
+    private ?PhpVersion $phpVersion = null;
 
-    private string $benchmarkName = '';
+    private ?Benchmark $benchmark = null;
+
+    private int $iterations = 1;
 
     public function __construct(
         /** @var Benchmark[] */
@@ -31,36 +33,42 @@ final class Configurator
     /**
      * @return PhpVersion[]
      */
-    public function getPhpVersion(): array
+    public function getAllPhpVersions(): array
     {
-        if (null === $this->phpVersion) {
-            return PhpVersion::cases();
-        }
-
-        return [$this->phpVersion];
+        return PhpVersion::cases();
     }
 
-    public function setBenchmarkName(string $benchmarkName): void
+    public function getPhpVersion(): PhpVersion
     {
-        $this->benchmarkName = $benchmarkName;
+        return $this->phpVersion ?? throw new RuntimeException('PHP version is not set');
+    }
+
+    public function setBenchmark(string $benchmarkName): void
+    {
+        if (null === $this->benchmark) {
+            foreach ($this->benchmarks as $benchmark) {
+                if (str_ends_with($benchmark::class, $benchmarkName)) {
+                    $this->benchmark = $benchmark;
+                }
+            }
+        }
+
+        if (null === $this->benchmark) {
+            throw new BenchmarkNotFound($benchmarkName);
+        }
     }
 
     /**
      * @return Benchmark[]
      */
-    public function getBenchmarks(): array
+    public function getAllBenchmarks(): array
     {
-        if ('' !== $this->benchmarkName) {
-            foreach ($this->benchmarks as $benchmark) {
-                if (str_ends_with($benchmark::class, $this->benchmarkName)) {
-                    return [$benchmark];
-                }
-            }
-
-            throw new BenchmarkNotFound($this->benchmarkName);
-        }
-
         return iterator_to_array($this->benchmarks);
+    }
+
+    public function getBenchmark(): Benchmark
+    {
+        return $this->benchmark ?? throw new RuntimeException('Benchmark is not set');
     }
 
     public function setIterations(int $iterations): void
@@ -71,5 +79,15 @@ final class Configurator
     public function getIterations(): int
     {
         return $this->iterations;
+    }
+
+    public function getBenchmarkMethodBody(): string
+    {
+        return $this->getBenchmark()->getMethodBody($this->getPhpVersion());
+    }
+
+    public function isNotConfiguratedForSingleRun(): bool
+    {
+        return null !== $this->phpVersion && null !== $this->benchmark;
     }
 }
