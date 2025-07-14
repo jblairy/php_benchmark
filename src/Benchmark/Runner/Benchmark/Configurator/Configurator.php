@@ -35,6 +35,10 @@ final class Configurator
      */
     public function getAllPhpVersions(): array
     {
+        if (null !== $this->phpVersion) {
+            return [$this->phpVersion];
+        }
+
         return PhpVersion::cases();
     }
 
@@ -63,6 +67,10 @@ final class Configurator
      */
     public function getAllBenchmarks(): array
     {
+        if (null !== $this->benchmark) {
+            return [$this->benchmark];
+        }
+
         return iterator_to_array($this->benchmarks);
     }
 
@@ -86,7 +94,7 @@ final class Configurator
         return $this->getBenchmark()->getMethodBody($this->getPhpVersion());
     }
 
-    public function isNotConfiguratedForSingleRun(): bool
+    public function isConfiguratedForSingleRun(): bool
     {
         return null !== $this->phpVersion && null !== $this->benchmark;
     }

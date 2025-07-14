@@ -36,7 +36,7 @@ final class BenchmarkCommand
     ): int {
         $this->configure($test, $iterations, $phpVersion);
 
-        if (!$this->configurator->isNotConfiguratedForSingleRun()) {
+        if (!$this->configurator->isConfiguratedForSingleRun()) {
             $io->title('🚀 PHP Benchmark Runner');
             $this->createAndRunMultipleProcess();
             $io->success('Benchmark finished.');
