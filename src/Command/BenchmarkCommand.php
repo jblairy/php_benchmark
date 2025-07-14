@@ -12,6 +12,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Process\Process;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -29,8 +30,6 @@ final class BenchmarkCommand extends Command
         InputInterface $input,
         SymfonyStyle $io,
     ): int {
-        $io->title('🚀 PHP Benchmark Runner');
-
         $testName = $input->getOption('test');
         if (is_string($testName) && '' !== $testName) {
             $this->configurator->setBenchmarkName($testName);
@@ -46,15 +45,48 @@ final class BenchmarkCommand extends Command
             $this->configurator->setPhpVersion(PhpVersion::from($phpVersion));
         }
 
+        if (1 !== count($this->configurator->getPhpVersion())) {
+            $io->title('🚀 PHP Benchmark Runner');
+            $processes = [];
+            if (file_exists('benchmark.csv')) {
+                unlink('benchmark.csv');
+            }
+            if (file_exists('debug.log')) {
+                unlink('debug.log');
+            }
+
+            foreach ($this->configurator->getBenchmarks() as $benchmark) {
+                foreach ($this->configurator->getPhpVersion() as $phpVersion) {
+                    $benchmarkName = explode('/', $benchmark::class);
+                    $process = new Process(['php', 'bin/console', 'benchmark:run', '--test=' . end($benchmarkName), '--php-version=' . $phpVersion->value, '--iterations=' . $this->configurator->getIterations()]);
+                    $process->start();
+                    $processes[] = $process;
+                }
+            }
+
+            foreach ($processes as $process) {
+                while ($process->isRunning()) {
+                    // TODO log
+                }
+
+                if (!$process->isSuccessful()) {
+                    echo 'Error : ' . $process->getErrorOutput();
+                }
+            }
+
+            $io->success('Benchmark finished.');
+
+            return Command::SUCCESS;
+        }
+
         $runner = new BenchmarkRunner($this->configurator);
         $runner->execute();
 
         file_put_contents(
             'benchmark.csv',
             $this->serializer->serialize($runner->getResults(), CsvEncoder::FORMAT),
+            flags: FILE_APPEND,
         );
-
-        $io->success('Benchmark finished.');
 
         return Command::SUCCESS;
     }

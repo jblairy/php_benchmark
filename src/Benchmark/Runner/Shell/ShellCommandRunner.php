@@ -35,8 +35,8 @@ final class ShellCommandRunner
         $exitCode = 0;
 
         $tempFile = sprintf(
-            './var/tmp/benchmark_script_%s.php',
-            uniqid(),
+            '/srv/php_benchmark/var/tmp/benchmark_script_%s.php',
+            uniqid('', true),
         );
         file_put_contents($tempFile, '<?php ' . $this->script);
 
@@ -46,7 +46,9 @@ final class ShellCommandRunner
             $tempFile,
         ), $output, $exitCode);
 
-        unlink($tempFile);
+        if (is_file($tempFile)) {
+            unlink($tempFile);
+        }
 
         if (0 !== $exitCode) {
             throw new RuntimeException('Errored while executing script.');

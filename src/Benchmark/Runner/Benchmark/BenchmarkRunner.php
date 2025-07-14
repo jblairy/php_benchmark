@@ -9,9 +9,11 @@ use Jblairy\PhpBenchmark\Benchmark\Runner\Benchmark\Configurator\Configurator;
 use Jblairy\PhpBenchmark\Benchmark\Runner\Benchmark\Result\BenchmarkResult;
 use Jblairy\PhpBenchmark\Benchmark\Runner\Benchmark\Result\BenchmarkResultCollection;
 use Jblairy\PhpBenchmark\Benchmark\Runner\Shell\Result\Aggregator\SchellCommandResultAggregator;
+use Jblairy\PhpBenchmark\Benchmark\Runner\Shell\Result\SchellCommandResult;
 use Jblairy\PhpBenchmark\Benchmark\Runner\Shell\ShellCommandRunner;
 use Jblairy\PhpBenchmark\Benchmark\ScriptBuilder\ScriptBuilder;
 use Jblairy\PhpBenchmark\PhpVersion\Enum\PhpVersion;
+use Spatie\Async\Pool;
 
 class BenchmarkRunner
 {
@@ -36,9 +38,17 @@ class BenchmarkRunner
             $resultAggregator = new SchellCommandResultAggregator();
             $commandRunner = $this->getCommandRunner($benchmark->getMethodBody($phpVersion), $phpVersion);
 
+            $pool = Pool::create()->concurrency(100);
+
             for ($i = 0; $i < $this->configurator->getIterations(); ++$i) {
-                $resultAggregator->addResult($commandRunner->executeScript());
+                $pool->add(function () use ($commandRunner) {
+                    return $commandRunner->executeScript();
+                })->then(function (SchellCommandResult $result) use (&$resultAggregator) {
+                    $resultAggregator->addResult($result);
+                });
             }
+
+            $pool->wait();
 
             $this->results->append(
                 new BenchmarkResult(
