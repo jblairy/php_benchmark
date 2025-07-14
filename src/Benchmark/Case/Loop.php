@@ -10,7 +10,7 @@ use Jblairy\PhpBenchmark\PhpVersion\Attribute\All;
 final class Loop extends AbstractBenchmark
 {
     #[All]
-    public function executeWithPhp56(): void
+    public function execute(): void
     {
         $x = [];
 
