@@ -9,13 +9,33 @@ services:
     working_dir: /srv/php_benchmark
     environment:
       - DOCKER_HOST=unix:///var/run/docker.sock
+      - DATABASE_URL=mysql://root:password@mariadb:3306/php_benchmark
+    depends_on:
+        - mariadb
     command: tail -f /dev/null
+
+  mariadb:
+      image: mariadb:10.11
+      restart: unless-stopped
+      environment:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: php_benchmark
+          MYSQL_USER: php_user
+          MYSQL_PASSWORD: php_password
+      ports:
+          - "3306:3306"
+      volumes:
+          - mariadb_data:/var/lib/mysql
+      command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
 
   php56:
     image: php:5.6-cli
     volumes:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
+    mem_limit: 512m
+    cpus: 1
     command: tail -f /dev/null
 
   php70:
@@ -23,6 +43,8 @@ services:
     volumes:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
+    mem_limit: 512m
+    cpus: 1
     command: tail -f /dev/null
 
   php71:
@@ -30,6 +52,8 @@ services:
     volumes:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
+    mem_limit: 512m
+    cpus: 1
     command: tail -f /dev/null
 
   php72:
@@ -37,6 +61,8 @@ services:
     volumes:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
+    mem_limit: 512m
+    cpus: 1
     command: tail -f /dev/null
 
   php73:
@@ -44,6 +70,8 @@ services:
     volumes:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
+    mem_limit: 512m
+    cpus: 1
     command: tail -f /dev/null
 
   php74:
@@ -51,6 +79,8 @@ services:
     volumes:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
+    mem_limit: 512m
+    cpus: 1
     command: tail -f /dev/null
 
   php80:
@@ -58,6 +88,8 @@ services:
     volumes:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
+    mem_limit: 512m
+    cpus: 1
     command: tail -f /dev/null
 
   php81:
@@ -65,6 +97,8 @@ services:
     volumes:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
+    mem_limit: 512m
+    cpus: 1
     command: tail -f /dev/null
 
   php82:
@@ -72,6 +106,8 @@ services:
     volumes:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
+    mem_limit: 512m
+    cpus: 1
     command: tail -f /dev/null
 
   php83:
@@ -79,6 +115,8 @@ services:
     volumes:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
+    mem_limit: 512m
+    cpus: 1
     command: tail -f /dev/null
 
   php84:
@@ -86,6 +124,8 @@ services:
     volumes:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
+    mem_limit: 512m
+    cpus: 1
     command: tail -f /dev/null
 
   php85:
@@ -95,4 +135,9 @@ services:
       volumes:
           - ./:/srv/php_benchmark
       working_dir: /srv/php_benchmark
+      mem_limit: 512m
+      cpus: 1
       command: tail -f /dev/null
+
+volumes:
+    mariadb_data:

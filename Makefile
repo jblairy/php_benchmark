@@ -1,7 +1,10 @@
-.PHONY: up run phpcsfixer phpcsfixer-fix phpstan quality phpmd
+.PHONY: up start run phpcsfixer phpcsfixer-fix phpstan quality phpmd
 
 up:
 	docker-compose up -d --remove-orphans
+
+start:
+	docker-compose build
 
 #usage make run test=Loop iterations=3
 run:
