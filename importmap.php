@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * Returns the importmap for this application.
  *
@@ -26,5 +24,14 @@ return [
     ],
     '@hotwired/turbo' => [
         'version' => '7.3.0',
+    ],
+    'chart.js' => [
+        'version' => '4.5.0',
+    ],
+    '@symfony/ux-chartjs' => [
+        'version' => '2.30.0',
+    ],
+    '@kurkle/color' => [
+        'version' => '0.3.4',
     ],
 ];

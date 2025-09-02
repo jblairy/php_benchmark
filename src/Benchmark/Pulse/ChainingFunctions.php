@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Jblairy\PhpBenchmark\Benchmark\Case;
+namespace Jblairy\PhpBenchmark\Benchmark\Pulse;
 
 use Jblairy\PhpBenchmark\Benchmark\AbstractBenchmark;
 use Jblairy\PhpBenchmark\PhpVersion\Attribute\Php56;
@@ -18,19 +18,8 @@ use Jblairy\PhpBenchmark\PhpVersion\Attribute\Php83;
 use Jblairy\PhpBenchmark\PhpVersion\Attribute\Php84;
 use Jblairy\PhpBenchmark\PhpVersion\Attribute\Php85;
 
-final class PipeOperator extends AbstractBenchmark
+final class ChainingFunctions extends AbstractBenchmark
 {
-    #[Php85]
-    public function executeWithPhp85(): void
-    {
-        <<<PHP
-            $result = 'Hello World'
-                |> strtoupper(...)
-                |> str_shuffle(...)
-                |> trim(...);
-        PHP;
-    }
-
     #[Php56]
     #[Php70]
     #[Php71]
@@ -42,6 +31,7 @@ final class PipeOperator extends AbstractBenchmark
     #[Php82]
     #[Php83]
     #[Php84]
+    #[Php85]
     public function executeWithPhp8AndOlder(): void
     {
         <<<PHP

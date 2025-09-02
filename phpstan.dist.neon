@@ -13,7 +13,7 @@ parameters:
         - var/
         - vendor/
         - tests/bootstrap.php
-        - src/Benchmark/Case
+        - src/Benchmark/Pulse
 
     checkMissingCallableSignature: true
     checkMissingVarTagTypehint: true

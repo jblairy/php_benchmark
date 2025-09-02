@@ -29,5 +29,3 @@
 ###> phpstan/phpstan ###
 phpstan.neon
 ###< phpstan/phpstan ###
-/benchmark.csv
-/debug.log

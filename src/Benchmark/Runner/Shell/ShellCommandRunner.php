@@ -13,13 +13,13 @@ final class ShellCommandRunner
 {
     private string $script = '';
 
-    private function __construct(private PhpVersion $phpVersion)
-    {
-    }
+    private ?PhpVersion $phpVersion = null;
 
-    public static function fromPhpVersion(PhpVersion $phpVersion): ShellCommandRunner
+    public function withPhpVersion(PhpVersion $phpVersion): ShellCommandRunner
     {
-        return new ShellCommandRunner($phpVersion);
+        $this->phpVersion = $phpVersion;
+
+        return $this;
     }
 
     public function withScript(string $script): ShellCommandRunner

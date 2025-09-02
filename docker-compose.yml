@@ -12,7 +12,9 @@ services:
       - DATABASE_URL=mysql://root:password@mariadb:3306/php_benchmark
     depends_on:
         - mariadb
-    command: tail -f /dev/null
+    command: php -S 0.0.0.0:8000 -t public
+    ports:
+      - "8000:8000"
 
   mariadb:
       image: mariadb:10.11

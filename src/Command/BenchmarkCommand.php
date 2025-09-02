@@ -7,6 +7,7 @@ namespace Jblairy\PhpBenchmark\Command;
 use Jblairy\PhpBenchmark\Benchmark\Runner\Benchmark\BenchmarkRunner;
 use Jblairy\PhpBenchmark\Benchmark\Runner\Benchmark\Configurator\Configurator;
 use Jblairy\PhpBenchmark\PhpVersion\Enum\PhpVersion;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
@@ -21,14 +22,14 @@ final class BenchmarkCommand
     public function __construct(
         private Configurator $configurator,
         private BenchmarkRunner $benchmarkRunner,
-        private SerializerInterface $serializer,
+        private LoggerInterface $logger,
     ) {
     }
 
     public function __invoke(
         SymfonyStyle $io,
         #[Option(description: 'Name of  the test to run', name: 'test')]
-        ?string $test = null,
+        string $test = '',
         #[Option(description: 'Number of iterations to run', name: 'iterations')]
         int $iterations = 1,
         #[Option(description: 'Php version to run', name: 'php-version')]
@@ -44,14 +45,14 @@ final class BenchmarkCommand
             return Command::SUCCESS;
         }
 
-        $this->executeBenchmarkRunnerAndAppendToCsv();
+        $this->benchmarkRunner->execute();
 
         return Command::SUCCESS;
     }
 
-    private function configure(?string $test, int $iterations, ?string $phpVersion): void
+    private function configure(string $test, int $iterations, ?string $phpVersion): void
     {
-        if (null !== $test) {
+        if ('' !== $test) {
             $this->configurator->setBenchmark($test);
         }
 
@@ -66,17 +67,13 @@ final class BenchmarkCommand
 
     private function createAndRunMultipleProcess(): void
     {
-        if (file_exists('benchmark.csv')) {
-            unlink('benchmark.csv');
-        }
-
         foreach ($this->generateProcesses() as $process) {
             while ($process->isRunning()) {
-                // TODO log
+                $this->logger->debug(sprintf('Executing %s', $process->getCommandLine()));
             }
 
             if (!$process->isSuccessful()) {
-                echo 'Error : ' . $process->getErrorOutput();
+                $this->logger->error(sprintf('Error %s', $process->getErrorOutput()));
             }
         }
     }
@@ -95,16 +92,5 @@ final class BenchmarkCommand
                 yield $process;
             }
         }
-    }
-
-    private function executeBenchmarkRunnerAndAppendToCsv(): void
-    {
-        $this->benchmarkRunner->execute();
-
-        file_put_contents(
-            'benchmark.csv',
-            $this->serializer->serialize($this->benchmarkRunner->getResults(), CsvEncoder::FORMAT),
-            flags: FILE_APPEND,
-        );
     }
 }

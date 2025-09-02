@@ -1,0 +1,15 @@
+@import "variables";
+@import "layout";
+@import "components/table";
+@import "components/card";
+@import "components/buttons";
+@import "components/chart";
+
+.empty-message {
+    text-align: center;
+    padding: $spacing-lg;
+    color: $color-text-secondary;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: $shadow-md;
+}

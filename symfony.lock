@@ -294,6 +294,9 @@
             "templates/base.html.twig"
         ]
     },
+    "symfony/ux-chartjs": {
+        "version": "v2.30.0"
+    },
     "symfony/ux-turbo": {
         "version": "2.27",
         "recipe": {
@@ -339,6 +342,9 @@
         "files": [
             "config/packages/messenger.yaml"
         ]
+    },
+    "symfonycasts/sass-bundle": {
+        "version": "v0.8.3"
     },
     "twig/extra-bundle": {
         "version": "v3.21.0"

@@ -1,0 +1,17 @@
+.dashboard {
+    &__container {
+        max-width: $breakpoint-desktop;
+        margin: 0 auto;
+        padding: $spacing-lg;
+    }
+
+    &__title {
+        color: $color-text;
+        margin-bottom: $spacing-lg;
+    }
+
+    &__subtitle {
+        color: $color-text;
+        margin-bottom: $spacing-lg;
+    }
+}

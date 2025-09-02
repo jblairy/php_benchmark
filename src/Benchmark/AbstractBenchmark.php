@@ -21,8 +21,9 @@ abstract class AbstractBenchmark implements Benchmark
         $code = (array) file($fileName);
 
         $lines = array_slice($code, $startLine, $endLine - $startLine);
+        $script = implode('', $lines);
 
-        return implode('', $lines);
+        return str_replace(['<<<PHP', 'PHP;'], '', $script); // TODO just a POC need an improvement or refactor
     }
 
     private function getReflexionMethod(PhpVersion $phpVersion): ReflectionMethod

@@ -2,20 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Jblairy\PhpBenchmark\Benchmark\Case;
+namespace Jblairy\PhpBenchmark\Benchmark\Pulse;
 
 use Jblairy\PhpBenchmark\Benchmark\AbstractBenchmark;
 use Jblairy\PhpBenchmark\PhpVersion\Attribute\All;
 
-final class Loop extends AbstractBenchmark
+final class ArrayFill extends AbstractBenchmark
 {
     #[All]
     public function execute(): void
     {
-        $x = [];
-
-        for ($i = 0; 100000 > $i; ++$i) {
-            $x[] = $i * 2;
-        }
+        $arr = array_fill(0, 100000, 'test');
     }
 }
