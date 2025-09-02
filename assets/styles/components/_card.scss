@@ -1,0 +1,35 @@
+.stats-card {
+    &__container {
+        background-color: $color-background;
+        border-radius: 5px;
+        padding: $spacing-lg;
+        margin-bottom: $spacing-lg;
+        box-shadow: $shadow-md;
+    }
+
+    &__flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: $spacing-md;
+    }
+
+    &__item {
+        padding: $spacing-sm;
+        border-radius: 4px;
+        background-color: white;
+        box-shadow: $shadow-sm;
+    }
+
+    &__label {
+        font-size: 0.9rem;
+        color: $color-text-secondary;
+        margin-bottom: $spacing-xs;
+    }
+
+    &__value {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: $color-text;
+    }
+}

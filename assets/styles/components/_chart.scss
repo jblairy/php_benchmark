@@ -1,0 +1,11 @@
+.chart {
+    &__container {
+        height: 300px;
+        margin-top: $spacing-lg;
+        display: none;
+
+        &--visible {
+            display: block;
+        }
+    }
+}

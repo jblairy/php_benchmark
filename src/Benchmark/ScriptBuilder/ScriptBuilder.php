@@ -6,13 +6,13 @@ namespace Jblairy\PhpBenchmark\Benchmark\ScriptBuilder;
 
 final class ScriptBuilder implements BuilderInterface
 {
-    private function __construct(private string $methodBody)
-    {
-    }
+    private string $methodBody = '';
 
-    public static function fromMethodBody(string $methodBody): BuilderInterface
+    public function withBody(string $methodBody): BuilderInterface
     {
-        return new self($methodBody);
+        $this->methodBody = $methodBody;
+
+        return $this;
     }
 
     public function build(): string

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Jblairy\PhpBenchmark\Benchmark\Case;
+namespace Jblairy\PhpBenchmark\Benchmark\Pulse;
 
 use Jblairy\PhpBenchmark\Benchmark\AbstractBenchmark;
 use Jblairy\PhpBenchmark\PhpVersion\Attribute\Php56;
