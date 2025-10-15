@@ -20,13 +20,15 @@
 
             {% for benchmarkKey, benchmark in stats %}
                 <div class="stats-card__container" id="benchmark-{{ benchmarkKey | replace({'\\': '_'}) }}">
-                    <div data-controller="toggle">
+                    <div data-controller="toggle unit-switch">
                         <div class="stats-card__flex">
                             <h2 class="stats-card__title">{{ benchmark.name }} ({{ benchmark.benchId }})</h2>
                             <div>
-                                <button class="button__toggle"
-                                        data-action="toggle#toggle">
+                                <button class="button__toggle" data-action="toggle#toggle">
                                     Afficher/Masquer le graphique
+                                </button>
+                                <button class="button__toggle" data-action="unit-switch#toggle">
+                                    ms/ns
                                 </button>
                             </div>
                         </div>
@@ -60,7 +62,7 @@
                                 {% endfor %}
                             </tr>
                             <tr class="table__row">
-                                <td class="table__cell table__cell--metric">p50 (ms)</td>
+                                <td class="table__cell table__cell--metric" data-metric="p50">p50 (ms)</td>
                                 {% set best_p50 = 999999 %}
                                 {% for version in allPhpVersions %}
                                     {% if benchmark.phpVersions[version] is defined and benchmark.phpVersions[version].p50 < best_p50 %}
@@ -69,7 +71,9 @@
                                 {% endfor %}
 
                                 {% for version in allPhpVersions %}
-                                    <td class="table__cell {% if benchmark.phpVersions[version] is defined and benchmark.phpVersions[version].p50 == best_p50 %}table__cell--best-value{% endif %}">
+                                    <td class="table__cell {% if benchmark.phpVersions[version] is defined and benchmark.phpVersions[version].p50 == best_p50 %}table__cell--best-value{% endif %}"*
+                                        data-unit-switch-target="cell"
+                                        data-value="{{ benchmark.phpVersions[version].p50|default(0) }}">
                                         {% if benchmark.phpVersions[version] is defined %}
                                             {{ benchmark.phpVersions[version].p50|number_format(5) }}
                                         {% else %}
@@ -79,7 +83,7 @@
                                 {% endfor %}
                             </tr>
                             <tr class="table__row">
-                                <td class="table__cell table__cell--metric">p80 (ms)</td>
+                                <td class="table__cell table__cell--metric" data-metric="p80">p80 (ms)</td>
                                 {% set best_p80 = 999999 %}
                                 {% for version in allPhpVersions %}
                                     {% if benchmark.phpVersions[version] is defined and benchmark.phpVersions[version].p80 < best_p80 %}
@@ -88,7 +92,9 @@
                                 {% endfor %}
 
                                 {% for version in allPhpVersions %}
-                                    <td class="table__cell {% if benchmark.phpVersions[version] is defined and benchmark.phpVersions[version].p80 == best_p80 %}table__cell--best-value{% endif %}">
+                                    <td class="table__cell {% if benchmark.phpVersions[version] is defined and benchmark.phpVersions[version].p80== best_p80 %}table__cell--best-value{% endif %}"*
+                                        data-unit-switch-target="cell"
+                                        data-value="{{ benchmark.phpVersions[version].p80|default(0) }}">
                                         {% if benchmark.phpVersions[version] is defined %}
                                             {{ benchmark.phpVersions[version].p80|number_format(5) }}
                                         {% else %}
@@ -98,7 +104,7 @@
                                 {% endfor %}
                             </tr>
                             <tr class="table__row">
-                                <td class="table__cell table__cell--metric">p90 (ms)</td>
+                                <td class="table__cell table__cell--metric" data-metric="p90">p90 (ms)</td>
                                 {% set best_p90 = 999999 %}
                                 {% for version in allPhpVersions %}
                                     {% if benchmark.phpVersions[version] is defined and benchmark.phpVersions[version].p90 < best_p90 %}
@@ -107,7 +113,9 @@
                                 {% endfor %}
 
                                 {% for version in allPhpVersions %}
-                                    <td class="table__cell {% if benchmark.phpVersions[version] is defined and benchmark.phpVersions[version].p90 == best_p90 %}table__cell--best-value{% endif %}">
+                                    <td class="table__cell {% if benchmark.phpVersions[version] is defined and benchmark.phpVersions[version].p90 == best_p90 %}table__cell--best-value{% endif %}"*
+                                        data-unit-switch-target="cell"
+                                        data-value="{{ benchmark.phpVersions[version].p90|default(0) }}">
                                         {% if benchmark.phpVersions[version] is defined %}
                                             {{ benchmark.phpVersions[version].p90|number_format(5) }}
                                         {% else %}
@@ -117,7 +125,7 @@
                                 {% endfor %}
                             </tr>
                             <tr class="table__row">
-                                <td class="table__cell table__cell--metric">p95 (ms)</td>
+                                <td class="table__cell table__cell--metric" data-metric="p95">p95 (ms)</td>
                                 {% set best_p95 = 999999 %}
                                 {% for version in allPhpVersions %}
                                     {% if benchmark.phpVersions[version] is defined and benchmark.phpVersions[version].p95 < best_p95 %}
@@ -126,7 +134,9 @@
                                 {% endfor %}
 
                                 {% for version in allPhpVersions %}
-                                    <td class="table__cell {% if benchmark.phpVersions[version] is defined and benchmark.phpVersions[version].p95 == best_p95 %}table__cell--best-value{% endif %}">
+                                    <td class="table__cell {% if benchmark.phpVersions[version] is defined and benchmark.phpVersions[version].p95 == best_p95 %}table__cell--best-value{% endif %}"*
+                                        data-unit-switch-target="cell"
+                                        data-value="{{ benchmark.phpVersions[version].p95|default(0) }}">
                                         {% if benchmark.phpVersions[version] is defined %}
                                             {{ benchmark.phpVersions[version].p95|number_format(5) }}
                                         {% else %}
@@ -136,7 +146,7 @@
                                 {% endfor %}
                             </tr>
                             <tr class="table__row">
-                                <td class="table__cell table__cell--metric">p99 (ms)</td>
+                                <td class="table__cell table__cell--metric" data-metric="p99">p99 (ms)</td>
                                 {% set best_p99 = 999999 %}
                                 {% for version in allPhpVersions %}
                                     {% if benchmark.phpVersions[version] is defined and benchmark.phpVersions[version].p99 < best_p99 %}
@@ -145,7 +155,9 @@
                                 {% endfor %}
 
                                 {% for version in allPhpVersions %}
-                                    <td class="table__cell {% if benchmark.phpVersions[version] is defined and benchmark.phpVersions[version].p99 == best_p99 %}table__cell--best-value{% endif %}">
+                                    <td class="table__cell {% if benchmark.phpVersions[version] is defined and benchmark.phpVersions[version].p99 == best_p99 %}table__cell--best-value{% endif %}"*
+                                        data-unit-switch-target="cell"
+                                        data-value="{{ benchmark.phpVersions[version].p99|default(0) }}">
                                         {% if benchmark.phpVersions[version] is defined %}
                                             {{ benchmark.phpVersions[version].p99|number_format(5) }}
                                         {% else %}
@@ -155,7 +167,7 @@
                                 {% endfor %}
                             </tr>
                             <tr class="table__row">
-                                <td class="table__cell table__cell--metric">Moyenne (ms)</td>
+                                <td class="table__cell table__cell--metric" data-metric="avg">Moyenne (ms)</td>
                                 {% set best_avg = 999999 %}
                                 {% for version in allPhpVersions %}
                                     {% if benchmark.phpVersions[version] is defined and benchmark.phpVersions[version].avg < best_avg %}
@@ -164,9 +176,49 @@
                                 {% endfor %}
 
                                 {% for version in allPhpVersions %}
-                                    <td class="table__cell {% if benchmark.phpVersions[version] is defined and benchmark.phpVersions[version].avg == best_avg %}table__cell--best-value{% endif %}">
+                                    <td class="table__cell {% if benchmark.phpVersions[version] is defined and benchmark.phpVersions[version].avg == best_avg %}table__cell--best-value{% endif %}"*
+                                        data-unit-switch-target="cell"
+                                        data-value="{{ benchmark.phpVersions[version].avg|default(0) }}">
                                         {% if benchmark.phpVersions[version] is defined %}
                                             {{ benchmark.phpVersions[version].avg|number_format(5) }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                            <tr class="table__row">
+                                <td class="table__cell table__cell--metric" data-metric="memoryUsed">Mémoire utilisée (Mo)</td>
+                                {% set best_memory = 999999999999 %}
+                                {% for version in allPhpVersions %}
+                                    {% if benchmark.phpVersions[version] is defined and benchmark.phpVersions[version].memoryUsed < best_memory %}
+                                        {% set best_memory = benchmark.phpVersions[version].memoryUsed %}
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% for version in allPhpVersions %}
+                                    <td class="table__cell {% if benchmark.phpVersions[version] is defined and benchmark.phpVersions[version].memoryUsed == best_memory %}table__cell--best-value{% endif %}">
+                                        {% if benchmark.phpVersions[version] is defined %}
+                                            {{ (benchmark.phpVersions[version].memoryUsed / 1024 / 1024)|number_format(2) }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                            <tr class="table__row">
+                                <td class="table__cell table__cell--metric" data-metric="memoryPeak">Pic de mémoire (Mo)</td>
+                                {% set best_memory_peak = 999999999999 %}
+                                {% for version in allPhpVersions %}
+                                    {% if benchmark.phpVersions[version] is defined and benchmark.phpVersions[version].memoryPeak < best_memory_peak %}
+                                        {% set best_memory_peak = benchmark.phpVersions[version].memoryPeak %}
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% for version in allPhpVersions %}
+                                    <td class="table__cell {% if benchmark.phpVersions[version] is defined and benchmark.phpVersions[version].memoryPeak == best_memory_peak %}table__cell--best-value{% endif %}">
+                                        {% if benchmark.phpVersions[version] is defined %}
+                                            {{ (benchmark.phpVersions[version].memoryPeak / 1024 / 1024)|number_format(2) }}
                                         {% else %}
                                             -
                                         {% endif %}

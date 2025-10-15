@@ -33,10 +33,16 @@ class DashboardController extends AbstractController
 
             $phpVersion = $pulse->phpVersion->value;
             if (!isset($benchmarks[$benchmarkKey]['versions'][$phpVersion])) {
-                $benchmarks[$benchmarkKey]['versions'][$phpVersion] = [];
+                $benchmarks[$benchmarkKey]['versions'][$phpVersion] = [
+                    'times' => [],
+                    'memoryUsed' => [],
+                    'memoryPeak' => []
+                ];
             }
 
-            $benchmarks[$benchmarkKey]['versions'][$phpVersion][] = $pulse->executionTimeMs;
+            $benchmarks[$benchmarkKey]['versions'][$phpVersion]['times'][] = $pulse->executionTimeMs;
+            $benchmarks[$benchmarkKey]['versions'][$phpVersion]['memoryUsed'][] = $pulse->memoryUsedBytes;
+            $benchmarks[$benchmarkKey]['versions'][$phpVersion]['memoryPeak'][] = $pulse->memoryPeakByte;
         }
 
         // Calculer les statistiques pour chaque version PHP de chaque benchmark
@@ -48,20 +54,22 @@ class DashboardController extends AbstractController
                 'phpVersions' => []
             ];
 
-            foreach ($benchmark['versions'] as $phpVersion => $times) {
-                sort($times);
-                $count = count($times);
+            foreach ($benchmark['versions'] as $phpVersion => $data) {
+                sort($data['times']);
+                $count = count($data['times']);
 
                 if ($count > 0) {
                     $benchmarkStats[$benchmarkKey]['phpVersions'][$phpVersion] = [
                         'version' => $phpVersion,
                         'count' => $count,
-                        'avg' => array_sum($times) / $count,
-                        'p50' => $this->percentile($times, 50),
-                        'p80' => $this->percentile($times, 80),
-                        'p90' => $this->percentile($times, 90),
-                        'p95' => $this->percentile($times, 95),
-                        'p99' => $this->percentile($times, 99)
+                        'avg' => array_sum($data['times']) / $count,
+                        'p50' => $this->percentile($data['times'], 50),
+                        'p80' => $this->percentile($data['times'], 80),
+                        'p90' => $this->percentile($data['times'], 90),
+                        'p95' => $this->percentile($data['times'], 95),
+                        'p99' => $this->percentile($data['times'], 99),
+                        'memoryUsed' => array_sum($data['memoryUsed']) / $count,
+                        'memoryPeak' => max($data['memoryPeak'])
                     ];
                 }
             }
