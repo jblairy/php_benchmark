@@ -1,4 +1,4 @@
-.PHONY: up start run phpcsfixer phpcsfixer-fix phpstan quality phpmd
+.PHONY: up start run phpcsfixer phpcsfixer-fix phpstan quality phpmd phparkitect
 
 up:
 	docker-compose up -d --remove-orphans
@@ -6,9 +6,21 @@ up:
 start:
 	docker-compose build
 
-#usage make run test=Loop iterations=3
+# New refactored benchmark command
+# Usage examples:
+#   make run test=Loop iterations=3
+#   make run test=HashWithSha256 iterations=50 version=php84
+#   make run iterations=10
 run:
-	docker-compose run --rm main php bin/console benchmark:run --test=$(test) --iterations=$(iterations)
+	@if [ -z "$(version)" ]; then \
+		if [ -z "$(test)" ]; then \
+			docker-compose run --rm main php bin/console benchmark:run --iterations=$(or $(iterations),1); \
+		else \
+			docker-compose run --rm main php bin/console benchmark:run --test=$(test) --iterations=$(or $(iterations),1); \
+		fi \
+	else \
+		docker-compose run --rm main php bin/console benchmark:run --test=$(test) --iterations=$(or $(iterations),1) --php-version=$(version); \
+	fi
 
 phpcsfixer:
 	docker-compose run --rm main vendor/bin/php-cs-fixer fix --dry-run --diff
@@ -22,4 +34,7 @@ phpstan:
 phpmd:
 	docker-compose run --rm main vendor/bin/phpmd ./src ansi rulesets.xml
 
-quality: phpcsfixer-fix phpstan phpmd
+phparkitect:
+	docker-compose run --rm main vendor/bin/phparkitect check
+
+quality: phpcsfixer-fix phpstan phpmd phparkitect
