@@ -85,201 +85,9 @@ docker-compose run --rm main vendor/bin/phpunit
 
 ## Architecture
 
-This project follows **Clean Architecture** with **Domain-Driven Design (DDD)** and **Hexagonal Architecture (Ports & Adapters)** patterns.
+This project follows **Clean Architecture + DDD + Hexagonal Architecture** (Ports & Adapters).
 
-### 🎯 Core Principles
-
-1. **Clean Architecture**: Dependencies point inward (Infrastructure → Application → Domain)
-2. **DDD**: Business logic is in the Domain layer, isolated from technical details
-3. **Hexagonal**: Domain defines Ports (interfaces), Infrastructure provides Adapters (implementations)
-
-### 📁 Project Structure (Clean Architecture Layers)
-
-```
-src/
-├── Application/              # Use Cases (orchestration)
-│   ├── Service/
-│   │   └── ChartBuilder.php
-│   └── UseCase/
-│       ├── AsyncBenchmarkRunner.php
-│       └── BenchmarkOrchestrator.php
-│
-├── Domain/                   # Business Logic (core)
-│   ├── Benchmark/
-│   │   ├── Contract/         # Abstractions
-│   │   │   ├── AbstractBenchmark.php
-│   │   │   └── Benchmark.php (interface)
-│   │   ├── Exception/        # Domain exceptions
-│   │   ├── Model/            # Value Objects & Domain Models
-│   │   │   ├── BenchmarkConfiguration.php
-│   │   │   ├── BenchmarkResult.php
-│   │   │   └── ExecutionContext.php
-│   │   ├── Port/             # Interfaces (Hexagonal Ports)
-│   │   │   ├── BenchmarkExecutorPort.php
-│   │   │   ├── BenchmarkRepositoryPort.php
-│   │   │   ├── CodeExtractorPort.php
-│   │   │   ├── ResultPersisterPort.php
-│   │   │   └── ScriptExecutorPort.php
-│   │   ├── Service/          # Domain Services
-│   │   │   └── SingleBenchmarkExecutor.php
-│   │   └── Test/             # Benchmark implementations
-│   │       ├── Loop.php
-│   │       ├── ArrayMap/
-│   │       ├── StringConcatenation/
-│   │       └── ... (40+ benchmarks)
-│   └── PhpVersion/
-│       ├── Attribute/        # PHP version targeting (#[Php84], #[All])
-│       └── Enum/
-│           └── PhpVersion.php
-│
-└── Infrastructure/           # Technical implementations (adapters)
-    ├── Cli/
-    │   └── BenchmarkCommand.php
-    ├── Execution/
-    │   ├── CodeExtraction/
-    │   │   └── ReflectionCodeExtractor.php
-    │   ├── Docker/
-    │   │   └── DockerScriptExecutor.php
-    │   └── ScriptBuilding/
-    │       └── InstrumentedScriptBuilder.php
-    ├── Persistence/
-    │   ├── Doctrine/
-    │   │   ├── Entity/       # Doctrine entities
-    │   │   │   └── Pulse.php
-    │   │   ├── Repository/   # Doctrine repositories
-    │   │   │   └── PulseRepository.php
-    │   │   └── DoctrinePulseResultPersister.php
-    │   └── InMemory/
-    │       └── InMemoryBenchmarkRepository.php
-    └── Web/
-        └── Controller/
-            └── DashboardController.php
-```
-
-### 🔄 Dependency Flow (Hexagonal Architecture)
-
-**Port (Domain) → Adapter (Infrastructure)**
-
-| Port (Interface in Domain) | Adapter (Implementation in Infrastructure) |
-|----------------------------|---------------------------------------------|
-| `CodeExtractorPort` | `ReflectionCodeExtractor` |
-| `BenchmarkRepositoryPort` | `InMemoryBenchmarkRepository` |
-| `ScriptExecutorPort` | `DockerScriptExecutor` |
-| `ResultPersisterPort` | `DoctrinePulseResultPersister` |
-| `BenchmarkExecutorPort` | `SingleBenchmarkExecutor` (Domain Service) |
-
-**Configuration in `config/services.yaml`:**
-```yaml
-Jblairy\PhpBenchmark\Domain\Benchmark\Port\CodeExtractorPort:
-    class: Jblairy\PhpBenchmark\Infrastructure\Execution\CodeExtraction\ReflectionCodeExtractor
-```
-
-### 🚀 Execution Flow
-
-```
-1. CLI Command (Infrastructure/Cli/BenchmarkCommand)
-   ↓ Receives: php bin/console benchmark:run --test=Loop
-   ↓ Parses options and calls Application layer
-
-2. Use Case (Application/UseCase/BenchmarkOrchestrator)
-   ↓ Orchestrates execution
-   ↓ Creates BenchmarkConfiguration (Domain Model)
-   ↓ Delegates to AsyncBenchmarkRunner
-
-3. AsyncBenchmarkRunner (Application/UseCase)
-   ↓ Uses BenchmarkExecutorPort (Domain Port)
-   ↓ Runs benchmarks in parallel (Spatie\Async\Pool)
-
-4. SingleBenchmarkExecutor (Domain/Benchmark/Service)
-   ↓ Implements BenchmarkExecutorPort
-   ↓ Uses CodeExtractorPort to extract code
-   ↓ Uses ScriptExecutorPort to execute
-   ↓ Returns BenchmarkResult (Value Object)
-
-5. DockerScriptExecutor (Infrastructure/Execution/Docker)
-   ↓ Implements ScriptExecutorPort
-   ↓ Executes in Docker container via docker-compose exec
-   ↓ Returns execution metrics
-
-6. DoctrinePulseResultPersister (Infrastructure/Persistence/Doctrine)
-   ↓ Implements ResultPersisterPort
-   ↓ Converts BenchmarkResult (Domain) → Pulse (Doctrine Entity)
-   ↓ Persists to MariaDB via Doctrine ORM
-```
-
-### 🏗️ Domain-Driven Design (DDD) Concepts
-
-**Value Objects (Domain/Benchmark/Model/):**
-- `BenchmarkConfiguration`: Immutable configuration (benchmark + PHP version + iterations)
-- `BenchmarkResult`: Immutable result (execution time + memory usage)
-- `ExecutionContext`: Immutable execution context
-
-**Entities (Infrastructure/Persistence/Doctrine/Entity/):**
-- `Pulse`: Doctrine entity with ID, persisted to database
-
-**Domain Services (Domain/Benchmark/Service/):**
-- `SingleBenchmarkExecutor`: Coordinates benchmark execution
-
-**Ports (Domain/Benchmark/Port/):**
-- Interfaces that define contracts for Infrastructure
-
-**Adapters (Infrastructure/):**
-- Concrete implementations of Ports
-
-### 📝 Creating Benchmarks
-
-Benchmarks live in `src/Domain/Benchmark/Test/` and must:
-
-1. **Extend `AbstractBenchmark`** (implements `Benchmark` interface)
-2. **Use PHP version attributes** to specify compatibility:
-   - `#[All]` - Run on all PHP versions
-   - `#[Php73]`, `#[Php74]`, `#[Php84]`, etc. - Run on specific versions
-   - Multiple attributes can be used on different methods
-
-**Example:**
-```php
-namespace Jblairy\PhpBenchmark\Domain\Benchmark\Test;
-
-use Jblairy\PhpBenchmark\Domain\Benchmark\Contract\AbstractBenchmark;
-use Jblairy\PhpBenchmark\Domain\PhpVersion\Attribute\All;
-
-final class Loop extends AbstractBenchmark
-{
-    #[All]
-    public function execute(): void
-    {
-        $x = [];
-        for ($i = 0; 100000 > $i; ++$i) {
-            $x[] = $i * 2;
-        }
-    }
-}
-```
-
-### 🐳 PHP Version System
-
-- **PhpVersion Enum** (`src/Domain/PhpVersion/Enum/PhpVersion.php`) - Defines available PHP versions
-- **Version Attributes** (`src/Domain/PhpVersion/Attribute/`) - PHP 5.6 through 8.5, plus `All.php`
-- **Docker Services** (`docker-compose.yml`) - Each PHP version runs as isolated container:
-  - Shared volume mount at `/srv/php_benchmark`
-  - 512MB memory limit
-  - 1 CPU limit
-  - `tail -f /dev/null` to keep running
-
-### 📊 Data Layer
-
-**Domain Models (Value Objects):**
-- `BenchmarkResult` - Immutable result object
-
-**Infrastructure Entities:**
-- `Pulse` (src/Infrastructure/Persistence/Doctrine/Entity/Pulse.php) - Doctrine entity for database
-  - Fields: `id`, `benchId`, `name`, `phpVersion`, `executionTimeMs`, `memoryUsedBytes`, `memoryPeakByte`
-
-**Dashboard:**
-- `DashboardController` (src/Infrastructure/Web/Controller/DashboardController.php) - Web UI at `/dashboard`
-  - Aggregates benchmark results by test and PHP version
-  - Calculates percentiles (P50, P80, P90, P95, P99) and averages
-  - Generates charts via `ChartBuilder`
+📖 **Full documentation**: [docs/architecture/01-overview.md](docs/architecture/01-overview.md)
 
 ## Database
 
@@ -300,6 +108,107 @@ The project uses MariaDB 10.11 via Docker. Doctrine ORM is configured for entity
 - **Symfony 7.3** framework
 - **Docker** for PHP version isolation
 - **MariaDB 10.11** database
+
+### Code Comments and Documentation
+
+**Principle: Self-documenting code over comments**
+
+#### ✅ DO: Write expressive, well-named code
+
+```php
+// ✅ GOOD - Self-explanatory
+final readonly class StatisticsCalculator
+{
+    public function calculatePercentile(array $sortedValues, int $percentile): float
+    {
+        $index = (int) ceil(($percentile / 100) * count($sortedValues)) - 1;
+        return $sortedValues[max(0, $index)];
+    }
+}
+```
+
+#### ❌ DON'T: Use comments to explain what code does
+
+```php
+// ❌ BAD - Comment explains poor naming
+// Calculate the p value from the arr
+public function calc(array $arr, int $p): float
+{
+    // Get the index
+    $i = (int) ceil(($p / 100) * count($arr)) - 1;
+    // Return the value
+    return $arr[max(0, $i)];
+}
+```
+
+#### ✅ WHEN to use comments
+
+Comments are **acceptable and encouraged** for:
+
+1. **"Why" not "What"** - Explain business decisions or complex algorithms
+   ```php
+   // Using P90 instead of average to avoid outliers skewing benchmark results
+   $p90 = $this->calculatePercentile($times, 90);
+   ```
+
+2. **API documentation** - Public interfaces and contracts (PHPDoc)
+   ```php
+   /**
+    * Port for accessing dashboard data
+    */
+   interface DashboardRepositoryPort
+   {
+       /**
+        * @return BenchmarkMetrics[] Grouped by benchmark ID and PHP version
+        */
+       public function getAllBenchmarkMetrics(): array;
+   }
+   ```
+
+3. **Class-level documentation** - Purpose and responsibility
+   ```php
+   /**
+    * Doctrine adapter implementing DashboardRepositoryPort
+    *
+    * Follows Dependency Inversion Principle: implements interface from Domain
+    */
+   final readonly class DoctrineDashboardRepository implements DashboardRepositoryPort
+   ```
+
+4. **Non-obvious workarounds** - Technical constraints or edge cases
+   ```php
+   // PHP 5.6 doesn't support ** operator, must use pow()
+   if ($phpVersion === 'php56') {
+       return pow($base, $exponent);
+   }
+   ```
+
+#### ❌ AVOID these comments
+
+- **Obvious comments**: `// Set the name` above `$this->name = $name;`
+- **Commented-out code**: Delete it (use git history if needed)
+- **Redundant documentation**: Repeating method signature in PHPDoc
+  ```php
+  // ❌ BAD
+  /**
+   * Get dashboard data
+   * @return DashboardData The dashboard data
+   */
+  public function getDashboardData(): DashboardData
+  ```
+
+- **TODO/FIXME without context**: Always add reason and date
+  ```php
+  // ❌ BAD: TODO fix this
+  // ✅ GOOD: TODO (2024-10-15): Refactor to use async for performance
+  ```
+
+#### Best Practices
+
+1. **Prefer refactoring over commenting** - If code needs a comment to be understood, consider refactoring
+2. **Use meaningful names** - `calculatePercentile()` > `calc()` + comment
+3. **Extract complex logic** - Into well-named private methods or Value Objects
+4. **Keep comments up-to-date** - Outdated comments are worse than no comments
 
 ### Quality Commands
 
