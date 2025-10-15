@@ -1,5 +1,5 @@
 controllers:
     resource:
-        path: ../src/Controller/
-        namespace: Jblairy\PhpBenchmark\Controller
+        path: ../src/Infrastructure/Web/Controller/
+        namespace: Jblairy\PhpBenchmark\Infrastructure\Web\Controller
     type: attribute

@@ -5,18 +5,52 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     container.dumper.inline_class_loader: false
+
 services:
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
+    # Auto-tag all Benchmark implementations for autowiring
+    _instanceof:
+        Jblairy\PhpBenchmark\Domain\Benchmark\Contract\Benchmark:
+            tags: ['Jblairy\PhpBenchmark\Domain\Benchmark\Contract\Benchmark']
+
     # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
     Jblairy\PhpBenchmark\:
         resource: '../src/'
         exclude:
             - '../src/Builder/'
+            - '../src/Domain/'
+            - '../src/Kernel.php'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    Jblairy\PhpBenchmark\Domain\Benchmark\Test\:
+        resource: '../src/Domain/Benchmark/Test/'
+
+    # Clean Architecture - Port implementations
+
+    # Code Extraction (Port -> Adapter)
+    Jblairy\PhpBenchmark\Domain\Benchmark\Port\CodeExtractorPort:
+        class: Jblairy\PhpBenchmark\Infrastructure\Execution\CodeExtraction\ReflectionCodeExtractor
+
+    # Benchmark Repository (Port -> Adapter)
+    Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkRepositoryPort:
+        class: Jblairy\PhpBenchmark\Infrastructure\Persistence\InMemory\InMemoryBenchmarkRepository
+
+    # Script Execution (Port -> Adapter)
+    Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptExecutorPort:
+        class: Jblairy\PhpBenchmark\Infrastructure\Execution\Docker\DockerScriptExecutor
+
+    # Result Persistence (Port -> Adapter)
+    Jblairy\PhpBenchmark\Domain\Benchmark\Port\ResultPersisterPort:
+        class: Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\DoctrinePulseResultPersister
+
+    # Benchmark Execution (Port -> Adapter)
+    Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkExecutorPort:
+        class: Jblairy\PhpBenchmark\Domain\Benchmark\Service\SingleBenchmarkExecutor
+
+    # Application Use Cases with dependencies
+    Jblairy\PhpBenchmark\Application\UseCase\AsyncBenchmarkRunner:
+        arguments:
+            $concurrency: 100
