@@ -21,8 +21,8 @@ doctrine:
             App:
                 type: attribute
                 is_bundle: false
-                dir: '%kernel.project_dir%/src/Entity'
-                prefix: 'Jblairy\PhpBenchmark\Entity'
+                dir: '%kernel.project_dir%/src/Infrastructure/Persistence/Doctrine/Entity'
+                prefix: 'Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Entity'
                 alias: App
         controller_resolver:
             auto_mapping: false
