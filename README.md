@@ -49,31 +49,21 @@ Open your browser at `http://localhost/dashboard` to see charts and statistics.
 
 ## Architecture
 
-This project implements **Clean Architecture + DDD + Hexagonal Architecture**.
+**Clean Architecture + DDD + Hexagonal** (Ports & Adapters).
 
 ```
 src/
-├── Application/        # Use Cases (orchestration)
-├── Domain/            # Business Logic (pure PHP, no framework)
-│   └── Benchmark/
-│       ├── Model/      # Value Objects (immutable)
-│       ├── Port/       # Interfaces (Hexagonal Ports)
-│       ├── Service/    # Domain Services
-│       └── Test/       # 40+ benchmark implementations
-└── Infrastructure/    # Technical implementations (adapters)
-    ├── Cli/           # Symfony Console commands
-    ├── Execution/     # Docker, code extraction
-    ├── Persistence/   # Doctrine ORM, repositories
-    └── Web/          # Dashboard controllers
+├── Domain/            # Business logic (pure PHP, no framework)
+├── Application/       # Use cases (orchestration)
+└── Infrastructure/    # Technical details (Symfony, Doctrine, Docker)
 ```
 
-**Key Principle:** Dependencies point inward → Infrastructure → Application → Domain
+**Dependencies flow inward**: Infrastructure → Application → Domain
 
-### Documentation
-
-- **[docs/README.md](docs/README.md)** - Complete documentation index
-- **[docs/architecture/01-overview.md](docs/architecture/01-overview.md)** - Architecture deep dive
-- **[CLAUDE.md](CLAUDE.md)** - Developer reference guide
+📖 **Full documentation**:
+- [docs/architecture/01-overview.md](docs/architecture/01-overview.md) - Architecture deep dive
+- [CLAUDE.md](CLAUDE.md) - Developer reference guide
+- [docs/README.md](docs/README.md) - Complete documentation index
 
 ## Contributing
 
@@ -91,48 +81,27 @@ See **[CLAUDE.md](CLAUDE.md)** for detailed developer guidelines.
 
 ### Creating Custom Benchmarks
 
-1. **Create a class in `src/Domain/Benchmark/Test/`**
-2. **Extend `AbstractBenchmark`**
-3. **Add PHP version attributes**
-4. **Implement your test method**
-
-**Example:**
+Quick example:
 
 ```php
-<?php
-
-namespace Jblairy\PhpBenchmark\Domain\Benchmark\Test;
-
 use Jblairy\PhpBenchmark\Domain\Benchmark\Contract\AbstractBenchmark;
 use Jblairy\PhpBenchmark\Domain\PhpVersion\Attribute\All;
-use Jblairy\PhpBenchmark\Domain\PhpVersion\Attribute\Php80; // PHP 8.0+
 
-final class MyCustomBenchmark extends AbstractBenchmark
+final class MyBenchmark extends AbstractBenchmark
 {
     #[All]
-    public function withForLoop(): void
+    public function execute(): void
     {
+        // Your benchmark code here
         $result = [];
         for ($i = 0; $i < 10000; $i++) {
             $result[] = $i * 2;
         }
     }
-
-    #[Php80] // Only on PHP 8.0+
-    public function withMatchExpression(): void
-    {
-        $result = match (true) {
-            true => 'success',
-            false => 'failure',
-        };
-    }
 }
 ```
 
-**Available Attributes:**
-- `#[All]` - Run on all PHP versions
-- `#[Php56]`, `#[Php70]`, `#[Php71]`, `#[Php72]`, `#[Php73]`, `#[Php74]` - Legacy versions
-- `#[Php80]`, `#[Php81]`, `#[Php82]`, `#[Php83]`, `#[Php84]`, `#[Php85]` - Modern versions
+📖 **Full guide**: [docs/guides/creating-benchmarks.md](docs/guides/creating-benchmarks.md)
 
 ### Code Quality Tools
 

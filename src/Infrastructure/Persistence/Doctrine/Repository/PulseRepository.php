@@ -19,8 +19,6 @@ class PulseRepository extends ServiceEntityRepository
     }
 
     /**
-     * Trouve tous les benchmarks uniques (combinaisons de benchId et name)
-     *
      * @return array<int, array{benchId: string, name: string}>
      */
     public function findUniqueBenchmarks(): array
@@ -32,10 +30,6 @@ class PulseRepository extends ServiceEntityRepository
     }
 
     /**
-     * Calcule les statistiques pour un benchmark spécifique
-     *
-     * @param string $benchId
-     * @param string $name
      * @return array<string, mixed>
      */
     public function getStatisticsForBenchmark(string $benchId, string $name): array
@@ -63,9 +57,6 @@ class PulseRepository extends ServiceEntityRepository
         ];
     }
 
-    /**
-     * Calcule une valeur de percentile pour un ensemble de données
-     */
     private function percentile(array $data, int $percentile): float
     {
         if (empty($data)) {
