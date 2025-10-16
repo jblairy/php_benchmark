@@ -8,7 +8,7 @@ use Jblairy\PhpBenchmark\Domain\Benchmark\Contract\Benchmark;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkRepositoryPort;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-final class InMemoryBenchmarkRepository implements BenchmarkRepositoryPort
+final readonly class InMemoryBenchmarkRepository implements BenchmarkRepositoryPort
 {
     private array $benchmarks;
 
@@ -37,7 +37,7 @@ final class InMemoryBenchmarkRepository implements BenchmarkRepositoryPort
 
     public function hasBenchmark(string $name): bool
     {
-        return $this->findBenchmarkByName($name) !== null;
+        return $this->findBenchmarkByName($name) instanceof Benchmark;
     }
 
     private function matchesBenchmarkName(Benchmark $benchmark, string $searchName): bool

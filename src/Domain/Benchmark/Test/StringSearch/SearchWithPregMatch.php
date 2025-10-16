@@ -13,8 +13,8 @@ final class SearchWithPregMatch extends AbstractBenchmark
     public function execute(): void
     {
         $haystack = 'The quick brown fox jumps over the lazy dog';
-        for ($i = 0; $i < 100000; ++$i) {
-            $result = preg_match('/fox/', $haystack) === 1;
+        for ($i = 0; 100000 > $i; ++$i) {
+            $result = 1 === preg_match('/fox/', $haystack);
         }
     }
 }

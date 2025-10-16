@@ -2,51 +2,54 @@
 
 declare(strict_types=1);
 
-namespace Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Repository;
+namespace Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\BenchmarkMetrics;
-use Jblairy\PhpBenchmark\Domain\Dashboard\Port\DashboardRepositoryPort;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Port\DashboardDataProviderPort;
 use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Entity\Pulse;
 
 /**
- * Doctrine adapter implementing DashboardRepositoryPort
+ * Doctrine adapter implementing DashboardDataProviderPort.
  *
  * Follows Dependency Inversion Principle: implements interface from Domain
  */
-final readonly class DoctrineDashboardRepository implements DashboardRepositoryPort
+final readonly class DoctrineDashboardDataProvider implements DashboardDataProviderPort
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-    ) {}
+    ) {
+    }
 
     public function getAllBenchmarkMetrics(): array
     {
-        $repository = $this->entityManager->getRepository(Pulse::class);
-        $pulses = $repository->findAll();
+        $entityRepository = $this->entityManager->getRepository(Pulse::class);
+        $pulses = $entityRepository->findAll();
 
         return $this->groupPulsesIntoMetrics($pulses);
     }
 
     public function getAllPhpVersions(): array
     {
-        $qb = $this->entityManager->createQueryBuilder();
-        $qb->select('DISTINCT p.phpVersion')
+        $queryBuilder = $this->entityManager->createQueryBuilder();
+        $queryBuilder->select('DISTINCT p.phpVersion')
             ->from(Pulse::class, 'p')
             ->orderBy('p.phpVersion', 'ASC');
 
-        $results = $qb->getQuery()->getResult();
+        /** @var array<int, array{phpVersion: \Jblairy\PhpBenchmark\Domain\PhpVersion\Enum\PhpVersion}> $results */
+        $results = $queryBuilder->getQuery()->getResult();
 
         return array_map(
-            fn(array $row) => $row['phpVersion']->value,
-            $results
+            fn (array $row): string => $row['phpVersion']->value,
+            $results,
         );
     }
 
     /**
-     * Group Pulse entities into BenchmarkMetrics
+     * Group Pulse entities into BenchmarkMetrics.
      *
      * @param Pulse[] $pulses
+     *
      * @return BenchmarkMetrics[]
      */
     private function groupPulsesIntoMetrics(array $pulses): array
@@ -58,7 +61,7 @@ final readonly class DoctrineDashboardRepository implements DashboardRepositoryP
                 '%s_%s_%s',
                 $pulse->benchId,
                 $pulse->name,
-                $pulse->phpVersion->value
+                $pulse->phpVersion->value,
             );
 
             if (!isset($grouped[$key])) {
@@ -78,7 +81,7 @@ final readonly class DoctrineDashboardRepository implements DashboardRepositoryP
         }
 
         return array_map(
-            fn(array $data) => new BenchmarkMetrics(
+            fn (array $data): BenchmarkMetrics => new BenchmarkMetrics(
                 benchmarkId: $data['benchmarkId'],
                 benchmarkName: $data['benchmarkName'],
                 phpVersion: $data['phpVersion'],
@@ -86,7 +89,7 @@ final readonly class DoctrineDashboardRepository implements DashboardRepositoryP
                 memoryUsages: $data['memoryUsages'],
                 memoryPeaks: $data['memoryPeaks'],
             ),
-            $grouped
+            $grouped,
         );
     }
 }

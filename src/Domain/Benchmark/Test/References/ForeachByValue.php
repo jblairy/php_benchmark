@@ -15,7 +15,7 @@ final class ForeachByValue extends AbstractBenchmark
         $data = range(1, 10000);
 
         foreach ($data as $value) {
-            $value = $value * 2;
+            $value *= 2;
         }
     }
 }

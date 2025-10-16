@@ -13,8 +13,8 @@ final class SearchWithStrpos extends AbstractBenchmark
     public function execute(): void
     {
         $haystack = 'The quick brown fox jumps over the lazy dog';
-        for ($i = 0; $i < 100000; ++$i) {
-            $result = strpos($haystack, 'fox') !== false;
+        for ($i = 0; 100000 > $i; ++$i) {
+            $result = false !== mb_strpos($haystack, 'fox');
         }
     }
 }

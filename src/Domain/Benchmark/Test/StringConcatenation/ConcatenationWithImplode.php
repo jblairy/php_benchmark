@@ -13,7 +13,7 @@ final class ConcatenationWithImplode extends AbstractBenchmark
     public function execute(): void
     {
         $result = '';
-        for ($i = 0; $i < 10000; ++$i) {
+        for ($i = 0; 10000 > $i; ++$i) {
             $result = implode(' ', ['Hello', 'World', $i, 'test', 'benchmark']);
         }
     }

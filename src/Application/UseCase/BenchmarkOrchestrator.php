@@ -5,23 +5,23 @@ declare(strict_types=1);
 namespace Jblairy\PhpBenchmark\Application\UseCase;
 
 use Jblairy\PhpBenchmark\Domain\Benchmark\Contract\Benchmark;
+use Jblairy\PhpBenchmark\Domain\Benchmark\Exception\ReflexionMethodNotFound;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkConfiguration;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkRepositoryPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\CodeExtractorPort;
-use Jblairy\PhpBenchmark\Domain\Benchmark\Exception\ReflexionMethodNotFound;
 use Jblairy\PhpBenchmark\Domain\PhpVersion\Enum\PhpVersion;
 
-final class BenchmarkOrchestrator
+final readonly class BenchmarkOrchestrator
 {
     public function __construct(
-        private readonly AsyncBenchmarkRunner $runner,
-        private readonly CodeExtractorPort $codeExtractor,
+        private AsyncBenchmarkRunner $asyncBenchmarkRunner,
+        private CodeExtractorPort $codeExtractorPort,
     ) {
     }
 
-    public function executeSingle(BenchmarkConfiguration $configuration): void
+    public function executeSingle(BenchmarkConfiguration $benchmarkConfiguration): void
     {
-        $this->runner->run($configuration);
+        $this->asyncBenchmarkRunner->run($benchmarkConfiguration);
     }
 
     public function executeMultiple(array $benchmarks, array $phpVersions, int $iterations): void
@@ -38,27 +38,28 @@ final class BenchmarkOrchestrator
                     iterations: $iterations,
                 );
 
-                $this->runner->run($configuration);
+                $this->asyncBenchmarkRunner->run($configuration);
             }
         }
+    }
+
+    public function executeAll(BenchmarkRepositoryPort $benchmarkRepositoryPort, int $iterations): void
+    {
+        $this->executeMultiple(
+            benchmarks: $benchmarkRepositoryPort->getAllBenchmarks(),
+            phpVersions: PhpVersion::cases(),
+            iterations: $iterations,
+        );
     }
 
     private function benchmarkSupportsVersion(Benchmark $benchmark, PhpVersion $phpVersion): bool
     {
         try {
-            $this->codeExtractor->extractCode($benchmark, $phpVersion);
+            $this->codeExtractorPort->extractCode($benchmark, $phpVersion);
+
             return true;
         } catch (ReflexionMethodNotFound) {
             return false;
         }
-    }
-
-    public function executeAll(BenchmarkRepositoryPort $registry, int $iterations): void
-    {
-        $this->executeMultiple(
-            benchmarks: $registry->getAllBenchmarks(),
-            phpVersions: PhpVersion::cases(),
-            iterations: $iterations
-        );
     }
 }

@@ -24,7 +24,7 @@ final class AssignmentWithNullCoalescing extends AbstractBenchmark
     #[Php85]
     public function execute(): void
     {
-        for ($i = 0; $i < 100000; ++$i) {
+        for ($i = 0; 100000 > $i; ++$i) {
             $result = null;
             $result ??= 'default';
         }

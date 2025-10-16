@@ -7,22 +7,24 @@ namespace Jblairy\PhpBenchmark\Infrastructure\Execution\Docker;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkResult;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\ExecutionContext;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptExecutorPort;
+use RuntimeException;
 
 final class DockerScriptExecutor implements ScriptExecutorPort
 {
-    private const TEMP_DIR = '/srv/php_benchmark/var/tmp';
+    private const string TEMP_DIR = '/srv/php_benchmark/var/tmp';
 
-    public function executeScript(ExecutionContext $context): BenchmarkResult
+    public function executeScript(ExecutionContext $executionContext): BenchmarkResult
     {
-        $tempFile = $this->createTempScriptFile($context->scriptContent);
+        $tempFile = $this->createTempScriptFile($executionContext->scriptContent);
 
         try {
-            $output = $this->executeInDocker($context->phpVersion->value, $tempFile);
+            $output = $this->executeInDocker($executionContext->phpVersion->value, $tempFile);
             $result = $this->parseOutput($output);
             $this->cleanupTempFile($tempFile);
+
             return $result;
-        } catch (\RuntimeException $e) {
-            throw $this->enrichExceptionWithContext($e, $context, $tempFile);
+        } catch (RuntimeException $runtimeException) {
+            throw $this->enrichExceptionWithContext($runtimeException, $executionContext, $tempFile);
         }
     }
 
@@ -31,13 +33,13 @@ final class DockerScriptExecutor implements ScriptExecutorPort
         $tempFile = sprintf(
             '%s/benchmark_script_%s.php',
             self::TEMP_DIR,
-            uniqid('', true)
+            uniqid('', true),
         );
 
         $fullScript = "<?php\n\n" . $scriptContent;
 
-        if (file_put_contents($tempFile, $fullScript) === false) {
-            throw new \RuntimeException("Failed to create temp file: {$tempFile}");
+        if (false === file_put_contents($tempFile, $fullScript)) {
+            throw new RuntimeException('Failed to create temp file: ' . $tempFile);
         }
 
         return $tempFile;
@@ -48,7 +50,7 @@ final class DockerScriptExecutor implements ScriptExecutorPort
         $command = sprintf(
             'docker-compose exec -T %s php %s 2>&1',
             escapeshellarg($phpVersion),
-            escapeshellarg($scriptPath)
+            escapeshellarg($scriptPath),
         );
 
         $output = [];
@@ -56,10 +58,8 @@ final class DockerScriptExecutor implements ScriptExecutorPort
 
         exec($command, $output, $exitCode);
 
-        if ($exitCode !== 0) {
-            throw new \RuntimeException(
-                sprintf('Script execution failed with code %d: %s', $exitCode, implode("\n", $output))
-            );
+        if (0 !== $exitCode) {
+            throw new RuntimeException(sprintf('Script execution failed with code %d: %s', $exitCode, implode("\n", $output)));
         }
 
         return implode('', $output);
@@ -69,14 +69,12 @@ final class DockerScriptExecutor implements ScriptExecutorPort
     {
         $data = json_decode($output, true);
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \RuntimeException(
-                sprintf('Invalid JSON output: %s. Output was: %s', json_last_error_msg(), $output)
-            );
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new RuntimeException(sprintf('Invalid JSON output: %s. Output was: %s', json_last_error_msg(), $output));
         }
 
         if (!is_array($data)) {
-            throw new \RuntimeException('Expected array from JSON decode');
+            throw new RuntimeException('Expected array from JSON decode');
         }
 
         return BenchmarkResult::fromArray($data);
@@ -90,14 +88,14 @@ final class DockerScriptExecutor implements ScriptExecutorPort
     }
 
     private function enrichExceptionWithContext(
-        \RuntimeException $exception,
-        ExecutionContext $context,
-        string $tempFile
-    ): \RuntimeException {
-        return new \RuntimeException(
-            $exception->getMessage() . sprintf(' [Benchmark: %s, File: %s]', $context->benchmarkClassName, $tempFile),
-            $exception->getCode(),
-            $exception
+        RuntimeException $runtimeException,
+        ExecutionContext $executionContext,
+        string $tempFile,
+    ): RuntimeException {
+        return new RuntimeException(
+            $runtimeException->getMessage() . sprintf(' [Benchmark: %s, File: %s]', $executionContext->benchmarkClassName, $tempFile),
+            $runtimeException->getCode(),
+            $runtimeException,
         );
     }
 }

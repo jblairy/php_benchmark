@@ -16,7 +16,7 @@ final class MergeWithArrayMerge extends AbstractBenchmark
         $array2 = range(101, 200);
         $array3 = range(201, 300);
 
-        for ($i = 0; $i < 10000; ++$i) {
+        for ($i = 0; 10000 > $i; ++$i) {
             $result = array_merge($array1, $array2, $array3);
         }
     }

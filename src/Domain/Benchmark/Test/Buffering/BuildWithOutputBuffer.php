@@ -13,9 +13,10 @@ final class BuildWithOutputBuffer extends AbstractBenchmark
     public function execute(): void
     {
         ob_start();
-        for ($i = 0; $i < 1000; ++$i) {
+        for ($i = 0; 1000 > $i; ++$i) {
             echo 'Line ' . $i . "\n";
         }
-        $result = ob_get_clean();
+
+        ob_get_clean();
     }
 }

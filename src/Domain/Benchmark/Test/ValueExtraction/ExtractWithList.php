@@ -14,8 +14,8 @@ final class ExtractWithList extends AbstractBenchmark
     {
         $data = [1, 2, 3];
 
-        for ($i = 0; $i < 100000; ++$i) {
-            list($a, $b, $c) = $data;
+        for ($i = 0; 100000 > $i; ++$i) {
+            [$a, $b, $c] = $data;
         }
     }
 }

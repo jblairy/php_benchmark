@@ -14,7 +14,7 @@ final class CheckWithIsArray extends AbstractBenchmark
     {
         $data = [1, 2, 3, 4, 5];
 
-        for ($i = 0; $i < 100000; ++$i) {
+        for ($i = 0; 100000 > $i; ++$i) {
             $result = is_array($data);
         }
     }

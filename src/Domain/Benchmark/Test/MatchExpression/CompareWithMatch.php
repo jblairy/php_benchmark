@@ -22,7 +22,7 @@ final class CompareWithMatch extends AbstractBenchmark
     #[Php85]
     public function execute(): void
     {
-        for ($i = 0; $i < 100000; ++$i) {
+        for ($i = 0; 100000 > $i; ++$i) {
             $value = $i % 5;
             $result = match ($value) {
                 0 => 'zero',

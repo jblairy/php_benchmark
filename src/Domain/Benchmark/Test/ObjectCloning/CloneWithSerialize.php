@@ -17,7 +17,7 @@ final class CloneWithSerialize extends AbstractBenchmark
         $original->value = 123;
         $original->name = 'test';
 
-        for ($i = 0; $i < 100000; ++$i) {
+        for ($i = 0; 100000 > $i; ++$i) {
             $copy = unserialize(serialize($original));
         }
     }

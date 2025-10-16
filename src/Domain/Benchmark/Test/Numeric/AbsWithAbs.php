@@ -12,7 +12,7 @@ final class AbsWithAbs extends AbstractBenchmark
     #[All]
     public function execute(): void
     {
-        for ($i = -50000; $i < 50000; ++$i) {
+        for ($i = -50000; 50000 > $i; ++$i) {
             $result = abs($i);
         }
     }

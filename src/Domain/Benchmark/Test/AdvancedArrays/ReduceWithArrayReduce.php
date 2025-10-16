@@ -14,8 +14,6 @@ final class ReduceWithArrayReduce extends AbstractBenchmark
     {
         $data = range(1, 10000);
 
-        $result = array_reduce($data, function ($carry, $item) {
-            return $carry + $item;
-        }, 0);
+        array_reduce($data, fn ($carry, $item): float|int => $carry + $item, 0);
     }
 }

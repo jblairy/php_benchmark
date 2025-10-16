@@ -24,8 +24,8 @@ final class CallWithArrowFunction extends AbstractBenchmark
     #[Php85]
     public function execute(): void
     {
-        for ($i = 0; $i < 100000; ++$i) {
-            $result = (fn($x) => $x * 2)($i);
+        for ($i = 0; 100000 > $i; ++$i) {
+            $result = (fn ($x): int => $x * 2)($i);
         }
     }
 }

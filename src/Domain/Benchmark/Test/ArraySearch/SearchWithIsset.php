@@ -14,7 +14,7 @@ final class SearchWithIsset extends AbstractBenchmark
     {
         $haystack = array_flip(range(1, 1000));
 
-        for ($i = 0; $i < 10000; ++$i) {
+        for ($i = 0; 10000 > $i; ++$i) {
             $result = isset($haystack[750]);
         }
     }

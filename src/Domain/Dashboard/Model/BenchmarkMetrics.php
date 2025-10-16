@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Jblairy\PhpBenchmark\Domain\Dashboard\Model;
 
 /**
- * Value Object representing raw benchmark metrics before statistical analysis
+ * Value Object representing raw benchmark metrics before statistical analysis.
  */
 final readonly class BenchmarkMetrics
 {
@@ -21,7 +21,8 @@ final readonly class BenchmarkMetrics
         public array $executionTimes,
         public array $memoryUsages,
         public array $memoryPeaks,
-    ) {}
+    ) {
+    }
 
     public function getExecutionCount(): int
     {
@@ -30,6 +31,6 @@ final readonly class BenchmarkMetrics
 
     public function isEmpty(): bool
     {
-        return $this->getExecutionCount() === 0;
+        return 0 === $this->getExecutionCount();
     }
 }

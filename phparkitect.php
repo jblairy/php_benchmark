@@ -93,7 +93,7 @@ return static function (Config $config): void {
         ->should(new ResideInOneOfTheseNamespaces(
             'Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Repository',
             'Jblairy\PhpBenchmark\Infrastructure\Persistence\InMemory',
-            'Jblairy\PhpBenchmark\Domain\Benchmark\Port'
+            'Jblairy\PhpBenchmark\Domain\Benchmark\Port',
         ))
         ->because('Repositories must be in Infrastructure (concrete) or Domain/Port (interface)');
 

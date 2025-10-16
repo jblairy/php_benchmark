@@ -13,12 +13,10 @@ final class ColumnWithArrayMap extends AbstractBenchmark
     public function execute(): void
     {
         $data = [];
-        for ($i = 0; $i < 1000; ++$i) {
+        for ($i = 0; 1000 > $i; ++$i) {
             $data[] = ['id' => $i, 'name' => 'User' . $i, 'email' => 'user' . $i . '@test.com'];
         }
 
-        $result = array_map(function ($item) {
-            return $item['name'];
-        }, $data);
+        array_map(fn (array $item): string => $item['name'], $data);
     }
 }

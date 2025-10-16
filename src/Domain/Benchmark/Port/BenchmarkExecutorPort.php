@@ -13,5 +13,5 @@ use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkResult;
  */
 interface BenchmarkExecutorPort
 {
-    public function execute(BenchmarkConfiguration $configuration): BenchmarkResult;
+    public function execute(BenchmarkConfiguration $benchmarkConfiguration): BenchmarkResult;
 }

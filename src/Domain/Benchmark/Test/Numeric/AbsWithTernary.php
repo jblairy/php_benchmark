@@ -12,8 +12,8 @@ final class AbsWithTernary extends AbstractBenchmark
     #[All]
     public function execute(): void
     {
-        for ($i = -50000; $i < 50000; ++$i) {
-            $result = $i < 0 ? -$i : $i;
+        for ($i = -50000; 50000 > $i; ++$i) {
+            $result = 0 > $i ? -$i : $i;
         }
     }
 }

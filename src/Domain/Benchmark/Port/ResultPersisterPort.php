@@ -13,5 +13,5 @@ use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkResult;
  */
 interface ResultPersisterPort
 {
-    public function persist(BenchmarkConfiguration $configuration, BenchmarkResult $result): void;
+    public function persist(BenchmarkConfiguration $benchmarkConfiguration, BenchmarkResult $benchmarkResult): void;
 }

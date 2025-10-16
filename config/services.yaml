@@ -50,9 +50,9 @@ services:
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkExecutorPort:
         class: Jblairy\PhpBenchmark\Domain\Benchmark\Service\SingleBenchmarkExecutor
 
-    # Dashboard Repository (Port -> Adapter)
-    Jblairy\PhpBenchmark\Domain\Dashboard\Port\DashboardRepositoryPort:
-        class: Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Repository\DoctrineDashboardRepository
+    # Dashboard Data Provider (Port -> Adapter)
+    Jblairy\PhpBenchmark\Domain\Dashboard\Port\DashboardDataProviderPort:
+        class: Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\DoctrineDashboardDataProvider
 
     # Application Use Cases with dependencies
     Jblairy\PhpBenchmark\Application\UseCase\AsyncBenchmarkRunner:

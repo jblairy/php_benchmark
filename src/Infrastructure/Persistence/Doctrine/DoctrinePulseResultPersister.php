@@ -10,29 +10,29 @@ use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkResult;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ResultPersisterPort;
 use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Entity\Pulse;
 
-final class DoctrinePulseResultPersister implements ResultPersisterPort
+final readonly class DoctrinePulseResultPersister implements ResultPersisterPort
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
-    public function persist(BenchmarkConfiguration $configuration, BenchmarkResult $result): void
+    public function persist(BenchmarkConfiguration $benchmarkConfiguration, BenchmarkResult $benchmarkResult): void
     {
-        $pulse = $this->createPulseEntity($configuration, $result);
+        $pulse = $this->createPulseEntity($benchmarkConfiguration, $benchmarkResult);
 
         $this->entityManager->persist($pulse);
         $this->entityManager->flush();
     }
 
-    private function createPulseEntity(BenchmarkConfiguration $configuration, BenchmarkResult $result): Pulse
+    private function createPulseEntity(BenchmarkConfiguration $benchmarkConfiguration, BenchmarkResult $benchmarkResult): Pulse
     {
         return Pulse::create(
-            $result->executionTimeMs,
-            $result->memoryUsedBytes,
-            $result->memoryPeakBytes,
-            $configuration->phpVersion,
-            $configuration->benchmark::class,
+            $benchmarkResult->executionTimeMs,
+            $benchmarkResult->memoryUsedBytes,
+            $benchmarkResult->memoryPeakBytes,
+            $benchmarkConfiguration->phpVersion,
+            $benchmarkConfiguration->benchmark::class,
         );
     }
 }

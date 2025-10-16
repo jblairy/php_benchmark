@@ -13,7 +13,7 @@ final class ReplaceWithStrReplace extends AbstractBenchmark
     public function execute(): void
     {
         $text = 'Hello World, this is a test string for benchmarking purposes';
-        for ($i = 0; $i < 100000; ++$i) {
+        for ($i = 0; 100000 > $i; ++$i) {
             $result = str_replace('test', 'sample', $text);
         }
     }

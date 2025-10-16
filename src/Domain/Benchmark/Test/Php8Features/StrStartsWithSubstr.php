@@ -14,8 +14,8 @@ final class StrStartsWithSubstr extends AbstractBenchmark
     {
         $text = 'Hello World';
 
-        for ($i = 0; $i < 100000; ++$i) {
-            $result = substr($text, 0, 5) === 'Hello';
+        for ($i = 0; 100000 > $i; ++$i) {
+            $result = 'Hello' === mb_substr($text, 0, 5);
         }
     }
 }

@@ -13,9 +13,8 @@ final class BuildWithArrayImplode extends AbstractBenchmark
     public function execute(): void
     {
         $lines = [];
-        for ($i = 0; $i < 1000; ++$i) {
+        for ($i = 0; 1000 > $i; ++$i) {
             $lines[] = 'Line ' . $i;
         }
-        $result = implode("\n", $lines);
     }
 }

@@ -13,8 +13,8 @@ final class ConcatenationWithDot extends AbstractBenchmark
     public function execute(): void
     {
         $result = '';
-        for ($i = 0; $i < 10000; ++$i) {
-            $result = 'Hello' . ' ' . 'World' . ' ' . $i . ' ' . 'test' . ' ' . 'benchmark';
+        for ($i = 0; 10000 > $i; ++$i) {
+            $result = 'Hello World ' . $i . ' test benchmark';
         }
     }
 }

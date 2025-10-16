@@ -5,28 +5,29 @@ declare(strict_types=1);
 namespace Jblairy\PhpBenchmark\Infrastructure\Execution\CodeExtraction;
 
 use Jblairy\PhpBenchmark\Domain\Benchmark\Contract\Benchmark;
-use Jblairy\PhpBenchmark\Domain\Benchmark\Port\CodeExtractorPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Exception\ReflexionMethodNotFound;
+use Jblairy\PhpBenchmark\Domain\Benchmark\Port\CodeExtractorPort;
 use Jblairy\PhpBenchmark\Domain\PhpVersion\Attribute\All;
 use Jblairy\PhpBenchmark\Domain\PhpVersion\Enum\PhpVersion;
 use ReflectionClass;
 use ReflectionMethod;
+use RuntimeException;
 
 final class ReflectionCodeExtractor implements CodeExtractorPort
 {
     public function extractCode(Benchmark $benchmark, PhpVersion $phpVersion): string
     {
-        $method = $this->findMethodForVersion($benchmark, $phpVersion);
-        $rawCode = $this->extractMethodBody($method);
+        $reflectionMethod = $this->findMethodForVersion($benchmark, $phpVersion);
+        $rawCode = $this->extractMethodBody($reflectionMethod);
 
         return $this->cleanCode($rawCode);
     }
 
     private function findMethodForVersion(Benchmark $benchmark, PhpVersion $phpVersion): ReflectionMethod
     {
-        $reflection = new ReflectionClass($benchmark);
+        $reflectionClass = new ReflectionClass($benchmark);
 
-        foreach ($reflection->getMethods() as $method) {
+        foreach ($reflectionClass->getMethods() as $method) {
             if ($this->methodMatchesVersion($method, $phpVersion)) {
                 return $method;
             }
@@ -35,12 +36,12 @@ final class ReflectionCodeExtractor implements CodeExtractorPort
         throw new ReflexionMethodNotFound($benchmark::class, $phpVersion->value);
     }
 
-    private function methodMatchesVersion(ReflectionMethod $method, PhpVersion $phpVersion): bool
+    private function methodMatchesVersion(ReflectionMethod $reflectionMethod, PhpVersion $phpVersion): bool
     {
-        foreach ($method->getAttributes() as $attribute) {
+        foreach ($reflectionMethod->getAttributes() as $attribute) {
             $attributeName = $attribute->getName();
 
-            if ($attributeName === All::class) {
+            if (All::class === $attributeName) {
                 return true;
             }
 
@@ -52,11 +53,11 @@ final class ReflectionCodeExtractor implements CodeExtractorPort
         return false;
     }
 
-    private function extractMethodBody(ReflectionMethod $method): string
+    private function extractMethodBody(ReflectionMethod $reflectionMethod): string
     {
-        $fileName = (string) $method->getFileName();
-        $startLine = (int) $method->getStartLine();
-        $endLine = (int) $method->getEndLine();
+        $fileName = (string) $reflectionMethod->getFileName();
+        $startLine = (int) $reflectionMethod->getStartLine();
+        $endLine = (int) $reflectionMethod->getEndLine();
 
         $fileLines = $this->readFileLines($fileName);
 
@@ -66,12 +67,12 @@ final class ReflectionCodeExtractor implements CodeExtractorPort
     private function readFileLines(string $fileName): array
     {
         if (!file_exists($fileName)) {
-            throw new \RuntimeException("File not found: {$fileName}");
+            throw new RuntimeException('File not found: ' . $fileName);
         }
 
         $fileLines = file($fileName);
-        if ($fileLines === false) {
-            throw new \RuntimeException("Cannot read file: {$fileName}");
+        if (false === $fileLines) {
+            throw new RuntimeException('Cannot read file: ' . $fileName);
         }
 
         return $fileLines;
@@ -84,6 +85,7 @@ final class ReflectionCodeExtractor implements CodeExtractorPort
             if ($this->shouldSkipLine($fileLines[$i])) {
                 continue;
             }
+
             $bodyLines[] = $fileLines[$i];
         }
 
@@ -92,8 +94,9 @@ final class ReflectionCodeExtractor implements CodeExtractorPort
 
     private function shouldSkipLine(string $line): bool
     {
-        $trimmed = trim($line);
-        return $trimmed === '{' || $trimmed === '';
+        $trimmed = mb_trim($line);
+
+        return '{' === $trimmed || '' === $trimmed;
     }
 
     private function cleanCode(string $code): string
@@ -101,7 +104,7 @@ final class ReflectionCodeExtractor implements CodeExtractorPort
         $cleaned = $this->removeHeredocMarkers($code);
         $cleaned = $this->unescapeHeredocVariables($cleaned);
 
-        return trim($cleaned);
+        return mb_trim($cleaned);
     }
 
     private function removeHeredocMarkers(string $code): string

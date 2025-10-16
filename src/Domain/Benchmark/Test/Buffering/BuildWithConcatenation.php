@@ -13,7 +13,7 @@ final class BuildWithConcatenation extends AbstractBenchmark
     public function execute(): void
     {
         $result = '';
-        for ($i = 0; $i < 1000; ++$i) {
+        for ($i = 0; 1000 > $i; ++$i) {
             $result .= 'Line ' . $i . "\n";
         }
     }
