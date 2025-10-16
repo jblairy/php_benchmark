@@ -24,7 +24,7 @@ final class StrStartsWithFunction extends AbstractBenchmark
     {
         $text = 'Hello World';
 
-        for ($i = 0; $i < 100000; ++$i) {
+        for ($i = 0; 100000 > $i; ++$i) {
             $result = str_starts_with($text, 'Hello');
         }
     }

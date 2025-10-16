@@ -37,4 +37,7 @@ phpmd:
 phparkitect:
 	docker-compose run --rm main vendor/bin/phparkitect check
 
+rector:
+	docker-compose run --rm main vendor/bin/rector
+
 quality: phpcsfixer-fix phpstan phpmd phparkitect

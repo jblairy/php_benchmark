@@ -32,12 +32,10 @@ final class SortWithUsort extends AbstractBenchmark
     #[Php85]
     public function execute(): void
     {
-        for ($i = 0; $i < 1000; ++$i) {
+        for ($i = 0; 1000 > $i; ++$i) {
             $data = range(1, 1000);
             shuffle($data);
-            usort($data, function ($a, $b) {
-                return $a <=> $b;
-            });
+            usort($data, fn ($a, $b): int => $a <=> $b);
         }
     }
 }

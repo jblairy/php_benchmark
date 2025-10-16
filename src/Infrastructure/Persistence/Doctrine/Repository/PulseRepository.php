@@ -13,9 +13,9 @@ use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Entity\Pulse;
  */
 class PulseRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $managerRegistry)
     {
-        parent::__construct($registry, Pulse::class);
+        parent::__construct($managerRegistry, Pulse::class);
     }
 
     /**
@@ -36,11 +36,11 @@ class PulseRepository extends ServiceEntityRepository
     {
         $pulses = $this->findBy(['benchId' => $benchId, 'name' => $name]);
 
-        if (empty($pulses)) {
+        if ([] === $pulses) {
             return [];
         }
 
-        $executionTimes = array_map(fn(Pulse $pulse) => $pulse->executionTimeMs, $pulses);
+        $executionTimes = array_map(fn (Pulse $pulse): float => $pulse->executionTimeMs, $pulses);
         sort($executionTimes);
         $count = count($executionTimes);
 
@@ -53,17 +53,18 @@ class PulseRepository extends ServiceEntityRepository
             'p80' => $this->percentile($executionTimes, 80),
             'p90' => $this->percentile($executionTimes, 90),
             'p95' => $this->percentile($executionTimes, 95),
-            'p99' => $this->percentile($executionTimes, 99)
+            'p99' => $this->percentile($executionTimes, 99),
         ];
     }
 
     private function percentile(array $data, int $percentile): float
     {
-        if (empty($data)) {
+        if ([] === $data) {
             return 0;
         }
 
         $index = ceil($percentile / 100 * count($data)) - 1;
+
         return $data[$index] ?? end($data);
     }
 }

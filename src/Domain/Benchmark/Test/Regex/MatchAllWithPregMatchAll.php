@@ -14,7 +14,7 @@ final class MatchAllWithPregMatchAll extends AbstractBenchmark
     {
         $text = 'Numbers: 123, 456, 789, 012, 345';
 
-        for ($i = 0; $i < 50000; ++$i) {
+        for ($i = 0; 50000 > $i; ++$i) {
             preg_match_all('/\d+/', $text, $matches);
         }
     }

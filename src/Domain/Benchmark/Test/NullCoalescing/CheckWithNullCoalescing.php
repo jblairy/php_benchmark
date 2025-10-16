@@ -34,7 +34,7 @@ final class CheckWithNullCoalescing extends AbstractBenchmark
     {
         $data = ['key1' => 'value1', 'key2' => null, 'key3' => 'value3'];
 
-        for ($i = 0; $i < 100000; ++$i) {
+        for ($i = 0; 100000 > $i; ++$i) {
             $result = $data['key2'] ?? 'default';
         }
     }

@@ -14,8 +14,8 @@ final class LengthWithStrlen extends AbstractBenchmark
     {
         $text = 'Hello World, this is a test string for benchmarking';
 
-        for ($i = 0; $i < 100000; ++$i) {
-            $result = strlen($text);
+        for ($i = 0; 100000 > $i; ++$i) {
+            $result = mb_strlen($text);
         }
     }
 }

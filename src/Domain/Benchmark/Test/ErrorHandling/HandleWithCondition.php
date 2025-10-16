@@ -12,9 +12,9 @@ final class HandleWithCondition extends AbstractBenchmark
     #[All]
     public function execute(): void
     {
-        for ($i = 0; $i < 10000; ++$i) {
-            $divisor = $i % 10 === 0 ? 1 : $i;
-            $result = $divisor !== 0 ? 100 / $divisor : 0;
+        for ($i = 0; 10000 > $i; ++$i) {
+            $divisor = 0 === $i % 10 ? 1 : $i;
+            $result = 0 !== $divisor ? 100 / $divisor : 0;
         }
     }
 }

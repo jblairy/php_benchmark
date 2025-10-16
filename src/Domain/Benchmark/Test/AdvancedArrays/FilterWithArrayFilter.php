@@ -14,8 +14,6 @@ final class FilterWithArrayFilter extends AbstractBenchmark
     {
         $data = range(1, 10000);
 
-        $result = array_filter($data, function ($item) {
-            return $item % 2 === 0;
-        });
+        array_filter($data, fn ($item): bool => 0 === $item % 2);
     }
 }

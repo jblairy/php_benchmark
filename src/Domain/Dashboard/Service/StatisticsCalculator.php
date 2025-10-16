@@ -9,20 +9,20 @@ use Jblairy\PhpBenchmark\Domain\Dashboard\Model\BenchmarkStatistics;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\PercentileMetrics;
 
 /**
- * Domain Service for calculating benchmark statistics
+ * Domain Service for calculating benchmark statistics.
  */
 final readonly class StatisticsCalculator
 {
-    public function calculate(BenchmarkMetrics $metrics): BenchmarkStatistics
+    public function calculate(BenchmarkMetrics $benchmarkMetrics): BenchmarkStatistics
     {
-        if ($metrics->isEmpty()) {
-            return $this->createEmptyStatistics($metrics);
+        if ($benchmarkMetrics->isEmpty()) {
+            return $this->createEmptyStatistics($benchmarkMetrics);
         }
 
-        $sortedTimes = $metrics->executionTimes;
+        $sortedTimes = $benchmarkMetrics->executionTimes;
         sort($sortedTimes);
 
-        $percentiles = new PercentileMetrics(
+        $percentileMetrics = new PercentileMetrics(
             p50: $this->calculatePercentile($sortedTimes, 50),
             p80: $this->calculatePercentile($sortedTimes, 80),
             p90: $this->calculatePercentile($sortedTimes, 90),
@@ -31,32 +31,33 @@ final readonly class StatisticsCalculator
         );
 
         return new BenchmarkStatistics(
-            benchmarkId: $metrics->benchmarkId,
-            benchmarkName: $metrics->benchmarkName,
-            phpVersion: $metrics->phpVersion,
-            executionCount: $metrics->getExecutionCount(),
-            averageExecutionTime: $this->calculateAverage($metrics->executionTimes),
-            percentiles: $percentiles,
-            averageMemoryUsed: $this->calculateAverage($metrics->memoryUsages),
-            peakMemoryUsed: $this->calculateMax($metrics->memoryPeaks),
+            benchmarkId: $benchmarkMetrics->benchmarkId,
+            benchmarkName: $benchmarkMetrics->benchmarkName,
+            phpVersion: $benchmarkMetrics->phpVersion,
+            executionCount: $benchmarkMetrics->getExecutionCount(),
+            averageExecutionTime: $this->calculateAverage($benchmarkMetrics->executionTimes),
+            percentiles: $percentileMetrics,
+            averageMemoryUsed: $this->calculateAverage($benchmarkMetrics->memoryUsages),
+            peakMemoryUsed: $this->calculateMax($benchmarkMetrics->memoryPeaks),
         );
     }
 
     private function calculatePercentile(array $sortedData, int $percentile): float
     {
         $count = count($sortedData);
-        if ($count === 0) {
+        if (0 === $count) {
             return 0.0;
         }
 
         $index = (int) ceil($percentile / 100 * $count) - 1;
+
         return $sortedData[$index] ?? end($sortedData);
     }
 
     private function calculateAverage(array $values): float
     {
         $count = count($values);
-        if ($count === 0) {
+        if (0 === $count) {
             return 0.0;
         }
 
@@ -65,19 +66,19 @@ final readonly class StatisticsCalculator
 
     private function calculateMax(array $values): float
     {
-        if (empty($values)) {
+        if ([] === $values) {
             return 0.0;
         }
 
         return max($values);
     }
 
-    private function createEmptyStatistics(BenchmarkMetrics $metrics): BenchmarkStatistics
+    private function createEmptyStatistics(BenchmarkMetrics $benchmarkMetrics): BenchmarkStatistics
     {
         return new BenchmarkStatistics(
-            benchmarkId: $metrics->benchmarkId,
-            benchmarkName: $metrics->benchmarkName,
-            phpVersion: $metrics->phpVersion,
+            benchmarkId: $benchmarkMetrics->benchmarkId,
+            benchmarkName: $benchmarkMetrics->benchmarkName,
+            phpVersion: $benchmarkMetrics->phpVersion,
             executionCount: 0,
             averageExecutionTime: 0.0,
             percentiles: new PercentileMetrics(0.0, 0.0, 0.0, 0.0, 0.0),

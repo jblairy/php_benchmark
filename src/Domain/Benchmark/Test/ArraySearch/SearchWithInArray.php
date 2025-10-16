@@ -14,7 +14,7 @@ final class SearchWithInArray extends AbstractBenchmark
     {
         $haystack = range(1, 1000);
 
-        for ($i = 0; $i < 10000; ++$i) {
+        for ($i = 0; 10000 > $i; ++$i) {
             $result = in_array(750, $haystack, true);
         }
     }

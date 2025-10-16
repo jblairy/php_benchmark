@@ -10,6 +10,6 @@ final class BenchmarkNotFound extends RuntimeException
 {
     public function __construct(string $name)
     {
-        parent::__construct("Benchmark {$name} not found");
+        parent::__construct(sprintf('Benchmark %s not found', $name));
     }
 }

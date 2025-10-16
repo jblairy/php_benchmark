@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Jblairy\PhpBenchmark\Application\Dashboard\DTO;
 
 /**
- * Data Transfer Object grouping benchmark statistics by PHP version
+ * Data Transfer Object grouping benchmark statistics by PHP version.
  */
 final readonly class BenchmarkGroup
 {
@@ -16,7 +16,8 @@ final readonly class BenchmarkGroup
         public string $benchmarkId,
         public string $benchmarkName,
         public array $phpVersions,
-    ) {}
+    ) {
+    }
 
     public function toArray(): array
     {

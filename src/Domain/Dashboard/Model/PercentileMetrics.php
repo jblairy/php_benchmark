@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Jblairy\PhpBenchmark\Domain\Dashboard\Model;
 
 /**
- * Value Object representing percentile metrics
+ * Value Object representing percentile metrics.
  */
 final readonly class PercentileMetrics
 {
@@ -15,7 +15,8 @@ final readonly class PercentileMetrics
         public float $p90,
         public float $p95,
         public float $p99,
-    ) {}
+    ) {
+    }
 
     public static function fromArray(array $data): self
     {

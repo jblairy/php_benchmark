@@ -28,7 +28,7 @@ final class MergeWithArrayMergeUnpack extends AbstractBenchmark
         $array2 = range(51, 100);
         $array3 = range(101, 150);
 
-        for ($i = 0; $i < 1000; ++$i) {
+        for ($i = 0; 1000 > $i; ++$i) {
             $result = [...$array1, ...$array2, ...$array3];
         }
     }

@@ -14,8 +14,6 @@ final class MapWithArrayMap extends AbstractBenchmark
     {
         $data = range(1, 10000);
 
-        $result = array_map(function ($item) {
-            return $item * 2;
-        }, $data);
+        array_map(fn ($item): int => $item * 2, $data);
     }
 }

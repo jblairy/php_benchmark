@@ -14,8 +14,8 @@ final class SubstrWithSubstr extends AbstractBenchmark
     {
         $text = 'Hello World, this is a test string for benchmarking';
 
-        for ($i = 0; $i < 100000; ++$i) {
-            $result = substr($text, 0, 10);
+        for ($i = 0; 100000 > $i; ++$i) {
+            $result = mb_substr($text, 0, 10);
         }
     }
 }

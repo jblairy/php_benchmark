@@ -9,26 +9,24 @@ use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkExecutorPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ResultPersisterPort;
 use Spatie\Async\Pool;
 
-final class AsyncBenchmarkRunner
+final readonly class AsyncBenchmarkRunner
 {
-    private const DEFAULT_CONCURRENCY = 100;
+    private const int DEFAULT_CONCURRENCY = 100;
 
     public function __construct(
-        private readonly BenchmarkExecutorPort $executor,
-        private readonly ResultPersisterPort $persister,
-        private readonly int $concurrency = self::DEFAULT_CONCURRENCY,
+        private BenchmarkExecutorPort $benchmarkExecutorPort,
+        private ResultPersisterPort $resultPersisterPort,
+        private int $concurrency = self::DEFAULT_CONCURRENCY,
     ) {
     }
 
-    public function run(BenchmarkConfiguration $configuration): void
+    public function run(BenchmarkConfiguration $benchmarkConfiguration): void
     {
         $pool = Pool::create()->concurrency($this->concurrency);
 
-        for ($i = 0; $i < $configuration->iterations; ++$i) {
-            $pool->add(function () use ($configuration) {
-                return $this->executor->execute($configuration);
-            })->then(function ($result) use ($configuration) {
-                $this->persister->persist($configuration, $result);
+        for ($i = 0; $i < $benchmarkConfiguration->iterations; ++$i) {
+            $pool->add(fn (): \Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkResult => $this->benchmarkExecutorPort->execute($benchmarkConfiguration))->then(function ($result) use ($benchmarkConfiguration): void {
+                $this->resultPersisterPort->persist($benchmarkConfiguration, $result);
             });
         }
 

@@ -12,8 +12,9 @@ final class IterateWithGenerator extends AbstractBenchmark
     #[All]
     public function execute(): void
     {
-        function generateRange() {
-            for ($i = 1; $i <= 10000; ++$i) {
+        function generateRange()
+        {
+            for ($i = 1; 10000 >= $i; ++$i) {
                 yield $i;
             }
         }

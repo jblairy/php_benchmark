@@ -12,30 +12,30 @@ use Jblairy\PhpBenchmark\Domain\Benchmark\Port\CodeExtractorPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptExecutorPort;
 use Jblairy\PhpBenchmark\Infrastructure\Execution\ScriptBuilding\InstrumentedScriptBuilder;
 
-final class SingleBenchmarkExecutor implements BenchmarkExecutorPort
+final readonly class SingleBenchmarkExecutor implements BenchmarkExecutorPort
 {
     public function __construct(
-        private readonly CodeExtractorPort $codeExtractor,
-        private readonly InstrumentedScriptBuilder $scriptBuilder,
-        private readonly ScriptExecutorPort $scriptExecutor,
+        private CodeExtractorPort $codeExtractorPort,
+        private InstrumentedScriptBuilder $instrumentedScriptBuilder,
+        private ScriptExecutorPort $scriptExecutorPort,
     ) {
     }
 
-    public function execute(BenchmarkConfiguration $configuration): BenchmarkResult
+    public function execute(BenchmarkConfiguration $benchmarkConfiguration): BenchmarkResult
     {
-        $code = $this->codeExtractor->extractCode(
-            $configuration->benchmark,
-            $configuration->phpVersion
+        $code = $this->codeExtractorPort->extractCode(
+            $benchmarkConfiguration->benchmark,
+            $benchmarkConfiguration->phpVersion,
         );
 
-        $script = $this->scriptBuilder->build($code);
+        $script = $this->instrumentedScriptBuilder->build($code);
 
-        $context = new ExecutionContext(
-            phpVersion: $configuration->phpVersion,
+        $executionContext = new ExecutionContext(
+            phpVersion: $benchmarkConfiguration->phpVersion,
             scriptContent: $script,
-            benchmarkClassName: $configuration->benchmark::class,
+            benchmarkClassName: $benchmarkConfiguration->benchmark::class,
         );
 
-        return $this->scriptExecutor->executeScript($context);
+        return $this->scriptExecutorPort->executeScript($executionContext);
     }
 }

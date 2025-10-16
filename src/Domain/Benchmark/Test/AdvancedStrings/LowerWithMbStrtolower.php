@@ -14,7 +14,7 @@ final class LowerWithMbStrtolower extends AbstractBenchmark
     {
         $text = 'HELLO WORLD THIS IS A TEST STRING';
 
-        for ($i = 0; $i < 100000; ++$i) {
+        for ($i = 0; 100000 > $i; ++$i) {
             $result = mb_strtolower($text);
         }
     }

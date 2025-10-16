@@ -23,7 +23,7 @@ final class SearchWithStrContains extends AbstractBenchmark
     public function execute(): void
     {
         $haystack = 'The quick brown fox jumps over the lazy dog';
-        for ($i = 0; $i < 100000; ++$i) {
+        for ($i = 0; 100000 > $i; ++$i) {
             $result = str_contains($haystack, 'fox');
         }
     }

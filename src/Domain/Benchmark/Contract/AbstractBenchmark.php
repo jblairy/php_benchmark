@@ -14,10 +14,10 @@ abstract class AbstractBenchmark implements Benchmark
 {
     public function getMethodBody(PhpVersion $phpVersion): string
     {
-        $reflection = $this->getReflexionMethod($phpVersion);
-        $fileName = (string) $reflection->getFileName();
-        $startLine = (int) $reflection->getStartLine() + 1; // TODO make it better
-        $endLine = (int) $reflection->getEndLine() - 1; // TODO make it better
+        $reflectionMethod = $this->getReflexionMethod($phpVersion);
+        $fileName = (string) $reflectionMethod->getFileName();
+        $startLine = (int) $reflectionMethod->getStartLine() + 1; // TODO make it better
+        $endLine = (int) $reflectionMethod->getEndLine() - 1; // TODO make it better
         $code = (array) file($fileName);
 
         $lines = array_slice($code, $startLine, $endLine - $startLine);
@@ -28,9 +28,9 @@ abstract class AbstractBenchmark implements Benchmark
 
     private function getReflexionMethod(PhpVersion $phpVersion): ReflectionMethod
     {
-        $reflection = new ReflectionClass($this);
+        $reflectionClass = new ReflectionClass($this);
 
-        foreach ($reflection->getMethods() as $method) {
+        foreach ($reflectionClass->getMethods() as $method) {
             foreach ($method->getAttributes() as $attribute) {
                 if (All::class === $attribute->getName() || str_ends_with(mb_strtolower($attribute->getName()), $phpVersion->value)) {
                     return $method;
@@ -38,6 +38,6 @@ abstract class AbstractBenchmark implements Benchmark
             }
         }
 
-        throw new ReflexionMethodNotFound($this::class, $phpVersion->value);
+        throw new ReflexionMethodNotFound(static::class, $phpVersion->value);
     }
 }

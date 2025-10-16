@@ -12,10 +12,8 @@ final class CallWithClosure extends AbstractBenchmark
     #[Php70]
     public function execute(): void
     {
-        for ($i = 0; $i < 100000; ++$i) {
-            $result = (function ($x) {
-                return $x * 2;
-            })($i);
+        for ($i = 0; 100000 > $i; ++$i) {
+            $result = (fn ($x): int => $x * 2)($i);
         }
     }
 }

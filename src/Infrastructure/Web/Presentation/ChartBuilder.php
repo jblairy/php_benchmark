@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace Jblairy\PhpBenchmark\Infrastructure\Web\Presentation;
 
-use Symfony\UX\Chartjs\Model\Chart;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
+use Symfony\UX\Chartjs\Model\Chart;
 
 /**
- * Chart builder using Symfony UX Chartjs
+ * Chart builder using Symfony UX Chartjs.
  */
 final readonly class ChartBuilder
 {
     public function __construct(
         private ChartBuilderInterface $chartBuilder,
-    ) {}
+    ) {
+    }
 
     /**
-     * @param array $benchmark Benchmark data with phpVersions statistics
+     * @param array    $benchmark      Benchmark data with phpVersions statistics
      * @param string[] $allPhpVersions All available PHP versions
      */
     public function createBenchmarkChart(array $benchmark, array $allPhpVersions): Chart
@@ -46,10 +47,10 @@ final readonly class ChartBuilder
         $p90Data = [];
         $avgData = [];
 
-        foreach ($allPhpVersions as $version) {
-            $p50Data[] = $benchmark['phpVersions'][$version]['p50'] ?? null;
-            $p90Data[] = $benchmark['phpVersions'][$version]['p90'] ?? null;
-            $avgData[] = $benchmark['phpVersions'][$version]['avg'] ?? null;
+        foreach ($allPhpVersions as $allPhpVersion) {
+            $p50Data[] = $benchmark['phpVersions'][$allPhpVersion]['p50'] ?? null;
+            $p90Data[] = $benchmark['phpVersions'][$allPhpVersion]['p90'] ?? null;
+            $avgData[] = $benchmark['phpVersions'][$allPhpVersion]['avg'] ?? null;
         }
 
         return [$p50Data, $p90Data, $avgData];
@@ -58,8 +59,8 @@ final readonly class ChartBuilder
     private function formatVersionLabels(array $versions): array
     {
         return array_map(
-            fn(string $version) => 'PHP ' . str_replace('php', '', $version),
-            $versions
+            fn (string $version) => 'PHP ' . str_replace('php', '', $version),
+            $versions,
         );
     }
 

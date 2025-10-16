@@ -39,7 +39,7 @@ class Pulse
         float $memoryUsedBytes,
         float $memoryPeakBytes,
         PhpVersion $phpVersion,
-        string $className
+        string $className,
     ): self {
         $pulse = new self();
         $pulse->executionTimeMs = $executionTimeMs;

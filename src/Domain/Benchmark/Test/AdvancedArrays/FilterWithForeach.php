@@ -16,7 +16,7 @@ final class FilterWithForeach extends AbstractBenchmark
         $result = [];
 
         foreach ($data as $item) {
-            if ($item % 2 === 0) {
+            if (0 === $item % 2) {
                 $result[] = $item;
             }
         }

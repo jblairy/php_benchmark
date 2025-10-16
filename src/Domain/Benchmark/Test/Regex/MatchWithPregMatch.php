@@ -14,7 +14,7 @@ final class MatchWithPregMatch extends AbstractBenchmark
     {
         $text = 'Email: test@example.com, Phone: 123-456-7890';
 
-        for ($i = 0; $i < 50000; ++$i) {
+        for ($i = 0; 50000 > $i; ++$i) {
             preg_match('/[\w.-]+@[\w.-]+\.\w+/', $text, $matches);
         }
     }

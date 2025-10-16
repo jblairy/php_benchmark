@@ -12,7 +12,7 @@ final class HashWithSha1 extends AbstractBenchmark
     #[All]
     public function execute(): void
     {
-        for ($i = 0; $i < 50000; ++$i) {
+        for ($i = 0; 50000 > $i; ++$i) {
             $result = sha1('test string ' . $i);
         }
     }

@@ -14,8 +14,8 @@ final class CheckWithIssetTernary extends AbstractBenchmark
     {
         $data = ['key1' => 'value1', 'key2' => null, 'key3' => 'value3'];
 
-        for ($i = 0; $i < 100000; ++$i) {
-            $result = isset($data['key2']) ? $data['key2'] : 'default';
+        for ($i = 0; 100000 > $i; ++$i) {
+            $result = $data['key2'] ?? 'default';
         }
     }
 }

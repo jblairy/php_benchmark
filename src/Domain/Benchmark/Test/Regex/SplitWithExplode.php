@@ -14,7 +14,7 @@ final class SplitWithExplode extends AbstractBenchmark
     {
         $text = 'one,two,three,four,five';
 
-        for ($i = 0; $i < 50000; ++$i) {
+        for ($i = 0; 50000 > $i; ++$i) {
             $result = explode(',', $text);
         }
     }

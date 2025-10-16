@@ -13,7 +13,7 @@ final class CloneWithNewInstance extends AbstractBenchmark
     #[All]
     public function execute(): void
     {
-        for ($i = 0; $i < 100000; ++$i) {
+        for ($i = 0; 100000 > $i; ++$i) {
             $copy = new stdClass();
             $copy->value = 123;
             $copy->name = 'test';

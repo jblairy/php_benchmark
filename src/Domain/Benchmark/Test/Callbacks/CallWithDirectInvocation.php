@@ -12,11 +12,9 @@ final class CallWithDirectInvocation extends AbstractBenchmark
     #[All]
     public function execute(): void
     {
-        $func = function ($x) {
-            return $x * 2;
-        };
+        $func = (fn ($x): int|float => $x * 2);
 
-        for ($i = 0; $i < 100000; ++$i) {
+        for ($i = 0; 100000 > $i; ++$i) {
             $result = $func($i);
         }
     }

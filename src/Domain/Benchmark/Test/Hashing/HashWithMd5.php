@@ -12,7 +12,7 @@ final class HashWithMd5 extends AbstractBenchmark
     #[All]
     public function execute(): void
     {
-        for ($i = 0; $i < 50000; ++$i) {
+        for ($i = 0; 50000 > $i; ++$i) {
             $result = md5('test string ' . $i);
         }
     }

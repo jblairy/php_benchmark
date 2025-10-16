@@ -12,8 +12,8 @@ final class HandleWithSuppression extends AbstractBenchmark
     #[All]
     public function execute(): void
     {
-        for ($i = 0; $i < 10000; ++$i) {
-            $result = @(100 / ($i % 10 === 0 ? 1 : $i));
+        for ($i = 0; 10000 > $i; ++$i) {
+            $result = @(100 / (0 === $i % 10 ? 1 : $i));
         }
     }
 }

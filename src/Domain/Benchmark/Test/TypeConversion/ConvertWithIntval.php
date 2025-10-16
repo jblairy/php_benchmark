@@ -12,8 +12,8 @@ final class ConvertWithIntval extends AbstractBenchmark
     #[All]
     public function execute(): void
     {
-        for ($i = 0; $i < 100000; ++$i) {
-            $result = intval('123');
+        for ($i = 0; 100000 > $i; ++$i) {
+            $result = (int) '123';
         }
     }
 }

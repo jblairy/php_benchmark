@@ -16,7 +16,7 @@ final class CheckWithIsset extends AbstractBenchmark
         $obj = new stdClass();
         $obj->value = 123;
 
-        for ($i = 0; $i < 100000; ++$i) {
+        for ($i = 0; 100000 > $i; ++$i) {
             $result = isset($obj->value);
         }
     }

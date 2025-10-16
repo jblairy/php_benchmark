@@ -32,7 +32,7 @@ final class DivideWithIntdiv extends AbstractBenchmark
     #[Php85]
     public function execute(): void
     {
-        for ($i = 1; $i < 100000; ++$i) {
+        for ($i = 1; 100000 > $i; ++$i) {
             $result = intdiv(100, $i % 50 + 1);
         }
     }

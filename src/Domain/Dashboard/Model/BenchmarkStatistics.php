@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Jblairy\PhpBenchmark\Domain\Dashboard\Model;
 
 /**
- * Value Object representing benchmark statistics for a specific PHP version
+ * Value Object representing benchmark statistics for a specific PHP version.
  */
 final readonly class BenchmarkStatistics
 {
@@ -18,5 +18,6 @@ final readonly class BenchmarkStatistics
         public PercentileMetrics $percentiles,
         public float $averageMemoryUsed,
         public float $peakMemoryUsed,
-    ) {}
+    ) {
+    }
 }

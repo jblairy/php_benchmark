@@ -14,8 +14,8 @@ final class CheckWithGettype extends AbstractBenchmark
     {
         $data = [1, 2, 3, 4, 5];
 
-        for ($i = 0; $i < 100000; ++$i) {
-            $result = gettype($data) === 'array';
+        for ($i = 0; 100000 > $i; ++$i) {
+            $result = 'array' === gettype($data);
         }
     }
 }

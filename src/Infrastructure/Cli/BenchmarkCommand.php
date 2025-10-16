@@ -4,151 +4,125 @@ declare(strict_types=1);
 
 namespace Jblairy\PhpBenchmark\Infrastructure\Cli;
 
+use Exception;
+use InvalidArgumentException;
 use Jblairy\PhpBenchmark\Application\UseCase\BenchmarkOrchestrator;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Contract\Benchmark;
-use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkRepositoryPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkConfiguration;
+use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkRepositoryPort;
 use Jblairy\PhpBenchmark\Domain\PhpVersion\Enum\PhpVersion;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'benchmark:run',
-    description: 'Execute PHP benchmarks across different versions'
+    description: 'Execute PHP benchmarks across different versions',
 )]
-final class BenchmarkCommand extends Command
+final readonly class BenchmarkCommand
 {
-    public function __construct(
-        private readonly BenchmarkOrchestrator $orchestrator,
-        private readonly BenchmarkRepositoryPort $registry,
-    ) {
-        parent::__construct();
+    public function __construct(private BenchmarkOrchestrator $benchmarkOrchestrator, private BenchmarkRepositoryPort $benchmarkRepositoryPort)
+    {
     }
 
-    protected function configure(): void
+    public function __invoke(#[\Symfony\Component\Console\Attribute\Option]
+        $test, #[\Symfony\Component\Console\Attribute\Option]
+        $iterations, #[\Symfony\Component\Console\Attribute\Option]
+        $php_version, OutputInterface $output): int
     {
-        $this
-            ->addOption(
-                'test',
-                't',
-                InputOption::VALUE_OPTIONAL,
-                'Name of specific benchmark to run'
-            )
-            ->addOption(
-                'iterations',
-                'i',
-                InputOption::VALUE_OPTIONAL,
-                'Number of iterations to run',
-                1
-            )
-            ->addOption(
-                'php-version',
-                'p',
-                InputOption::VALUE_OPTIONAL,
-                'Specific PHP version to test (e.g., php84, php85)'
-            );
-    }
+        $symfonyStyle = new SymfonyStyle($input, $output);
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $io = new SymfonyStyle($input, $output);
+        $testName = $test;
+        $iterations = (int) $iterations;
+        $phpVersionName = $php_version;
 
-        $testName = $input->getOption('test');
-        $iterations = (int) $input->getOption('iterations');
-        $phpVersionName = $input->getOption('php-version');
-
-        if ($iterations <= 0) {
-            $io->error('Iterations must be greater than 0');
+        if (0 >= $iterations) {
+            $symfonyStyle->error('Iterations must be greater than 0');
 
             return Command::FAILURE;
         }
 
         try {
-            if ($testName !== null && $phpVersionName !== null) {
-                $this->executeSingleBenchmark($io, $testName, $phpVersionName, $iterations);
-            } elseif ($testName !== null) {
-                $this->executeBenchmarkAllVersions($io, $testName, $iterations);
+            if (null !== $testName && null !== $phpVersionName) {
+                $this->executeSingleBenchmark($symfonyStyle, $testName, $phpVersionName, $iterations);
+            } elseif (null !== $testName) {
+                $this->executeBenchmarkAllVersions($symfonyStyle, $testName, $iterations);
             } else {
-                $this->executeAllBenchmarks($io, $iterations);
+                $this->executeAllBenchmarks($symfonyStyle, $iterations);
             }
 
-            $io->success('Benchmark(s) completed successfully!');
+            $symfonyStyle->success('Benchmark(s) completed successfully!');
 
             return Command::SUCCESS;
-        } catch (\Exception $e) {
-            $io->error(sprintf('Benchmark failed: %s', $e->getMessage()));
+        } catch (Exception $exception) {
+            $symfonyStyle->error(sprintf('Benchmark failed: %s', $exception->getMessage()));
 
             return Command::FAILURE;
         }
     }
 
     private function executeSingleBenchmark(
-        SymfonyStyle $io,
+        SymfonyStyle $symfonyStyle,
         string $testName,
         string $phpVersionName,
-        int $iterations
+        int $iterations,
     ): void {
         $benchmark = $this->findBenchmark($testName);
         $phpVersion = PhpVersion::from($phpVersionName);
 
-        $io->title(sprintf(
+        $symfonyStyle->title(sprintf(
             'Running %s on %s (%d iterations)',
             $testName,
             $phpVersion->value,
-            $iterations
+            $iterations,
         ));
 
-        $configuration = new BenchmarkConfiguration(
+        $benchmarkConfiguration = new BenchmarkConfiguration(
             benchmark: $benchmark,
             phpVersion: $phpVersion,
-            iterations: $iterations
+            iterations: $iterations,
         );
 
-        $this->orchestrator->executeSingle($configuration);
+        $this->benchmarkOrchestrator->executeSingle($benchmarkConfiguration);
     }
 
     private function executeBenchmarkAllVersions(
-        SymfonyStyle $io,
+        SymfonyStyle $symfonyStyle,
         string $testName,
-        int $iterations
+        int $iterations,
     ): void {
         $benchmark = $this->findBenchmark($testName);
 
-        $io->title(sprintf(
+        $symfonyStyle->title(sprintf(
             'Running %s across all PHP versions (%d iterations)',
             $testName,
-            $iterations
+            $iterations,
         ));
 
-        $this->orchestrator->executeMultiple(
+        $this->benchmarkOrchestrator->executeMultiple(
             benchmarks: [$benchmark],
             phpVersions: PhpVersion::cases(),
-            iterations: $iterations
+            iterations: $iterations,
         );
     }
 
-    private function executeAllBenchmarks(SymfonyStyle $io, int $iterations): void
+    private function executeAllBenchmarks(SymfonyStyle $symfonyStyle, int $iterations): void
     {
-        $io->title(sprintf(
+        $symfonyStyle->title(sprintf(
             'Running all benchmarks across all PHP versions (%d iterations)',
-            $iterations
+            $iterations,
         ));
 
-        $this->orchestrator->executeAll($this->registry, $iterations);
+        $this->benchmarkOrchestrator->executeAll($this->benchmarkRepositoryPort, $iterations);
     }
 
     private function findBenchmark(string $name): Benchmark
     {
-        $benchmark = $this->registry->findBenchmarkByName($name);
+        $benchmark = $this->benchmarkRepositoryPort->findBenchmarkByName($name);
 
-        if ($benchmark === null) {
-            throw new \InvalidArgumentException(
-                sprintf('Benchmark "%s" not found', $name)
-            );
+        if (!$benchmark instanceof Benchmark) {
+            throw new InvalidArgumentException(sprintf('Benchmark "%s" not found', $name));
         }
 
         return $benchmark;

@@ -19,7 +19,7 @@ final class EncodeWithJsonEncode extends AbstractBenchmark
             'items' => range(1, 100),
         ];
 
-        for ($i = 0; $i < 10000; ++$i) {
+        for ($i = 0; 10000 > $i; ++$i) {
             $result = json_encode($data);
         }
     }

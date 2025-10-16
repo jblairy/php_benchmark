@@ -7,7 +7,7 @@ namespace Jblairy\PhpBenchmark\Application\Dashboard\DTO;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\BenchmarkStatistics;
 
 /**
- * Data Transfer Object for benchmark statistics
+ * Data Transfer Object for benchmark statistics.
  *
  * Used to transfer data from Application layer to Infrastructure (Controller)
  */
@@ -26,23 +26,24 @@ final readonly class BenchmarkStatisticsData
         public float $p99,
         public float $memoryUsed,
         public float $memoryPeak,
-    ) {}
+    ) {
+    }
 
-    public static function fromDomain(BenchmarkStatistics $statistics): self
+    public static function fromDomain(BenchmarkStatistics $benchmarkStatistics): self
     {
         return new self(
-            benchmarkId: $statistics->benchmarkId,
-            benchmarkName: $statistics->benchmarkName,
-            phpVersion: $statistics->phpVersion,
-            count: $statistics->executionCount,
-            avg: $statistics->averageExecutionTime,
-            p50: $statistics->percentiles->p50,
-            p80: $statistics->percentiles->p80,
-            p90: $statistics->percentiles->p90,
-            p95: $statistics->percentiles->p95,
-            p99: $statistics->percentiles->p99,
-            memoryUsed: $statistics->averageMemoryUsed,
-            memoryPeak: $statistics->peakMemoryUsed,
+            benchmarkId: $benchmarkStatistics->benchmarkId,
+            benchmarkName: $benchmarkStatistics->benchmarkName,
+            phpVersion: $benchmarkStatistics->phpVersion,
+            count: $benchmarkStatistics->executionCount,
+            avg: $benchmarkStatistics->averageExecutionTime,
+            p50: $benchmarkStatistics->percentiles->p50,
+            p80: $benchmarkStatistics->percentiles->p80,
+            p90: $benchmarkStatistics->percentiles->p90,
+            p95: $benchmarkStatistics->percentiles->p95,
+            p99: $benchmarkStatistics->percentiles->p99,
+            memoryUsed: $benchmarkStatistics->averageMemoryUsed,
+            memoryPeak: $benchmarkStatistics->peakMemoryUsed,
         );
     }
 
