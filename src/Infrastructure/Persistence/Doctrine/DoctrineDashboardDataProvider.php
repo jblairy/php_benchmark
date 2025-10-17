@@ -7,7 +7,9 @@ namespace Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine;
 use Doctrine\ORM\EntityManagerInterface;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\BenchmarkMetrics;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Port\DashboardDataProviderPort;
+use Jblairy\PhpBenchmark\Domain\PhpVersion\Enum\PhpVersion;
 use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Entity\Pulse;
+use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Repository\PulseRepositoryInterface;
 
 /**
  * Doctrine adapter implementing DashboardDataProviderPort.
@@ -17,31 +19,14 @@ use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Entity\Pulse;
 final readonly class DoctrineDashboardDataProvider implements DashboardDataProviderPort
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
+        private PulseRepositoryInterface $pulseRepository,
     ) {
     }
 
     public function getAllBenchmarkMetrics(): array
     {
-        $entityRepository = $this->entityManager->getRepository(Pulse::class);
-        $pulses = $entityRepository->findAll();
-
-        return $this->groupPulsesIntoMetrics($pulses);
-    }
-
-    public function getAllPhpVersions(): array
-    {
-        $queryBuilder = $this->entityManager->createQueryBuilder();
-        $queryBuilder->select('DISTINCT p.phpVersion')
-            ->from(Pulse::class, 'p')
-            ->orderBy('p.phpVersion', 'ASC');
-
-        /** @var array<int, array{phpVersion: \Jblairy\PhpBenchmark\Domain\PhpVersion\Enum\PhpVersion}> $results */
-        $results = $queryBuilder->getQuery()->getResult();
-
-        return array_map(
-            fn (array $row): string => $row['phpVersion']->value,
-            $results,
+        return $this->groupPulsesIntoMetrics(
+            $this->pulseRepository->findAll()
         );
     }
 

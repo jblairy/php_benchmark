@@ -11,7 +11,7 @@ use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Entity\Pulse;
 /**
  * @extends ServiceEntityRepository<Pulse>
  */
-class PulseRepository extends ServiceEntityRepository
+class PulseRepository extends ServiceEntityRepository implements PulseRepositoryInterface
 {
     public function __construct(ManagerRegistry $managerRegistry)
     {

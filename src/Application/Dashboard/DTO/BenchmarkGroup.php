@@ -18,18 +18,4 @@ final readonly class BenchmarkGroup
         public array $phpVersions,
     ) {
     }
-
-    public function toArray(): array
-    {
-        $phpVersionsArray = [];
-        foreach ($this->phpVersions as $phpVersion => $stats) {
-            $phpVersionsArray[$phpVersion] = $stats->toArray();
-        }
-
-        return [
-            'benchId' => $this->benchmarkId,
-            'name' => $this->benchmarkName,
-            'phpVersions' => $phpVersionsArray,
-        ];
-    }
 }

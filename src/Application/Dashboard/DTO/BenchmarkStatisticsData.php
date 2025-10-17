@@ -46,20 +46,4 @@ final readonly class BenchmarkStatisticsData
             memoryPeak: $benchmarkStatistics->peakMemoryUsed,
         );
     }
-
-    public function toArray(): array
-    {
-        return [
-            'version' => $this->phpVersion,
-            'count' => $this->count,
-            'avg' => $this->avg,
-            'p50' => $this->p50,
-            'p80' => $this->p80,
-            'p90' => $this->p90,
-            'p95' => $this->p95,
-            'p99' => $this->p99,
-            'memoryUsed' => $this->memoryUsed,
-            'memoryPeak' => $this->memoryPeak,
-        ];
-    }
 }

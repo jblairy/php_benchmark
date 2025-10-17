@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jblairy\PhpBenchmark\Infrastructure\Web\Controller;
 
 use Jblairy\PhpBenchmark\Application\Dashboard\UseCase\GetDashboardStatistics;
+use Jblairy\PhpBenchmark\Infrastructure\Web\Presentation\BenchmarkPresentation;
 use Jblairy\PhpBenchmark\Infrastructure\Web\Presentation\ChartBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,21 +24,16 @@ final class DashboardController extends AbstractController
     {
         $dashboardData = $this->getDashboardStatistics->execute();
 
-        $benchmarkStats = array_map(
-            function ($benchmarkGroup) use ($dashboardData) {
-                $benchmarkArray = $benchmarkGroup->toArray();
-                $benchmarkArray['chart'] = $this->chartBuilder->createBenchmarkChart(
-                    $benchmarkArray,
-                    $dashboardData->allPhpVersions,
-                );
-
-                return $benchmarkArray;
-            },
+        $benchmarkPresentations = array_map(
+            fn ($benchmarkGroup) => BenchmarkPresentation::fromBenchmarkGroup(
+                $benchmarkGroup,
+                $this->chartBuilder->createBenchmarkChart($benchmarkGroup, $dashboardData->allPhpVersions),
+            ),
             $dashboardData->benchmarks,
         );
 
         return $this->render('dashboard/index.html.twig', [
-            'stats' => $benchmarkStats,
+            'stats' => $benchmarkPresentations,
             'allPhpVersions' => $dashboardData->allPhpVersions,
         ]);
     }
