@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jblairy\PhpBenchmark\Application\Dashboard\UseCase;
 
+use Jblairy\PhpBenchmark\Application\Dashboard\Builder\BenchmarkGroupBuilder;
 use Jblairy\PhpBenchmark\Application\Dashboard\DTO\BenchmarkGroup;
 use Jblairy\PhpBenchmark\Application\Dashboard\DTO\BenchmarkStatisticsData;
 use Jblairy\PhpBenchmark\Application\Dashboard\DTO\DashboardData;
@@ -54,28 +55,25 @@ final readonly class GetDashboardStatistics
     {
         $grouped = [];
 
-        foreach ($allMetrics as $allMetric) {
-            $statistics = $this->statisticsCalculator->calculate($allMetric);
-            $statisticsData = BenchmarkStatisticsData::fromDomain($statistics);
-            $benchmarkKey = $allMetric->benchmarkId . '_' . $allMetric->benchmarkName;
+        foreach ($allMetrics as $metric) {
+            $benchmarkKey = $metric->benchmarkId . '_' . $metric->benchmarkName;
 
             if (!isset($grouped[$benchmarkKey])) {
-                $grouped[$benchmarkKey] = [
-                    'benchmarkId' => $allMetric->benchmarkId,
-                    'benchmarkName' => $allMetric->benchmarkName,
-                    'phpVersions' => [],
-                ];
+                $grouped[$benchmarkKey] = new BenchmarkGroupBuilder(
+                    $metric->benchmarkId,
+                    $metric->benchmarkName,
+                );
             }
 
-            $grouped[$benchmarkKey]['phpVersions'][$allMetric->phpVersion] = $statisticsData;
+            $statistics = $this->statisticsCalculator->calculate($metric);
+            $grouped[$benchmarkKey]->addPhpVersion(
+                $metric->phpVersion,
+                BenchmarkStatisticsData::fromDomain($statistics),
+            );
         }
 
         return array_map(
-            fn (array $group): BenchmarkGroup => new BenchmarkGroup(
-                benchmarkId: $group['benchmarkId'],
-                benchmarkName: $group['benchmarkName'],
-                phpVersions: $group['phpVersions'],
-            ),
+            fn (BenchmarkGroupBuilder $builder): BenchmarkGroup => $builder->build(),
             $grouped,
         );
     }
