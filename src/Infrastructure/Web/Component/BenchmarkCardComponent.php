@@ -13,19 +13,19 @@ use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 
-#[AsLiveComponent]
+#[AsLiveComponent('BenchmarkCard')]
 final class BenchmarkCardComponent
 {
     use DefaultActionTrait;
 
     #[LiveProp]
-    public string $benchmarkId;
+    public string $benchmarkId = '';
 
     #[LiveProp]
-    public string $benchmarkName;
+    public string $benchmarkName = '';
 
-    public ?BenchmarkData $data = null;
-    public ?Chart $chart = null;
+    private ?BenchmarkData $data = null;
+    private ?Chart $chart = null;
 
     public function __construct(
         private readonly GetBenchmarkStatistics $getBenchmarkStatistics,
@@ -33,10 +33,25 @@ final class BenchmarkCardComponent
     ) {
     }
 
-    public function mount(): void
+    public function getData(): ?BenchmarkData
     {
-        $this->data = $this->getBenchmarkStatistics->execute($this->benchmarkId, $this->benchmarkName);
-        $this->chart = $this->chartBuilder->createBenchmarkChart($this->data, $this->getAllPhpVersions());
+        if (null === $this->data && '' !== $this->benchmarkId && '' !== $this->benchmarkName) {
+            $this->data = $this->getBenchmarkStatistics->execute($this->benchmarkId, $this->benchmarkName);
+        }
+
+        return $this->data;
+    }
+
+    public function getChart(): ?Chart
+    {
+        if (null === $this->chart && null !== $this->getData()) {
+            $this->chart = $this->chartBuilder->createBenchmarkChart(
+                $this->getData(),
+                $this->getAllPhpVersions(),
+            );
+        }
+
+        return $this->chart;
     }
 
     /**

@@ -14,11 +14,6 @@ interface PulseRepositoryInterface
     public function findUniqueBenchmarks(): array;
 
     /**
-     * @return array<string, mixed>
-     */
-    public function getStatisticsForBenchmark(string $benchId, string $name): array;
-
-    /**
      * Get metrics for a specific benchmark grouped by PHP version.
      *
      * @return BenchmarkMetrics[]

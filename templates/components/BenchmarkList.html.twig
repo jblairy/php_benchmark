@@ -1,0 +1,18 @@
+<div {{ attributes }}>
+    <div data-loading="delay|show">
+        <div class="stats-card__container">
+            <span class="spinner">⏳</span> Chargement de la liste des benchmarks...
+        </div>
+    </div>
+
+    {% if this.benchmarks %}
+        <div data-loading="hide">
+            {% for benchmark in this.benchmarks %}
+                <twig:BenchmarkCard
+                    benchmarkId="{{ benchmark.benchId }}"
+                    benchmarkName="{{ benchmark.name }}"
+                />
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
