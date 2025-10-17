@@ -22,32 +22,27 @@ class PulseRepository extends ServiceEntityRepository implements PulseRepository
     /**
      * @return BenchmarkMetrics[]
      */
-    public function findAllGroupedMetrics(): array
+    public function findMetricsByBenchmark(string $benchmarkId, string $benchmarkName): array
     {
         $sql = <<<'SQL'
             SELECT
-                sub.bench_id,
-                sub.name,
-                sub.php_version,
-                sub.execution_times,
-                sub.memory_usages,
-                sub.memory_peaks
-            FROM (
-                SELECT
-                    p.bench_id,
-                    p.name,
-                    p.php_version,
-                    JSON_ARRAYAGG(p.execution_time_ms) as execution_times,
-                    JSON_ARRAYAGG(p.memory_used_bytes) as memory_usages,
-                    JSON_ARRAYAGG(p.memory_peak_byte) as memory_peaks
-                FROM pulse p
-                GROUP BY p.bench_id, p.name, p.php_version
-            ) sub
-            ORDER BY sub.bench_id, sub.name, sub.php_version
+                p.bench_id,
+                p.name,
+                p.php_version,
+                JSON_ARRAYAGG(p.execution_time_ms) as execution_times,
+                JSON_ARRAYAGG(p.memory_used_bytes) as memory_usages,
+                JSON_ARRAYAGG(p.memory_peak_byte) as memory_peaks
+            FROM pulse p
+            WHERE p.bench_id = :benchmarkId AND p.name = :benchmarkName
+            GROUP BY p.bench_id, p.name, p.php_version
+            ORDER BY p.php_version
         SQL;
 
         $connection = $this->getEntityManager()->getConnection();
-        $result = $connection->executeQuery($sql)->fetchAllAssociative();
+        $result = $connection->executeQuery($sql, [
+            'benchmarkId' => $benchmarkId,
+            'benchmarkName' => $benchmarkName,
+        ])->fetchAllAssociative();
 
         return array_map(
             fn (array $row): BenchmarkMetrics => new BenchmarkMetrics(

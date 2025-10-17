@@ -1,0 +1,185 @@
+<div {{ attributes }} class="stats-card__container">
+    <div data-loading="delay|show">
+        <div class="stats-card__flex">
+            <h2 class="stats-card__title">{{ benchmarkName }} ({{ benchmarkId }})</h2>
+            <div>
+                <span class="spinner">⏳</span> Chargement des statistiques...
+            </div>
+        </div>
+    </div>
+
+    {% if data %}
+        <div data-loading="hide">
+            <div data-controller="toggle unit-switch">
+                <div class="stats-card__flex">
+                    <h2 class="stats-card__title">{{ data.benchmarkName }} ({{ data.benchmarkId }})</h2>
+                    <div>
+                        <button class="button__toggle" data-action="toggle#toggle">
+                            Afficher/Masquer le graphique
+                        </button>
+                        <button class="button__toggle" data-action="unit-switch#toggle">
+                            ms/ns
+                        </button>
+                    </div>
+                </div>
+
+                <div class="chart__container" data-toggle-target="chart">
+                    {{ render_chart(chart) }}
+                </div>
+
+                <table class="table">
+                    <thead class="table__header">
+                    <tr>
+                        <th class="table__cell">Métrique</th>
+                        {% for phpVersion in data.phpVersions|keys %}
+                            <th class="table__cell table__cell--metric">
+                                PHP {{ phpVersion|replace({'php': ''}) }}
+                            </th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr class="table__row">
+                        <td class="table__cell table__cell--metric">Échantillons</td>
+                        {% for stats in data.phpVersions %}
+                            <td class="table__cell">{{ stats.count }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="table__row">
+                        <td class="table__cell table__cell--metric" data-metric="p50">p50 (ms)</td>
+                        {% set best_p50 = 999999 %}
+                        {% for stats in data.phpVersions %}
+                            {% if stats.p50 < best_p50 %}
+                                {% set best_p50 = stats.p50 %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for stats in data.phpVersions %}
+                            <td class="table__cell {% if stats.p50 == best_p50 %}table__cell--best-value{% endif %}"
+                                data-unit-switch-target="cell"
+                                data-value="{{ stats.p50 }}">
+                                {{ stats.p50|number_format(5) }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="table__row">
+                        <td class="table__cell table__cell--metric" data-metric="p80">p80 (ms)</td>
+                        {% set best_p80 = 999999 %}
+                        {% for stats in data.phpVersions %}
+                            {% if stats.p80 < best_p80 %}
+                                {% set best_p80 = stats.p80 %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for stats in data.phpVersions %}
+                            <td class="table__cell {% if stats.p80 == best_p80 %}table__cell--best-value{% endif %}"
+                                data-unit-switch-target="cell"
+                                data-value="{{ stats.p80 }}">
+                                {{ stats.p80|number_format(5) }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="table__row">
+                        <td class="table__cell table__cell--metric" data-metric="p90">p90 (ms)</td>
+                        {% set best_p90 = 999999 %}
+                        {% for stats in data.phpVersions %}
+                            {% if stats.p90 < best_p90 %}
+                                {% set best_p90 = stats.p90 %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for stats in data.phpVersions %}
+                            <td class="table__cell {% if stats.p90 == best_p90 %}table__cell--best-value{% endif %}"
+                                data-unit-switch-target="cell"
+                                data-value="{{ stats.p90 }}">
+                                {{ stats.p90|number_format(5) }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="table__row">
+                        <td class="table__cell table__cell--metric" data-metric="p95">p95 (ms)</td>
+                        {% set best_p95 = 999999 %}
+                        {% for stats in data.phpVersions %}
+                            {% if stats.p95 < best_p95 %}
+                                {% set best_p95 = stats.p95 %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for stats in data.phpVersions %}
+                            <td class="table__cell {% if stats.p95 == best_p95 %}table__cell--best-value{% endif %}"
+                                data-unit-switch-target="cell"
+                                data-value="{{ stats.p95 }}">
+                                {{ stats.p95|number_format(5) }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="table__row">
+                        <td class="table__cell table__cell--metric" data-metric="p99">p99 (ms)</td>
+                        {% set best_p99 = 999999 %}
+                        {% for stats in data.phpVersions %}
+                            {% if stats.p99 < best_p99 %}
+                                {% set best_p99 = stats.p99 %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for stats in data.phpVersions %}
+                            <td class="table__cell {% if stats.p99 == best_p99 %}table__cell--best-value{% endif %}"
+                                data-unit-switch-target="cell"
+                                data-value="{{ stats.p99 }}">
+                                {{ stats.p99|number_format(5) }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="table__row">
+                        <td class="table__cell table__cell--metric" data-metric="avg">Moyenne (ms)</td>
+                        {% set best_avg = 999999 %}
+                        {% for stats in data.phpVersions %}
+                            {% if stats.avg < best_avg %}
+                                {% set best_avg = stats.avg %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for stats in data.phpVersions %}
+                            <td class="table__cell {% if stats.avg == best_avg %}table__cell--best-value{% endif %}"
+                                data-unit-switch-target="cell"
+                                data-value="{{ stats.avg }}">
+                                {{ stats.avg|number_format(5) }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="table__row">
+                        <td class="table__cell table__cell--metric" data-metric="memoryUsed">Mémoire utilisée (Mo)</td>
+                        {% set best_memory = 999999999999 %}
+                        {% for stats in data.phpVersions %}
+                            {% if stats.memoryUsed < best_memory %}
+                                {% set best_memory = stats.memoryUsed %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for stats in data.phpVersions %}
+                            <td class="table__cell {% if stats.memoryUsed == best_memory %}table__cell--best-value{% endif %}">
+                                {{ (stats.memoryUsed / 1024 / 1024)|number_format(2) }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="table__row">
+                        <td class="table__cell table__cell--metric" data-metric="memoryPeak">Pic de mémoire (Mo)</td>
+                        {% set best_memory_peak = 999999999999 %}
+                        {% for stats in data.phpVersions %}
+                            {% if stats.memoryPeak < best_memory_peak %}
+                                {% set best_memory_peak = stats.memoryPeak %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for stats in data.phpVersions %}
+                            <td class="table__cell {% if stats.memoryPeak == best_memory_peak %}table__cell--best-value{% endif %}">
+                                {{ (stats.memoryPeak / 1024 / 1024)|number_format(2) }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+</div>

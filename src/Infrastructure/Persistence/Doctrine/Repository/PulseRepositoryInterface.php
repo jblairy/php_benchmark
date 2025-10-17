@@ -19,11 +19,9 @@ interface PulseRepositoryInterface
     public function getStatisticsForBenchmark(string $benchId, string $name): array;
 
     /**
-     * Get all benchmark metrics grouped by benchmark and PHP version using SQL aggregation.
-     *
-     * Uses JSON_ARRAYAGG to efficiently aggregate metrics at database level.
+     * Get metrics for a specific benchmark grouped by PHP version.
      *
      * @return BenchmarkMetrics[]
      */
-    public function findAllGroupedMetrics(): array;
+    public function findMetricsByBenchmark(string $benchmarkId, string $benchmarkName): array;
 }
