@@ -41,6 +41,11 @@ final readonly class ChartBuilder
         return $chart;
     }
 
+    /**
+     * @param string[] $allPhpVersions
+     *
+     * @return array{array<float|null>, array<float|null>, array<float|null>}
+     */
     private function prepareChartData(BenchmarkData $benchmarkData, array $allPhpVersions): array
     {
         $p50Data = [];
@@ -57,6 +62,11 @@ final readonly class ChartBuilder
         return [$p50Data, $p90Data, $avgData];
     }
 
+    /**
+     * @param string[] $versions
+     *
+     * @return string[]
+     */
     private function formatVersionLabels(array $versions): array
     {
         return array_map(
@@ -65,6 +75,11 @@ final readonly class ChartBuilder
         );
     }
 
+    /**
+     * @param array<float|null> $data
+     *
+     * @return array{label: string, data: array<float|null>, backgroundColor: string, borderColor: string, borderWidth: int}
+     */
     private function createDataset(string $label, array $data, string $bgColor, string $borderColor): array
     {
         return [
@@ -76,6 +91,9 @@ final readonly class ChartBuilder
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function getChartOptions(): array
     {
         return [

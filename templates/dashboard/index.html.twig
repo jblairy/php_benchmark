@@ -11,22 +11,10 @@
     <div class="dashboard__container">
         <h1 class="dashboard__title">Comparaison par version PHP</h1>
 
-        {% if benchmarks|length > 0 %}
-            <div class="stats-card__container">
-                <h2 class="dashboard__subtitle">Vue d'ensemble des benchmarks</h2>
-                <p>Nombre total de benchmarks: {{ benchmarks|length }}</p>
-            </div>
+        <div class="stats-card__container">
+            <h2 class="dashboard__subtitle">Vue d'ensemble des benchmarks</h2>
+        </div>
 
-            {% for benchmark in benchmarks %}
-                <twig:BenchmarkCard
-                    :benchmarkId="benchmark.benchId"
-                    :benchmarkName="benchmark.name"
-                />
-            {% endfor %}
-        {% else %}
-            <div class="empty-message">
-                <p>Aucune donnée de performance disponible.</p>
-            </div>
-        {% endif %}
+        <twig:BenchmarkList />
     </div>
 {% endblock %}
