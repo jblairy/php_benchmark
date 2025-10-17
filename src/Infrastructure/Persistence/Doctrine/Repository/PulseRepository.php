@@ -6,6 +6,7 @@ namespace Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Model\BenchmarkMetrics;
 use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Entity\Pulse;
 
 /**
@@ -16,6 +17,40 @@ class PulseRepository extends ServiceEntityRepository implements PulseRepository
     public function __construct(ManagerRegistry $managerRegistry)
     {
         parent::__construct($managerRegistry, Pulse::class);
+    }
+
+    /**
+     * @return BenchmarkMetrics[]
+     */
+    public function findAllGroupedMetrics(): array
+    {
+        $sql = <<<'SQL'
+            SELECT
+                p.bench_id,
+                p.name,
+                p.php_version,
+                JSON_ARRAYAGG(p.execution_time_ms) as execution_times,
+                JSON_ARRAYAGG(p.memory_used_bytes) as memory_usages,
+                JSON_ARRAYAGG(p.memory_peak_byte) as memory_peaks
+            FROM pulse p
+            GROUP BY p.bench_id, p.name, p.php_version
+            ORDER BY p.bench_id, p.php_version
+        SQL;
+
+        $connection = $this->getEntityManager()->getConnection();
+        $result = $connection->executeQuery($sql)->fetchAllAssociative();
+
+        return array_map(
+            fn (array $row): BenchmarkMetrics => new BenchmarkMetrics(
+                benchmarkId: $row['bench_id'],
+                benchmarkName: $row['name'],
+                phpVersion: $row['php_version'],
+                executionTimes: json_decode($row['execution_times'], true),
+                memoryUsages: json_decode($row['memory_usages'], true),
+                memoryPeaks: json_decode($row['memory_peaks'], true),
+            ),
+            $result,
+        );
     }
 
     /**
