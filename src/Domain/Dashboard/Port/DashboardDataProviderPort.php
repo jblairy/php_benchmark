@@ -20,11 +20,4 @@ interface DashboardDataProviderPort
      * @return BenchmarkMetrics[]
      */
     public function getAllBenchmarkMetrics(): array;
-
-    /**
-     * Get all unique PHP versions present in benchmarks.
-     *
-     * @return string[]
-     */
-    public function getAllPhpVersions(): array;
 }

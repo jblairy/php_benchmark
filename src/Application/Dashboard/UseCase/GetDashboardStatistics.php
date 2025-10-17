@@ -9,6 +9,7 @@ use Jblairy\PhpBenchmark\Application\Dashboard\DTO\BenchmarkStatisticsData;
 use Jblairy\PhpBenchmark\Application\Dashboard\DTO\DashboardData;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Port\DashboardDataProviderPort;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Service\StatisticsCalculator;
+use Jblairy\PhpBenchmark\Domain\PhpVersion\Enum\PhpVersion;
 
 /**
  * Use Case: Get Dashboard Statistics.
@@ -25,11 +26,22 @@ final readonly class GetDashboardStatistics
     {
         $allMetrics = $this->dashboardDataProvider->getAllBenchmarkMetrics();
         $benchmarkGroups = $this->groupStatisticsByBenchmark($allMetrics);
-        $allPhpVersions = $this->dashboardDataProvider->getAllPhpVersions();
+        $allPhpVersions = $this->getAllPhpVersionsFromEnum();
 
         return new DashboardData(
             benchmarks: $benchmarkGroups,
             allPhpVersions: $allPhpVersions,
+        );
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getAllPhpVersionsFromEnum(): array
+    {
+        return array_map(
+            fn (PhpVersion $version): string => $version->value,
+            PhpVersion::cases(),
         );
     }
 

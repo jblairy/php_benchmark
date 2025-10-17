@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jblairy\PhpBenchmark\Infrastructure\Web\Presentation;
 
+use Jblairy\PhpBenchmark\Application\Dashboard\DTO\BenchmarkGroup;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 
@@ -18,14 +19,13 @@ final readonly class ChartBuilder
     }
 
     /**
-     * @param array    $benchmark      Benchmark data with phpVersions statistics
      * @param string[] $allPhpVersions All available PHP versions
      */
-    public function createBenchmarkChart(array $benchmark, array $allPhpVersions): Chart
+    public function createBenchmarkChart(BenchmarkGroup $benchmarkGroup, array $allPhpVersions): Chart
     {
         $chart = $this->chartBuilder->createChart(Chart::TYPE_BAR);
 
-        [$p50Data, $p90Data, $avgData] = $this->prepareChartData($benchmark, $allPhpVersions);
+        [$p50Data, $p90Data, $avgData] = $this->prepareChartData($benchmarkGroup, $allPhpVersions);
 
         $chart->setData([
             'labels' => $this->formatVersionLabels($allPhpVersions),
@@ -41,16 +41,17 @@ final readonly class ChartBuilder
         return $chart;
     }
 
-    private function prepareChartData(array $benchmark, array $allPhpVersions): array
+    private function prepareChartData(BenchmarkGroup $benchmarkGroup, array $allPhpVersions): array
     {
         $p50Data = [];
         $p90Data = [];
         $avgData = [];
 
-        foreach ($allPhpVersions as $allPhpVersion) {
-            $p50Data[] = $benchmark['phpVersions'][$allPhpVersion]['p50'] ?? null;
-            $p90Data[] = $benchmark['phpVersions'][$allPhpVersion]['p90'] ?? null;
-            $avgData[] = $benchmark['phpVersions'][$allPhpVersion]['avg'] ?? null;
+        foreach ($allPhpVersions as $phpVersion) {
+            $stats = $benchmarkGroup->phpVersions[$phpVersion] ?? null;
+            $p50Data[] = $stats?->p50;
+            $p90Data[] = $stats?->p90;
+            $avgData[] = $stats?->avg;
         }
 
         return [$p50Data, $p90Data, $avgData];

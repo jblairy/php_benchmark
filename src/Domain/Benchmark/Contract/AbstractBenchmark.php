@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Jblairy\PhpBenchmark\Domain\Benchmark\Contract;
 
-use Jblairy\PhpBenchmark\Benchmark\Exception\ReflexionMethodNotFound;
+use Jblairy\PhpBenchmark\Domain\Benchmark\Exception\ReflexionMethodNotFound;
 use Jblairy\PhpBenchmark\Domain\PhpVersion\Attribute\All;
 use Jblairy\PhpBenchmark\Domain\PhpVersion\Enum\PhpVersion;
 use ReflectionClass;
@@ -16,14 +16,47 @@ abstract class AbstractBenchmark implements Benchmark
     {
         $reflectionMethod = $this->getReflexionMethod($phpVersion);
         $fileName = (string) $reflectionMethod->getFileName();
-        $startLine = (int) $reflectionMethod->getStartLine() + 1; // TODO make it better
-        $endLine = (int) $reflectionMethod->getEndLine() - 1; // TODO make it better
+
+        [$startLine, $endLine] = $this->extractMethodBodyBoundaries($reflectionMethod);
+        $methodBodyLines = $this->extractLinesFromFile($fileName, $startLine, $endLine);
+        $rawScript = implode('', $methodBodyLines);
+
+        return $this->removeHeredocMarkers($rawScript);
+    }
+
+    /**
+     * Extract start and end line numbers for method body content.
+     * Excludes method signature (first line) and closing brace (last line).
+     *
+     * @return array{int, int} [startLine, endLine]
+     */
+    private function extractMethodBodyBoundaries(ReflectionMethod $reflectionMethod): array
+    {
+        $startLine = (int) $reflectionMethod->getStartLine() + 1;
+        $endLine = (int) $reflectionMethod->getEndLine() - 1;
+
+        return [$startLine, $endLine];
+    }
+
+    /**
+     * Extract specific lines from a file.
+     *
+     * @return string[]
+     */
+    private function extractLinesFromFile(string $fileName, int $startLine, int $endLine): array
+    {
         $code = (array) file($fileName);
 
-        $lines = array_slice($code, $startLine, $endLine - $startLine);
-        $script = implode('', $lines);
+        return array_slice($code, $startLine, $endLine - $startLine);
+    }
 
-        return str_replace(['<<<PHP', 'PHP;'], '', $script); // TODO just a POC need an improvement or refactor
+    /**
+     * Remove PHP heredoc syntax markers from script.
+     * Cleans up '<<<PHP' opening and 'PHP;' closing markers.
+     */
+    private function removeHeredocMarkers(string $script): string
+    {
+        return str_replace(['<<<PHP', 'PHP;'], '', $script);
     }
 
     private function getReflexionMethod(PhpVersion $phpVersion): ReflectionMethod
