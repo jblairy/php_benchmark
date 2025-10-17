@@ -26,15 +26,24 @@ class PulseRepository extends ServiceEntityRepository implements PulseRepository
     {
         $sql = <<<'SQL'
             SELECT
-                p.bench_id,
-                p.name,
-                p.php_version,
-                JSON_ARRAYAGG(p.execution_time_ms) as execution_times,
-                JSON_ARRAYAGG(p.memory_used_bytes) as memory_usages,
-                JSON_ARRAYAGG(p.memory_peak_byte) as memory_peaks
-            FROM pulse p
-            GROUP BY p.bench_id, p.name, p.php_version
-            ORDER BY p.bench_id, p.php_version
+                sub.bench_id,
+                sub.name,
+                sub.php_version,
+                sub.execution_times,
+                sub.memory_usages,
+                sub.memory_peaks
+            FROM (
+                SELECT
+                    p.bench_id,
+                    p.name,
+                    p.php_version,
+                    JSON_ARRAYAGG(p.execution_time_ms) as execution_times,
+                    JSON_ARRAYAGG(p.memory_used_bytes) as memory_usages,
+                    JSON_ARRAYAGG(p.memory_peak_byte) as memory_peaks
+                FROM pulse p
+                GROUP BY p.bench_id, p.name, p.php_version
+            ) sub
+            ORDER BY sub.bench_id, sub.name, sub.php_version
         SQL;
 
         $connection = $this->getEntityManager()->getConnection();
