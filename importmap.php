@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * Returns the importmap for this application.
  *
@@ -35,5 +33,8 @@ return [
     ],
     '@kurkle/color' => [
         'version' => '0.3.4',
+    ],
+    '@symfony/ux-live-component' => [
+        'path' => './vendor/symfony/ux-live-component/assets/dist/live_controller.js',
     ],
 ];
