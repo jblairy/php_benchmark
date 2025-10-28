@@ -1,37 +1,35 @@
 <div {{ attributes }}
      data-controller="mercure-progress"
-     data-mercure-progress-url-value="{{ mercurePublicUrl }}"
+     data-mercure-progress-url-value="{{ this.mercurePublicUrl }}"
      data-mercure-progress-topic-value="benchmark/progress"
      class="benchmark-progress-container">
 
     <div class="benchmark-progress-header">
-        <h3>{{ benchmarkName }}</h3>
-        <span class="php-version-badge">{{ phpVersion }}</span>
+        <h3 class="benchmark-name">Waiting for benchmark...</h3>
+        <span class="php-version-badge" style="display: none;"></span>
     </div>
 
-    {% if status == 'idle' %}
-        <div class="status-idle">
-            <p>Waiting to start...</p>
-        </div>
-    {% endif %}
+    <div class="status-idle">
+        <p>⏳ En attente de démarrage d'un benchmark...</p>
+    </div>
 
-    {% if isRunning %}
-        <div class="status-running">
-            <div class="progress-bar-container">
-                <div class="progress-bar" style="width: {{ progress }}%">
-                    <span class="progress-text">{{ currentIteration }} / {{ totalIterations }}</span>
-                </div>
+    <div class="status-started" style="display: none;">
+        <p class="status-text">🚀 Démarrage...</p>
+    </div>
+
+    <div class="status-running" style="display: none;">
+        <div class="progress-bar-container">
+            <div class="progress-bar" style="width: 0%">
+                <span class="progress-text">0 / 0</span>
             </div>
-            <p class="status-text">Running benchmark... {{ progress }}%</p>
         </div>
-    {% endif %}
+        <p class="status-text">⏱️ Benchmark en cours...</p>
+    </div>
 
-    {% if isCompleted %}
-        <div class="status-completed">
-            <p class="status-text success">Completed! {{ totalIterations }} iterations finished.</p>
-            <p class="info-text">View detailed results in the dashboard below.</p>
-        </div>
-    {% endif %}
+    <div class="status-completed" style="display: none;">
+        <p class="status-text success">✅ Terminé!</p>
+        <p class="info-text">Consultez les résultats détaillés ci-dessous.</p>
+    </div>
 </div>
 
 <style>
