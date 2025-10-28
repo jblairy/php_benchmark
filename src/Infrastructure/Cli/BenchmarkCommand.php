@@ -12,7 +12,9 @@ use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkConfiguration;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkRepositoryPort;
 use Jblairy\PhpBenchmark\Domain\PhpVersion\Enum\PhpVersion;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -22,15 +24,22 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 final readonly class BenchmarkCommand
 {
-    public function __construct(private BenchmarkOrchestrator $benchmarkOrchestrator, private BenchmarkRepositoryPort $benchmarkRepositoryPort)
-    {
+    public function __construct(
+        private BenchmarkOrchestrator $benchmarkOrchestrator,
+        private BenchmarkRepositoryPort $benchmarkRepositoryPort,
+    ) {
     }
 
-    public function __invoke(#[\Symfony\Component\Console\Attribute\Option]
-        $test, #[\Symfony\Component\Console\Attribute\Option]
-        $iterations, #[\Symfony\Component\Console\Attribute\Option]
-        $php_version, OutputInterface $output): int
-    {
+    public function __invoke(
+        OutputInterface $output,
+        InputInterface $input,
+        #[Option]
+        ?string $test = null,
+        #[Option]
+        int $iterations = 0,
+        #[Option]
+        ?string $php_version = null,
+): int {
         $symfonyStyle = new SymfonyStyle($input, $output);
 
         $testName = $test;

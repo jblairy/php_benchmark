@@ -1,6 +1,6 @@
 FROM debian:bullseye
 
-# 📦 Installer les dépendances nécessaires
+# Install required dependencies
 RUN apt update && apt install -y \
     build-essential \
     libxml2-dev \
@@ -20,15 +20,15 @@ RUN apt update && apt install -y \
     bzip2 \
     git
 
-# 📥 Télécharger et extraire PHP 8.5.0 Alpha 1
+# Download and extract PHP 8.5.0
 WORKDIR /usr/src
-RUN wget https://downloads.php.net/~daniels/php-8.5.0alpha1.tar.xz && \
-    tar -xf php-8.5.0alpha1.tar.xz && \
-    rm php-8.5.0alpha1.tar.xz
+RUN wget https://downloads.php.net/~daniels/php-8.5.0RC3.tar.xz && \
+    tar -xf php-8.5.0RC3.tar.xz && \
+    rm php-8.5.0RC3.tar.xz
 
-WORKDIR /usr/src/php-8.5.0alpha1
+WORKDIR /usr/src/php-8.5.0RC3
 
-# ⚙️ Configurer, compiler et installer
+# Configure, compile and install
 RUN ./configure --prefix=/usr/local/php8.5 \
     --with-openssl \
     --enable-mbstring \
@@ -37,8 +37,8 @@ RUN ./configure --prefix=/usr/local/php8.5 \
     make -j$(nproc) && \
     make install
 
-# 🧪 Ajouter PHP au PATH
+# Add PHP to PATH
 ENV PATH="/usr/local/php8.5/bin:${PATH}"
 
-# 🔍 Vérification
+# Verification
 CMD ["php", "-v"]
