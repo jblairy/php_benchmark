@@ -13,6 +13,8 @@ final class DashboardController extends AbstractController
     #[Route('/dashboard', name: 'app_dashboard')]
     public function dashboard(): Response
     {
-        return $this->render('dashboard/index.html.twig');
+        return $this->render('dashboard/index.html.twig', [
+            'mercure_public_url' => $_ENV['MERCURE_PUBLIC_URL'] ?? 'http://localhost:3000/.well-known/mercure',
+        ]);
     }
 }

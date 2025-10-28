@@ -4,15 +4,18 @@
 
 {% block javascripts %}
     {{ parent() }}
-    {{ encore_entry_script_tags('app') }}
 {% endblock %}
 
 {% block body %}
-    <div class="dashboard__container">
+    <div class="dashboard__container"
+         data-controller="dashboard-mercure"
+         data-dashboard-mercure-url-value="{{ mercure_public_url }}"
+         data-dashboard-mercure-topic-value="benchmark/results">
         <h1 class="dashboard__title">Comparaison par version PHP</h1>
 
         <div class="stats-card__container">
             <h2 class="dashboard__subtitle">Vue d'ensemble des benchmarks</h2>
+            <p class="dashboard__subtitle-info">🔄 Les tableaux se mettent à jour automatiquement en temps réel</p>
         </div>
 
         <twig:BenchmarkList />
