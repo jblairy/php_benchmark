@@ -39,7 +39,7 @@ final readonly class BenchmarkCommand
         int $iterations = 0,
         #[Option]
         ?string $php_version = null,
-): int {
+    ): int {
         $symfonyStyle = new SymfonyStyle($input, $output);
 
         $testName = $test;
