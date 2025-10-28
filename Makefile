@@ -22,6 +22,11 @@ run:
 		docker-compose run --rm main php bin/console benchmark:run --test=$(test) --iterations=$(or $(iterations),1) --php-version=$(version); \
 	fi
 
+db.reset:
+	docker-compose run main php bin/console d:d:d --force; \
+	docker-compose run main php bin/console d:d:c; \
+	docker-compose run main php bin/console d:m:m; \
+
 phpcsfixer:
 	docker-compose run --rm main vendor/bin/php-cs-fixer fix --dry-run --diff
 
