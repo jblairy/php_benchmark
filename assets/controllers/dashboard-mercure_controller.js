@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus';
 
 /**
  * Stimulus controller for real-time dashboard updates via Mercure
- * Listens for benchmark completion events and reloads the corresponding BenchmarkCard
+ * Shows notification banner when benchmarks complete, lets user decide when to refresh
  */
 export default class extends Controller {
     static values = {
@@ -10,12 +10,16 @@ export default class extends Controller {
         topic: String
     };
 
+    static targets = ['banner', 'bannerText'];
+
     eventSource = null;
+    pendingUpdates = 0;
 
     connect() {
         console.log('🔌 Dashboard Mercure Controller connected');
         console.log('📡 Mercure URL:', this.urlValue);
         console.log('📢 Topic:', this.topicValue);
+
         this.subscribeToMercure();
     }
 
@@ -39,62 +43,61 @@ export default class extends Controller {
         };
 
         this.eventSource.onmessage = (event) => {
-            console.log('📬 Raw event data:', event.data);
+            console.log('📬 Mercure event received');
             const data = JSON.parse(event.data);
             this.handleBenchmarkEvent(data);
         };
 
         this.eventSource.onerror = (error) => {
             console.error('❌ Mercure connection error:', error);
-            console.error('ReadyState:', this.eventSource.readyState);
         };
     }
 
     handleBenchmarkEvent(data) {
-        console.log('📨 Mercure event received:', data);
-
         if (data.type === 'benchmark.completed') {
-            console.log('✅ Benchmark completed:', data.benchmarkId, data.phpVersion);
-            this.reloadBenchmarkCard(data.benchmarkId);
+            console.log('✅ Benchmark completed:', data.benchmarkName || data.benchmarkId);
+            this.onBenchmarkCompleted(data);
         }
     }
 
-    reloadBenchmarkCard(benchmarkId) {
-        console.log('🔄 Reloading dashboard for benchmark:', benchmarkId);
+    onBenchmarkCompleted(data) {
+        // Increment pending updates counter
+        this.pendingUpdates++;
 
-        // Show a brief notification
-        this.showNotification(`✅ Benchmark terminé: ${benchmarkId.split('\\').pop()}`);
+        // Update banner text
+        if (this.hasBannerTextTarget) {
+            if (this.pendingUpdates === 1) {
+                this.bannerTextTarget.textContent = `1 nouveau résultat disponible`;
+            } else {
+                this.bannerTextTarget.textContent = `${this.pendingUpdates} nouveaux résultats disponibles`;
+            }
+        }
 
-        // Wait 1 second to let the user see the notification, then reload
-        setTimeout(() => {
-            window.location.reload();
-        }, 1000);
+        // Show banner
+        if (this.hasBannerTarget) {
+            this.bannerTarget.style.display = 'block';
+        }
+
+        console.log(`📊 ${this.pendingUpdates} pending update(s)`);
     }
 
-    showNotification(message) {
-        // Create a simple notification
-        const notification = document.createElement('div');
-        notification.textContent = message;
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #4caf50;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            z-index: 10000;
-            font-weight: bold;
-            animation: slideIn 0.3s ease-out;
-        `;
+    refreshNow() {
+        console.log('🔄 User requested manual refresh');
 
-        document.body.appendChild(notification);
+        // Save scroll position
+        const scrollY = window.scrollY;
+        sessionStorage.setItem('dashboardScrollPosition', scrollY.toString());
 
-        // Remove after 3 seconds
-        setTimeout(() => {
-            notification.style.animation = 'slideOut 0.3s ease-out';
-            setTimeout(() => notification.remove(), 300);
-        }, 2500);
+        // Reload page
+        window.location.reload();
     }
 }
+
+// Restore scroll position on page load
+window.addEventListener('DOMContentLoaded', () => {
+    const savedPosition = sessionStorage.getItem('dashboardScrollPosition');
+    if (savedPosition) {
+        window.scrollTo(0, parseInt(savedPosition, 10));
+        sessionStorage.removeItem('dashboardScrollPosition');
+    }
+});
