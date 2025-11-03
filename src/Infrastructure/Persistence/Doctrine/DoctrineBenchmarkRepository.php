@@ -87,4 +87,19 @@ final readonly class DoctrineBenchmarkRepository implements BenchmarkRepositoryP
             ->setParameter('totalBenchmarks', $totalBenchmarks)
             ->getSingleResult();
     }
+
+    public function getTopCategories(int $limit = 3): array
+    {
+        $results = $this->entityManager
+            ->createQuery('
+                SELECT b.category, COUNT(b.id) as benchmark_count
+                FROM ' . BenchmarkEntity::class . ' b
+                GROUP BY b.category
+                ORDER BY benchmark_count DESC
+            ')
+            ->setMaxResults($limit)
+            ->getResult();
+
+        return array_map(fn (array $row): string => $row['category'], $results);
+    }
 }

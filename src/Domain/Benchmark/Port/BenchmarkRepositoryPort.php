@@ -26,4 +26,11 @@ interface BenchmarkRepositoryPort
      * Get dashboard overview statistics.
      */
     public function getDashboardStats(): DashboardStatsData;
+
+    /**
+     * Get top N most populated categories.
+     *
+     * @return string[] Array of category names
+     */
+    public function getTopCategories(int $limit = 3): array;
 }
