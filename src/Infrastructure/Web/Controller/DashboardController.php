@@ -6,6 +6,7 @@ namespace Jblairy\PhpBenchmark\Infrastructure\Web\Controller;
 
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkRepositoryPort;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -13,6 +14,8 @@ final class DashboardController extends AbstractController
 {
     public function __construct(
         private readonly BenchmarkRepositoryPort $benchmarkRepository,
+        #[Autowire(env: 'MERCURE_PUBLIC_URL')]
+        private readonly string $mercurePublicUrl,
     ) {
     }
 
@@ -20,7 +23,7 @@ final class DashboardController extends AbstractController
     public function dashboard(): Response
     {
         return $this->render('dashboard/index.html.twig', [
-            'mercure_public_url' => $_ENV['MERCURE_PUBLIC_URL'] ?? 'http://localhost:3000/.well-known/mercure',
+            'mercure_public_url' => $this->mercurePublicUrl,
             'stats' => $this->benchmarkRepository->getDashboardStats(),
             'top_categories' => $this->benchmarkRepository->getTopCategories(3),
         ]);

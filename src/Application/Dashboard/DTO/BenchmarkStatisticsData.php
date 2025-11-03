@@ -5,11 +5,19 @@ declare(strict_types=1);
 namespace Jblairy\PhpBenchmark\Application\Dashboard\DTO;
 
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\BenchmarkStatistics;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Model\PercentileMetrics;
+use RuntimeException;
 
 /**
  * Data Transfer Object for benchmark statistics.
  *
  * Used to transfer data from Application layer to Infrastructure (Controller)
+ *
+ * @property float $p50
+ * @property float $p80
+ * @property float $p90
+ * @property float $p95
+ * @property float $p99
  */
 final readonly class BenchmarkStatisticsData
 {
@@ -19,14 +27,26 @@ final readonly class BenchmarkStatisticsData
         public string $phpVersion,
         public int $count,
         public float $avg,
-        public float $p50,
-        public float $p80,
-        public float $p90,
-        public float $p95,
-        public float $p99,
+        public PercentileMetrics $percentiles,
         public float $memoryUsed,
         public float $memoryPeak,
     ) {
+    }
+
+    /**
+     * Magic getter for backward compatibility with templates.
+     * Allows accessing $stats.p50 instead of $stats.percentiles.p50.
+     */
+    public function __get(string $name): mixed
+    {
+        return match ($name) {
+            'p50' => $this->percentiles->p50,
+            'p80' => $this->percentiles->p80,
+            'p90' => $this->percentiles->p90,
+            'p95' => $this->percentiles->p95,
+            'p99' => $this->percentiles->p99,
+            default => throw new RuntimeException(sprintf('Undefined property: %s', $name)),
+        };
     }
 
     public static function fromDomain(BenchmarkStatistics $benchmarkStatistics): self
@@ -37,11 +57,7 @@ final readonly class BenchmarkStatisticsData
             phpVersion: $benchmarkStatistics->phpVersion,
             count: $benchmarkStatistics->executionCount,
             avg: $benchmarkStatistics->averageExecutionTime,
-            p50: $benchmarkStatistics->percentiles->p50,
-            p80: $benchmarkStatistics->percentiles->p80,
-            p90: $benchmarkStatistics->percentiles->p90,
-            p95: $benchmarkStatistics->percentiles->p95,
-            p99: $benchmarkStatistics->percentiles->p99,
+            percentiles: $benchmarkStatistics->percentiles,
             memoryUsed: $benchmarkStatistics->averageMemoryUsed,
             memoryPeak: $benchmarkStatistics->peakMemoryUsed,
         );
