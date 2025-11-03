@@ -73,6 +73,7 @@ final readonly class DoctrineBenchmarkRepository implements BenchmarkRepositoryP
             ->getSingleScalarResult();
 
         // Get pulse statistics using SELECT NEW for type safety
+        /** @var DashboardStatsData */
         return $this->entityManager
             ->createQuery('
                 SELECT NEW ' . DashboardStatsData::class . '(
