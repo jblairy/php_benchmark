@@ -8,12 +8,11 @@
     {% if this.benchmarks %}
         <div data-loading="hide" class="benchmark-list">
             {% for benchmark in this.benchmarks %}
-                <div data-benchmark-filter-target="card">
-                    <twig:BenchmarkCard
-                        benchmarkId="{{ benchmark.benchId }}"
-                        benchmarkName="{{ benchmark.name }}"
-                    />
-                </div>
+                <twig:BenchmarkCard
+                    benchmarkId="{{ benchmark.benchId }}"
+                    benchmarkName="{{ benchmark.name }}"
+                    data-benchmark-filter-target="card"
+                />
             {% endfor %}
         </div>
     {% endif %}

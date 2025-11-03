@@ -23,7 +23,7 @@ export default class extends Controller {
     }
 
     filterByCategory(event) {
-        this.selectedCategoryValue = event.target.value;
+        this.selectedCategoryValue = event.currentTarget.dataset.category;
         this.updateCategoryButtonStates();
         this.updateView();
     }
