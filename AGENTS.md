@@ -16,6 +16,11 @@ make phpcsfixer-fix    # Fix code style (PSR-12)
 make phpstan           # Static analysis (level 9)
 make quality           # Run all checks + fixes
 
+# Assets (CSS/JS)
+make assets.refresh    # Force refresh assets: compile, regenerate hashes, clear cache, restart
+                       # Use when CSS/JS changes don't appear in browser
+                       # Don't forget to hard refresh browser (Ctrl+Shift+R)
+
 # Benchmarks
 make run test=Loop iterations=10              # Run specific benchmark
 docker-compose run --rm main php bin/console benchmark:run --test=Loop --php-version=php84

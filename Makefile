@@ -1,4 +1,4 @@
-.PHONY: up start run fixtures db.reset db.refresh phpcsfixer phpcsfixer-fix phpstan quality phpmd phparkitect
+.PHONY: up start run fixtures db.reset db.refresh phpcsfixer phpcsfixer-fix phpstan quality phpmd phparkitect assets.refresh
 
 up:
 	docker-compose up -d --remove-orphans
@@ -61,3 +61,22 @@ rector:
 	docker-compose run --rm main vendor/bin/rector
 
 quality: phpcsfixer-fix phpstan phpmd phparkitect
+
+# Force refresh assets (CSS/JS) and invalidate browser cache
+# Useful when CSS/JS changes are not reflected in the browser
+# This command:
+#   1. Compiles all assets (SCSS → CSS, etc.)
+#   2. Deletes compiled assets to force new hash generation
+#   3. Clears Symfony cache
+#   4. Restarts the main container for a clean state
+assets.refresh:
+	@echo "🎨 Compiling assets..."
+	@docker-compose exec main php bin/console asset-map:compile
+	@echo "🗑️  Removing compiled assets to force hash regeneration..."
+	@rm -rf public/assets
+	@echo "🔄 Clearing Symfony cache..."
+	@docker-compose exec main php bin/console cache:clear
+	@echo "🔄 Restarting main container..."
+	@docker-compose restart main
+	@echo "✅ Assets refreshed! New CSS/JS hashes generated."
+	@echo "💡 Hard refresh your browser (Ctrl+Shift+R or Cmd+Shift+R) to see changes."
