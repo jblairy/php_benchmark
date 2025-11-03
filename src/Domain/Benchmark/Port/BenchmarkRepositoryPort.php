@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Jblairy\PhpBenchmark\Domain\Benchmark\Port;
 
-use Jblairy\PhpBenchmark\Application\Dashboard\DTO\DashboardStatsData;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Contract\Benchmark;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Model\DashboardStats;
 
 /**
  * Interface for managing available benchmarks.
@@ -25,7 +25,7 @@ interface BenchmarkRepositoryPort
     /**
      * Get dashboard overview statistics.
      */
-    public function getDashboardStats(): DashboardStatsData;
+    public function getDashboardStats(): DashboardStats;
 
     /**
      * Get top N most populated categories.

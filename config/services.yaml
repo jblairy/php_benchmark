@@ -43,9 +43,14 @@ services:
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkExecutorPort:
         class: Jblairy\PhpBenchmark\Domain\Benchmark\Service\SingleBenchmarkExecutor
 
-    # Dashboard Data Provider (Port -> Adapter)
-    Jblairy\PhpBenchmark\Domain\Dashboard\Port\DashboardDataProviderPort:
-        class: Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\DoctrineDashboardDataProvider
+    # Script Builder (Port -> Adapter)
+    Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptBuilderPort:
+        class: Jblairy\PhpBenchmark\Infrastructure\Execution\ScriptBuilding\InstrumentedScriptBuilder
+
+    # Benchmark auto-tagging (moved from Domain to keep it framework-agnostic)
+    _instanceof:
+        Jblairy\PhpBenchmark\Domain\Benchmark\Contract\Benchmark:
+            tags: ['app.benchmark']
 
     # Application Use Cases with dependencies
     Jblairy\PhpBenchmark\Application\UseCase\AsyncBenchmarkRunner:
