@@ -1,16 +1,29 @@
 // assets/controllers/unit-switch_controller.js
 import { Controller } from '@hotwired/stimulus';
 
+/**
+ * Global unit switch controller - controls all benchmark cards at once
+ */
 export default class extends Controller {
-    static targets = ['cell'];
+    static targets = ['cell', 'msButton', 'nsButton'];
     static values = {
         currentUnit: { type: String, default: 'ms' }
     }
 
-    toggle() {
-        const newUnit = this.currentUnitValue === 'ms' ? 'ns' : 'ms';
-        this.currentUnitValue = newUnit;
+    connect() {
+        console.log('🔄 Global Unit Switch Controller connected');
+        this.updateButtonStates();
+    }
 
+    toggle(event) {
+        const clickedUnit = event.currentTarget.dataset.unit;
+        
+        // Don't toggle if clicking the already active unit
+        if (clickedUnit === this.currentUnitValue) return;
+        
+        this.currentUnitValue = clickedUnit;
+
+        // Update all cells across all cards
         this.cellTargets.forEach(cell => {
             const value = parseFloat(cell.dataset.value);
             if (!isNaN(value)) {
@@ -19,7 +32,7 @@ export default class extends Controller {
             }
         });
 
-        // Mise à jour du libellé de l'unité dans l'en-tête
+        // Update all metric headers across all cards
         const metrics = [
             { key: 'p50', label: 'p50' },
             { key: 'p80', label: 'p80' },
@@ -28,12 +41,26 @@ export default class extends Controller {
             { key: 'p99', label: 'p99' },
             { key: 'avg', label: 'Moyenne' }
         ];
+        
         metrics.forEach(metric => {
-            const header = this.element.querySelector(`[data-metric="${metric.key}"]`);
-            if (header) {
+            document.querySelectorAll(`[data-metric="${metric.key}"]`).forEach(header => {
                 header.textContent = `${metric.label} (${this.currentUnitValue})`;
-            }
+            });
         });
+
+        this.updateButtonStates();
+    }
+
+    updateButtonStates() {
+        if (this.hasMsButtonTarget && this.hasNsButtonTarget) {
+            if (this.currentUnitValue === 'ms') {
+                this.msButtonTarget.classList.add('filter__unit-button--active');
+                this.nsButtonTarget.classList.remove('filter__unit-button--active');
+            } else {
+                this.msButtonTarget.classList.remove('filter__unit-button--active');
+                this.nsButtonTarget.classList.add('filter__unit-button--active');
+            }
+        }
     }
 
     formatValue(value) {

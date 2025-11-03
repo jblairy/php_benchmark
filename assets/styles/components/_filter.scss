@@ -169,6 +169,43 @@
         }
     }
 
+    // Unit Group
+    &__unit-group {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+        flex-wrap: wrap;
+    }
+
+    &__unit-button {
+        padding: $spacing-sm $spacing-md;
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 20px;
+        color: #4a5568;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-transform: lowercase;
+        min-width: 50px;
+
+        &:hover {
+            border-color: #cbd5e0;
+            background: #f7fafc;
+        }
+
+        &--active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+
+            &:hover {
+                opacity: 0.9;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+        }
+    }
+
     // Stats
     &__stats-container {
         padding-top: $spacing-md;
@@ -180,6 +217,8 @@
         font-size: 0.875rem;
         font-weight: 500;
     }
+
+
 
     // No Results
     &__no-results {
@@ -233,3 +272,4 @@
         }
     }
 }
+
