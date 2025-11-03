@@ -43,7 +43,6 @@ final readonly class BenchmarkCommand
         $symfonyStyle = new SymfonyStyle($input, $output);
 
         $testName = $test;
-        $iterations = (int) $iterations;
         $phpVersionName = $php_version;
 
         if (0 >= $iterations) {

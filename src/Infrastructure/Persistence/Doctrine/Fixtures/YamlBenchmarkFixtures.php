@@ -41,7 +41,12 @@ class YamlBenchmarkFixtures extends Fixture
 
         foreach ($finder as $file) {
             try {
-                $data = Yaml::parseFile($file->getRealPath());
+                $realPath = $file->getRealPath();
+                if (false === $realPath) {
+                    continue;
+                }
+                
+                $data = Yaml::parseFile($realPath);
 
                 if (!is_array($data)) {
                     continue;
@@ -67,7 +72,7 @@ class YamlBenchmarkFixtures extends Fixture
      */
     private function createBenchmarkFromYaml(array $data, string $filename): Benchmark
     {
-        // Validate required fields
+        // Validate required fields exist
         $requiredFields = ['slug', 'name', 'category', 'code', 'phpVersions'];
         foreach ($requiredFields as $field) {
             if (!isset($data[$field])) {
@@ -75,8 +80,15 @@ class YamlBenchmarkFixtures extends Fixture
             }
         }
 
+        // Extract and validate string fields
+        $slug = is_string($data['slug']) ? $data['slug'] : throw new InvalidArgumentException(sprintf('slug must be string in %s', $filename));
+        $name = is_string($data['name']) ? $data['name'] : throw new InvalidArgumentException(sprintf('name must be string in %s', $filename));
+        $category = is_string($data['category']) ? $data['category'] : throw new InvalidArgumentException(sprintf('category must be string in %s', $filename));
+        $code = is_string($data['code']) ? mb_trim($data['code']) : throw new InvalidArgumentException(sprintf('code must be string in %s', $filename));
+        $description = isset($data['description']) && is_string($data['description']) ? $data['description'] : '';
+        
         // Validate code is not empty
-        if (empty(mb_trim($data['code']))) {
+        if (empty($code)) {
             throw new InvalidArgumentException(sprintf('Code field cannot be empty in %s', $filename));
         }
 
@@ -84,16 +96,20 @@ class YamlBenchmarkFixtures extends Fixture
         if (!is_array($data['phpVersions']) || empty($data['phpVersions'])) {
             throw new InvalidArgumentException(sprintf('phpVersions must be a non-empty array in %s', $filename));
         }
+        
+        // Extract and validate array fields
+        $tags = isset($data['tags']) && is_array($data['tags']) ? $data['tags'] : [];
+        $icon = isset($data['icon']) && is_string($data['icon']) ? $data['icon'] : null;
 
         return new Benchmark(
-            slug: $data['slug'],
-            name: $data['name'],
-            category: $data['category'],
-            description: $data['description'] ?? '',
-            code: mb_trim($data['code']),
+            slug: $slug,
+            name: $name,
+            category: $category,
+            description: $description,
+            code: $code,
             phpVersions: $data['phpVersions'],
-            tags: $data['tags'] ?? [],
-            icon: $data['icon'] ?? null,
+            tags: $tags,
+            icon: $icon,
         );
     }
 }

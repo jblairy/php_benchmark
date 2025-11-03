@@ -64,6 +64,9 @@ final class ReflectionCodeExtractor implements CodeExtractorPort
         return $this->extractBodyLinesBetweenBraces($fileLines, $startLine, $endLine);
     }
 
+    /**
+     * @return string[]
+     */
     private function readFileLines(string $fileName): array
     {
         if (!file_exists($fileName)) {
@@ -78,10 +81,17 @@ final class ReflectionCodeExtractor implements CodeExtractorPort
         return $fileLines;
     }
 
+    /**
+     * @param string[] $fileLines
+     */
     private function extractBodyLinesBetweenBraces(array $fileLines, int $startLine, int $endLine): string
     {
         $bodyLines = [];
         for ($i = $startLine; $i < $endLine - 1; ++$i) {
+            if (!isset($fileLines[$i])) {
+                continue;
+            }
+            
             if ($this->shouldSkipLine($fileLines[$i])) {
                 continue;
             }

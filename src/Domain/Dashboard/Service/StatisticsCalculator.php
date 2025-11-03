@@ -42,6 +42,9 @@ final readonly class StatisticsCalculator
         );
     }
 
+    /**
+     * @param array<int, float> $sortedData
+     */
     private function calculatePercentile(array $sortedData, int $percentile): float
     {
         $count = count($sortedData);

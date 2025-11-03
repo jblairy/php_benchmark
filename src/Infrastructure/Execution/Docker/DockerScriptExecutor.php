@@ -94,7 +94,7 @@ final class DockerScriptExecutor implements ScriptExecutorPort
     ): RuntimeException {
         return new RuntimeException(
             $runtimeException->getMessage() . sprintf(' [Benchmark: %s, File: %s]', $executionContext->benchmarkClassName, $tempFile),
-            $runtimeException->getCode(),
+            (int) $runtimeException->getCode(),
             $runtimeException,
         );
     }
