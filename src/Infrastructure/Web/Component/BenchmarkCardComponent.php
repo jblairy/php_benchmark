@@ -61,4 +61,63 @@ final class BenchmarkCardComponent
     {
         return array_map(fn (PhpVersion $version): string => $version->value, PhpVersion::cases());
     }
+
+    public function getCategory(): string
+    {
+        if ('' === $this->benchmarkName) {
+            return '';
+        }
+
+        $parts = explode('\\', $this->benchmarkName);
+
+        // Return the second-to-last part (before the class name)
+        return count($parts) >= 2 ? $parts[count($parts) - 2] : '';
+    }
+
+    public function getShortName(): string
+    {
+        if ('' === $this->benchmarkName) {
+            return $this->benchmarkId;
+        }
+
+        $parts = explode('\\', $this->benchmarkName);
+
+        // Return the last part (class name)
+        return end($parts) ?: $this->benchmarkId;
+    }
+
+    public function getSourceCode(): string
+    {
+        if ('' === $this->benchmarkName) {
+            return '';
+        }
+
+        try {
+            $reflection = new \ReflectionClass($this->benchmarkName);
+            $method = $reflection->getMethod('execute');
+            $filename = $method->getFileName();
+            $startLine = $method->getStartLine();
+            $endLine = $method->getEndLine();
+
+            if (false === $filename || false === $startLine || false === $endLine) {
+                return '';
+            }
+
+            $lines = file($filename);
+            if (false === $lines) {
+                return '';
+            }
+
+            // Extract method code (including signature)
+            $code = implode('', array_slice($lines, $startLine - 1, $endLine - $startLine + 1));
+
+            // Remove method signature and braces to show only the body
+            $code = preg_replace('/^\s*public\s+function\s+execute\([^)]*\)\s*:\s*\w+\s*\{/', '', $code);
+            $code = preg_replace('/\}\s*$/', '', $code);
+
+            return trim($code);
+        } catch (\ReflectionException $e) {
+            return '';
+        }
+    }
 }
