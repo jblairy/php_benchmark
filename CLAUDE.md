@@ -54,6 +54,20 @@ make up              # Start all Docker containers
 make start           # Build Docker images
 ```
 
+### Database & Fixtures
+```bash
+# Database management
+make db.reset        # Drop, create, and migrate database (empty)
+make db.refresh      # Reset database and load fixtures
+make fixtures        # Load benchmark fixtures from YAML files
+
+# Manual commands
+docker-compose run --rm main php bin/console doctrine:database:drop --force --if-exists
+docker-compose run --rm main php bin/console doctrine:database:create
+docker-compose run --rm main php bin/console doctrine:migrations:migrate --no-interaction
+docker-compose run --rm main php bin/console doctrine:fixtures:load --no-interaction
+```
+
 ### Mercure Real-Time (Debugging & Testing)
 ```bash
 ./scripts/mercure-verify.sh              # Verify Mercure configuration
@@ -90,6 +104,7 @@ make quality             # Run all quality checks and fixes
 ### Testing
 ```bash
 docker-compose run --rm main vendor/bin/phpunit
+docker-compose run --rm main vendor/bin/phpunit tests/Path/To/SpecificTest.php  # Single test
 ```
 
 ## Architecture
@@ -98,9 +113,57 @@ This project follows **Clean Architecture + DDD + Hexagonal Architecture** (Port
 
 📖 **Full documentation**: [docs/architecture/01-overview.md](docs/architecture/01-overview.md)
 
-## Database
+## Database & Fixtures
 
-The project uses MariaDB 10.11 via Docker. Doctrine ORM is configured for entity management and migrations are in `migrations/`.
+The project uses MariaDB 10.11 via Docker with Doctrine ORM for entity management.
+
+### Database Structure
+
+**Entities:**
+- **Benchmark** (`benchmarks` table) - Stores benchmark code and metadata loaded from YAML fixtures
+  - Fields: slug, name, category, description, code, phpVersions, tags, icon
+  - Loaded from `fixtures/benchmarks/*.yaml` files
+  
+- **Pulse** (`pulse` table) - Stores benchmark execution results
+  - Fields: benchId, name, phpVersion, executionTimeMs, memoryUsedBytes, memoryPeakByte
+  - Created during benchmark execution
+
+### Fixtures System
+
+Benchmarks are now defined as YAML files in `fixtures/benchmarks/` and loaded into the database:
+
+**Example fixture** (`fixtures/benchmarks/array-fill-benchmark.yaml`):
+```yaml
+slug: array-fill
+name: 'Array Fill'
+category: 'Array Operations'
+description: 'Fill array using array_fill() function'
+icon: 📦
+tags:
+  - array
+  - fill
+phpVersions:
+  - php56
+  - php70
+  - php84
+  - php85
+code: |
+  for ($i = 0; $i < 10000; $i++) {
+      $array = array_fill(0, 100, 'value');
+  }
+```
+
+**Loading fixtures:**
+```bash
+make fixtures         # Load all YAML files from fixtures/benchmarks/
+make db.refresh       # Reset database + load fixtures
+```
+
+### Migrations
+
+Doctrine migrations are in `migrations/`. Current migrations:
+- `Version20251103175019` - Creates `benchmarks` table
+- Earlier versions - Create `pulse` table and related schema
 
 ## Code Standards
 
