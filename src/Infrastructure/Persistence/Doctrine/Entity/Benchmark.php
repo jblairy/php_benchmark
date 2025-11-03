@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Entity;
 
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Jblairy\PhpBenchmark\Domain\PhpVersion\Enum\PhpVersion;
 
 /**
- * Benchmark entity storing test code and metadata in database
+ * Benchmark entity storing test code and metadata in database.
  */
 #[ORM\Entity]
 #[ORM\Table(name: 'benchmarks')]
@@ -51,10 +52,10 @@ class Benchmark
     private array $phpVersions = [];
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    private \DateTimeImmutable $createdAt;
+    private DateTimeImmutable $createdAt;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    private \DateTimeImmutable $updatedAt;
+    private DateTimeImmutable $updatedAt;
 
     public function __construct(
         string $slug = '',
@@ -64,7 +65,7 @@ class Benchmark
         string $code = '',
         array $phpVersions = [],
         array $tags = [],
-        ?string $icon = null
+        ?string $icon = null,
     ) {
         $this->slug = $slug;
         $this->name = $name;
@@ -74,14 +75,14 @@ class Benchmark
         $this->phpVersions = $phpVersions;
         $this->tags = $tags;
         $this->icon = $icon;
-        $this->createdAt = new \DateTimeImmutable();
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     #[ORM\PreUpdate]
     public function onPreUpdate(): void
     {
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -142,7 +143,7 @@ class Benchmark
     {
         return array_map(
             fn (string $version): PhpVersion => PhpVersion::from($version),
-            $this->phpVersions
+            $this->phpVersions,
         );
     }
 
@@ -151,12 +152,12 @@ class Benchmark
         return in_array($version->value, $this->phpVersions, true);
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): \DateTimeImmutable
+    public function getUpdatedAt(): DateTimeImmutable
     {
         return $this->updatedAt;
     }

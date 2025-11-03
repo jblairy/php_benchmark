@@ -11,22 +11,19 @@ use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Entity\Benchmark as
 
 /**
  * Adapter that wraps a Doctrine Benchmark entity and implements Domain Benchmark contract
- * Follows Hexagonal Architecture: Infrastructure adapts to Domain interface
+ * Follows Hexagonal Architecture: Infrastructure adapts to Domain interface.
  */
 final readonly class DatabaseBenchmark implements Benchmark
 {
     public function __construct(
-        private BenchmarkEntity $entity
+        private BenchmarkEntity $entity,
     ) {
     }
 
     public function getMethodBody(PhpVersion $phpVersion): string
     {
         if (!$this->entity->supportsPhpVersion($phpVersion)) {
-            throw new ReflexionMethodNotFound(
-                $this->entity->getSlug(),
-                $phpVersion->value
-            );
+            throw new ReflexionMethodNotFound($this->entity->getSlug(), $phpVersion->value);
         }
 
         return $this->entity->getCode();

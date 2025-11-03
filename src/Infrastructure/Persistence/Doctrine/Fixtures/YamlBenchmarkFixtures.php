@@ -6,18 +6,21 @@ namespace Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Fixtures;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Exception;
+use InvalidArgumentException;
 use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Entity\Benchmark;
+use RuntimeException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 
 /**
  * Loads benchmarks from YAML fixture files
- * Each YAML file represents one benchmark
+ * Each YAML file represents one benchmark.
  */
 class YamlBenchmarkFixtures extends Fixture
 {
     public function __construct(
-        private readonly string $projectDir
+        private readonly string $projectDir,
     ) {
     }
 
@@ -26,7 +29,7 @@ class YamlBenchmarkFixtures extends Fixture
         $fixturesPath = $this->projectDir . '/fixtures/benchmarks';
 
         if (!is_dir($fixturesPath)) {
-            throw new \RuntimeException("Fixtures directory not found: {$fixturesPath}");
+            throw new RuntimeException("Fixtures directory not found: {$fixturesPath}");
         }
 
         $finder = new Finder();
@@ -46,12 +49,12 @@ class YamlBenchmarkFixtures extends Fixture
 
                 $benchmark = $this->createBenchmarkFromYaml($data, $file->getFilename());
                 $manager->persist($benchmark);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // Log error but continue loading other fixtures
                 error_log(sprintf(
                     'Failed to load benchmark fixture %s: %s',
                     $file->getFilename(),
-                    $e->getMessage()
+                    $e->getMessage(),
                 ));
             }
         }
@@ -68,24 +71,18 @@ class YamlBenchmarkFixtures extends Fixture
         $requiredFields = ['slug', 'name', 'category', 'code', 'phpVersions'];
         foreach ($requiredFields as $field) {
             if (!isset($data[$field])) {
-                throw new \InvalidArgumentException(
-                    sprintf('Missing required field "%s" in %s', $field, $filename)
-                );
+                throw new InvalidArgumentException(sprintf('Missing required field "%s" in %s', $field, $filename));
             }
         }
 
         // Validate code is not empty
-        if (empty(trim($data['code']))) {
-            throw new \InvalidArgumentException(
-                sprintf('Code field cannot be empty in %s', $filename)
-            );
+        if (empty(mb_trim($data['code']))) {
+            throw new InvalidArgumentException(sprintf('Code field cannot be empty in %s', $filename));
         }
 
         // Validate phpVersions is an array
         if (!is_array($data['phpVersions']) || empty($data['phpVersions'])) {
-            throw new \InvalidArgumentException(
-                sprintf('phpVersions must be a non-empty array in %s', $filename)
-            );
+            throw new InvalidArgumentException(sprintf('phpVersions must be a non-empty array in %s', $filename));
         }
 
         return new Benchmark(
@@ -93,10 +90,10 @@ class YamlBenchmarkFixtures extends Fixture
             name: $data['name'],
             category: $data['category'],
             description: $data['description'] ?? '',
-            code: trim($data['code']),
+            code: mb_trim($data['code']),
             phpVersions: $data['phpVersions'],
             tags: $data['tags'] ?? [],
-            icon: $data['icon'] ?? null
+            icon: $data['icon'] ?? null,
         );
     }
 }

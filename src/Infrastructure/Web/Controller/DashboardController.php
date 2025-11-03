@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 final class DashboardController extends AbstractController
 {
     public function __construct(
-        private readonly BenchmarkRepositoryPort $benchmarkRepository
+        private readonly BenchmarkRepositoryPort $benchmarkRepository,
     ) {
     }
 
