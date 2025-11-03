@@ -1,4 +1,4 @@
-.PHONY: up start run phpcsfixer phpcsfixer-fix phpstan quality phpmd phparkitect
+.PHONY: up start run fixtures db.reset db.refresh phpcsfixer phpcsfixer-fix phpstan quality phpmd phparkitect
 
 up:
 	docker-compose up -d --remove-orphans
@@ -22,10 +22,25 @@ run:
 		docker-compose run --rm main php bin/console benchmark:run --test=$(test) --iterations=$(or $(iterations),1) --php-version=$(version); \
 	fi
 
+# Load fixtures into database from YAML files
+fixtures:
+	@echo "🔄 Loading fixtures from fixtures/benchmarks/*.yaml..."
+	@docker-compose exec main php bin/console doctrine:fixtures:load --no-interaction
+	@echo "✅ Fixtures loaded successfully"
+
+# Reset database (drop, create, migrate) - without fixtures
 db.reset:
-	docker-compose run main php bin/console d:d:d --force; \
-	docker-compose run main php bin/console d:d:c; \
-	docker-compose run main php bin/console d:m:m; \
+	@echo "🗑️  Dropping database..."
+	@docker-compose run --rm main php bin/console d:d:d --force --if-exists
+	@echo "📦 Creating database..."
+	@docker-compose run --rm main php bin/console d:d:c
+	@echo "🔄 Running migrations..."
+	@docker-compose run --rm main php bin/console d:m:m --no-interaction
+	@echo "✅ Database reset complete"
+
+# Reset database and load fixtures (full refresh)
+db.refresh: db.reset fixtures
+	@echo "✅ Database refreshed with fixtures"
 
 phpcsfixer:
 	docker-compose run --rm main vendor/bin/php-cs-fixer fix --dry-run --diff

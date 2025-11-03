@@ -90,13 +90,21 @@ export default class extends Controller {
             const categoryEl = element.querySelector('.benchmark-card__category');
             const titleEl = element.querySelector('.benchmark-card__title');
             const codeEl = element.querySelector('.benchmark-card__code');
+            const description = element.dataset.description || '';
+            const tags = element.dataset.tags || '';
 
             return {
                 element,
                 category: categoryEl ? categoryEl.textContent.trim().toLowerCase() : '',
                 name: titleEl ? titleEl.textContent.trim().toLowerCase() : '',
                 code: codeEl ? codeEl.textContent.trim().toLowerCase() : '',
-                fullText: (categoryEl?.textContent || '') + ' ' + (titleEl?.textContent || '') + ' ' + (codeEl?.textContent || '')
+                description: description.toLowerCase(),
+                tags: tags.toLowerCase(),
+                fullText: (categoryEl?.textContent || '') + ' ' +
+                         (titleEl?.textContent || '') + ' ' +
+                         (codeEl?.textContent || '') + ' ' +
+                         description + ' ' +
+                         tags
             };
         });
     }

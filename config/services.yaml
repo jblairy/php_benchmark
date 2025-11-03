@@ -12,11 +12,6 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
-    # Auto-tag all Benchmark implementations for autowiring
-    _instanceof:
-        Jblairy\PhpBenchmark\Domain\Benchmark\Contract\Benchmark:
-            tags: ['Jblairy\PhpBenchmark\Domain\Benchmark\Contract\Benchmark']
-
     # makes classes in src/ available to be used as services
     Jblairy\PhpBenchmark\:
         resource: '../src/'
@@ -24,9 +19,6 @@ services:
             - '../src/Builder/'
             - '../src/Domain/'
             - '../src/Kernel.php'
-
-    Jblairy\PhpBenchmark\Domain\Benchmark\Test\:
-        resource: '../src/Domain/Benchmark/Test/'
 
     # Clean Architecture - Port implementations
 
@@ -36,7 +28,7 @@ services:
 
     # Benchmark Repository (Port -> Adapter)
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkRepositoryPort:
-        class: Jblairy\PhpBenchmark\Infrastructure\Persistence\InMemory\InMemoryBenchmarkRepository
+        class: Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\DoctrineBenchmarkRepository
 
     # Script Execution (Port -> Adapter)
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptExecutorPort:
@@ -61,3 +53,8 @@ services:
 
     # Domain Services (need explicit registration since Domain is excluded)
     Jblairy\PhpBenchmark\Domain\Dashboard\Service\StatisticsCalculator: ~
+
+    # Fixtures configuration
+    Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Fixtures\YamlBenchmarkFixtures:
+        arguments:
+            $projectDir: '%kernel.project_dir%'

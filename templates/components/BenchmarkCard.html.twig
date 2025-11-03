@@ -2,7 +2,9 @@
         class: 'stats-card__container benchmark-card',
         'data-controller': 'benchmark-card-live',
         'data-benchmark-card-live-benchmark-id-value': this.benchmarkId,
-        'data-benchmark-card-live-benchmark-name-value': this.benchmarkName
+        'data-benchmark-card-live-benchmark-name-value': this.benchmarkName,
+        'data-description': this.description,
+        'data-tags': this.tags|join(',')
     }) }}>
 
     {% if this.data %}
@@ -16,7 +18,9 @@
                 <div class="benchmark-card__header">
                     <div class="benchmark-card__title-group">
                         <div class="benchmark-card__category">{{ this.category }}</div>
-                        <h2 class="benchmark-card__title">{{ this.shortName }}</h2>
+                        <h2 class="benchmark-card__title">
+                            {% if this.icon %}{{ this.icon }} {% endif %}{{ this.shortName }}
+                        </h2>
                     </div>
                     <div class="benchmark-card__actions">
                         <button class="button__toggle" data-action="toggle#toggle">
@@ -27,6 +31,20 @@
                         </button>
                     </div>
                 </div>
+
+                {% if this.description %}
+                <div class="benchmark-card__description">
+                    {{ this.description }}
+                </div>
+                {% endif %}
+
+                {% if this.tags|length > 0 %}
+                <div class="benchmark-card__tags">
+                    {% for tag in this.tags %}
+                        <span class="benchmark-card__tag">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
 
                 {% if this.sourceCode %}
                 <div class="benchmark-card__code-section">
