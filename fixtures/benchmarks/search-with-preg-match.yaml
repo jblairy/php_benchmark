@@ -1,0 +1,23 @@
+slug: search-with-preg-match
+name: 'Search With Preg Match'
+category: StringSearch
+description: ''
+tags: {  }
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $haystack = 'The quick brown fox jumps over the lazy dog';
+          for ($i = 0; 100000 > $i; ++$i) {
+              $result = 1 === preg_match('/fox/', $haystack);
+          }

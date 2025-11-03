@@ -1,0 +1,21 @@
+slug: merge-with-array-merge-unpack
+name: 'Merge With Array Merge Unpack'
+category: UnpackingDestructuring
+description: ''
+tags: {  }
+phpVersions:
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $array1 = range(1, 50);
+          $array2 = range(51, 100);
+          $array3 = range(101, 150);
+
+          for ($i = 0; 1000 > $i; ++$i) {
+              $result = [...$array1, ...$array2, ...$array3];
+          }

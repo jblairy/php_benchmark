@@ -1,0 +1,24 @@
+slug: split-with-explode
+name: 'Split With Explode'
+category: Regex
+description: ''
+tags: {  }
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $text = 'one,two,three,four,five';
+
+          for ($i = 0; 50000 > $i; ++$i) {
+              $result = explode(',', $text);
+          }

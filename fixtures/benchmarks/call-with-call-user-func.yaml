@@ -1,0 +1,18 @@
+slug: call-with-call-user-func
+name: 'Call With Call User Func'
+category: Callbacks
+description: ''
+tags: {  }
+phpVersions:
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $func = (fn ($x): int|float => $x * 2);
+
+          for ($i = 0; 100000 > $i; ++$i) {
+              $result = call_user_func($func, $i);
+          }

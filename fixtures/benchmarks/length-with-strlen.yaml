@@ -1,0 +1,24 @@
+slug: length-with-strlen
+name: 'Length With Strlen'
+category: AdvancedStrings
+description: ''
+tags: {  }
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $text = 'Hello World, this is a test string for benchmarking';
+
+          for ($i = 0; 100000 > $i; ++$i) {
+              $result = mb_strlen($text);
+          }

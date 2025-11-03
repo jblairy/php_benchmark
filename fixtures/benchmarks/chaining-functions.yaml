@@ -1,0 +1,45 @@
+slug: chaining-functions
+name: 'Function Chaining'
+category: 'Function Operations'
+description: 'Chain multiple function calls together'
+icon: ⛓️
+tags:
+  - function
+  - chaining
+  - fluent
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  class Calculator {
+      private $value = 0;
+
+      public function add($n) {
+          $this->value += $n;
+          return $this;
+      }
+
+      public function multiply($n) {
+          $this->value *= $n;
+          return $this;
+      }
+
+      public function getValue() {
+          return $this->value;
+      }
+  }
+
+  for ($i = 0; $i < 10000; $i++) {
+      $calc = new Calculator();
+      $result = $calc->add(5)->multiply(2)->add(3)->getValue();
+  }

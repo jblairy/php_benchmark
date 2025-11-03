@@ -1,0 +1,18 @@
+slug: check-with-get-debug-type
+name: 'Check With Get Debug Type'
+category: TypeChecking
+description: ''
+tags: {  }
+phpVersions:
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $data = [1, 2, 3, 4, 5];
+
+          for ($i = 0; 100000 > $i; ++$i) {
+              $result = 'array' === get_debug_type($data);
+          }

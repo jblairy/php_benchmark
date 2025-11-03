@@ -1,0 +1,30 @@
+slug: access-static-property
+name: 'Access Static Property'
+category: 'Static vs Instance'
+description: 'Benchmarks accessing a static property'
+icon: 📊
+tags:
+  - static
+  - property
+  - oop
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  class TestClass {
+      public static $value = 42;
+  }
+
+  for ($i = 0; $i < 100000; $i++) {
+      $result = TestClass::$value;
+  }

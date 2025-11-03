@@ -1,0 +1,17 @@
+slug: map-with-array-map
+name: 'Map With Array Map'
+category: ArrayMap
+description: ''
+tags: {  }
+phpVersions:
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $data = range(1, 10000);
+
+          array_map(fn ($item): int => $item * 2, $data);

@@ -1,0 +1,34 @@
+slug: check-method-with-is-callable
+name: 'Check Method with is_callable()'
+category: 'Object Operations'
+description: 'Check if method exists using is_callable()'
+icon: 📞
+tags:
+  - object
+  - method
+  - callable
+  - check
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  class TestClass {
+      public function testMethod() {
+          return true;
+      }
+  }
+
+  $obj = new TestClass();
+  for ($i = 0; $i < 100000; $i++) {
+      $exists = is_callable([$obj, 'testMethod']);
+  }

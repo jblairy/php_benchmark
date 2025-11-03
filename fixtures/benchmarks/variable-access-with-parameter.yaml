@@ -1,0 +1,31 @@
+slug: access-with-parameter
+name: 'Access via Parameter'
+category: 'Variable Optimization'
+description: 'Access variable by passing it as parameter'
+icon: 📥
+tags:
+  - parameter
+  - variable
+  - scope
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  function accessParameter($value) {
+      return $value;
+  }
+
+  $value = 42;
+  for ($i = 0; $i < 100000; $i++) {
+      $result = accessParameter($value);
+  }

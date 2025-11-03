@@ -1,0 +1,30 @@
+slug: iterate-with-generator
+name: 'Iterate With Generator'
+category: Iteration
+description: ''
+tags: {  }
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  function generateRange()
+          {
+              for ($i = 1; 10000 >= $i; ++$i) {
+                  yield $i;
+              }
+          }
+
+          $sum = 0;
+          foreach (generateRange() as $value) {
+              $sum += $value;
+          }

@@ -1,0 +1,25 @@
+slug: build-with-output-buffer
+name: 'Build With Output Buffer'
+category: Buffering
+description: ''
+tags: {  }
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  ob_start();
+          for ($i = 0; 1000 > $i; ++$i) {
+              echo 'Line ' . $i . "\n";
+          }
+
+          ob_get_clean();

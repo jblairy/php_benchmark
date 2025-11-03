@@ -1,0 +1,28 @@
+slug: concatenation-with-dot
+name: 'Dot Operator Concatenation'
+category: 'String Operations'
+description: 'String concatenation using the dot operator in a loop'
+icon: 🔗
+tags:
+  - string
+  - concatenation
+  - dot-operator
+  - performance
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $result = '';
+          for ($i = 0; 10000 > $i; ++$i) {
+              $result = 'Hello World ' . $i . ' test benchmark';
+          }

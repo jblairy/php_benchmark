@@ -1,0 +1,23 @@
+slug: search-with-str-contains
+name: 'String Contains (PHP 8+)'
+category: 'String Operations'
+description: 'String search using the modern str_contains() function introduced in PHP 8.0'
+icon: 🔍
+tags:
+  - string
+  - search
+  - php8
+  - str_contains
+  - modern
+phpVersions:
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $haystack = 'The quick brown fox jumps over the lazy dog';
+          for ($i = 0; 100000 > $i; ++$i) {
+              $result = str_contains($haystack, 'fox');
+          }

@@ -1,0 +1,26 @@
+slug: array-fill
+name: 'Array Fill'
+category: 'Array Operations'
+description: 'Fill array using array_fill() function'
+icon: 📦
+tags:
+  - array
+  - fill
+  - initialization
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  for ($i = 0; $i < 10000; $i++) {
+      $array = array_fill(0, 100, 'value');
+  }

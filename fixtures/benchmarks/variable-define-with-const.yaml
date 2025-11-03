@@ -1,0 +1,28 @@
+slug: define-with-const
+name: 'Define with const'
+category: 'Variable Optimization'
+description: 'Define constant using const keyword'
+icon: 🔒
+tags:
+  - const
+  - constant
+  - define
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  const MY_CONSTANT = 42;
+
+  for ($i = 0; $i < 100000; $i++) {
+      $result = MY_CONSTANT;
+  }

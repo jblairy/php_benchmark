@@ -1,0 +1,26 @@
+slug: iterate-with-for
+name: 'Iterate With For'
+category: Iteration
+description: ''
+tags: {  }
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $data = range(1, 10000);
+          $sum = 0;
+          $count = count($data);
+
+          for ($i = 0; $i < $count; ++$i) {
+              $sum += $data[$i];
+          }

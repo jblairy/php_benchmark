@@ -1,0 +1,32 @@
+slug: access-instance-property
+name: 'Access Instance Property'
+category: 'Static vs Instance'
+description: 'Benchmarks accessing an instance property'
+icon: 📊
+tags:
+  - static
+  - instance
+  - property
+  - oop
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  class TestClass {
+      public $value = 42;
+  }
+
+  $obj = new TestClass();
+  for ($i = 0; $i < 100000; $i++) {
+      $result = $obj->value;
+  }
