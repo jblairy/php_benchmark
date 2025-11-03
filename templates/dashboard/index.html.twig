@@ -113,12 +113,16 @@
                         </button>
                         {% endfor %}
                     </div>
+                </div>
 
-                    {# Global Unit Switch #}
-                    <div class="filter__unit-group">
-                        <span class="filter__label">Unit:</span>
+                {# Stats #}
+                <div class="filter__stats-container">
+                    <span class="filter__stats">Loading...</span>
+                    
+                    {# Global Unit Switch - Compact pill-shaped toggle #}
+                    <div class="filter__unit-toggle">
                         <button 
-                            class="filter__unit-button filter__unit-button--active"
+                            class="filter__unit-toggle-option filter__unit-toggle-option--active"
                             data-unit-switch-target="msButton"
                             data-unit="ms"
                             data-action="click->unit-switch#toggle"
@@ -126,7 +130,7 @@
                             ms
                         </button>
                         <button 
-                            class="filter__unit-button"
+                            class="filter__unit-toggle-option"
                             data-unit-switch-target="nsButton"
                             data-unit="ns"
                             data-action="click->unit-switch#toggle"
@@ -134,11 +138,6 @@
                             ns
                         </button>
                     </div>
-                </div>
-
-                {# Stats #}
-                <div class="filter__stats-container">
-                    <span class="filter__stats">Loading...</span>
                 </div>
             </div>
         </div>

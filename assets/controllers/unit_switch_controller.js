@@ -54,11 +54,11 @@ export default class extends Controller {
     updateButtonStates() {
         if (this.hasMsButtonTarget && this.hasNsButtonTarget) {
             if (this.currentUnitValue === 'ms') {
-                this.msButtonTarget.classList.add('filter__unit-button--active');
-                this.nsButtonTarget.classList.remove('filter__unit-button--active');
+                this.msButtonTarget.classList.add('filter__unit-toggle-option--active');
+                this.nsButtonTarget.classList.remove('filter__unit-toggle-option--active');
             } else {
-                this.msButtonTarget.classList.remove('filter__unit-button--active');
-                this.nsButtonTarget.classList.add('filter__unit-button--active');
+                this.msButtonTarget.classList.remove('filter__unit-toggle-option--active');
+                this.nsButtonTarget.classList.add('filter__unit-toggle-option--active');
             }
         }
     }

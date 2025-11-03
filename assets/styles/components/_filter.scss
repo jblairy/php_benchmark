@@ -169,53 +169,62 @@
         }
     }
 
-    // Unit Group
-    &__unit-group {
-        display: flex;
-        align-items: center;
-        gap: $spacing-sm;
-        flex-wrap: wrap;
-    }
-
-    &__unit-button {
-        padding: $spacing-sm $spacing-md;
-        background: white;
-        border: 2px solid #e2e8f0;
-        border-radius: 20px;
-        color: #4a5568;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        text-transform: lowercase;
-        min-width: 50px;
-
-        &:hover {
-            border-color: #cbd5e0;
-            background: #f7fafc;
-        }
-
-        &--active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-color: transparent;
-
-            &:hover {
-                opacity: 0.9;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            }
-        }
-    }
-
     // Stats
     &__stats-container {
         padding-top: $spacing-md;
         border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: $spacing-md;
+        flex-wrap: wrap;
     }
 
     &__stats {
         color: #718096;
         font-size: 0.875rem;
         font-weight: 500;
+    }
+
+    // Unit Toggle - Compact pill-shaped design
+    &__unit-toggle {
+        display: inline-flex;
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    &__unit-toggle-option {
+        padding: 6px 16px;
+        border: none;
+        background: transparent;
+        color: #4a5568;
+        font-weight: 500;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-transform: lowercase;
+        border-right: 1px solid #e2e8f0;
+
+        &:last-child {
+            border-right: none;
+        }
+
+        &:hover:not(&--active) {
+            background: #f7fafc;
+        }
+
+        &--active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-right-color: transparent;
+
+            &:hover {
+                opacity: 0.9;
+            }
+        }
     }
 
 
