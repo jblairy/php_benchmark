@@ -29,7 +29,7 @@ services:
 
     # Benchmark Repository (Port -> Adapter)
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkRepositoryPort:
-        class: Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\DoctrineBenchmarkRepository
+        class: Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Repository\DoctrineBenchmarkRepository
 
     # Script Execution (Port -> Adapter)
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptExecutorPort:
@@ -38,6 +38,10 @@ services:
     # Result Persistence (Port -> Adapter)
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\ResultPersisterPort:
         class: Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\DoctrinePulseResultPersister
+    
+    # Pulse Repository (Port -> Adapter)
+    Jblairy\PhpBenchmark\Domain\Dashboard\Port\PulseRepositoryPort:
+        class: Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Repository\PulseRepository
 
     # Benchmark Execution (Port -> Adapter)
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkExecutorPort:

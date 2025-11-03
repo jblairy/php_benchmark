@@ -6,8 +6,8 @@ namespace Jblairy\PhpBenchmark\Application\Dashboard\UseCase;
 
 use Jblairy\PhpBenchmark\Application\Dashboard\DTO\BenchmarkData;
 use Jblairy\PhpBenchmark\Application\Dashboard\DTO\BenchmarkStatisticsData;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Port\PulseRepositoryPort;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Service\StatisticsCalculator;
-use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Repository\PulseRepositoryInterface;
 
 /**
  * Use Case: Get statistics for a single benchmark across all PHP versions.
@@ -15,7 +15,7 @@ use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Repository\PulseRep
 final readonly class GetBenchmarkStatistics
 {
     public function __construct(
-        private PulseRepositoryInterface $pulseRepository,
+        private PulseRepositoryPort $pulseRepository,
         private StatisticsCalculator $statisticsCalculator,
     ) {
     }

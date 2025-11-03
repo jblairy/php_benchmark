@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Repository;
+namespace Jblairy\PhpBenchmark\Domain\Dashboard\Port;
 
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\BenchmarkMetrics;
 
-interface PulseRepositoryInterface
+interface PulseRepositoryPort
 {
     /**
      * @return array<int, array{benchId: string, name: string}>
