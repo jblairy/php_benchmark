@@ -69,16 +69,49 @@ class YamlBenchmarkFixtures extends Fixture
     private function createBenchmarkFromYaml(array $data, string $filename): Benchmark
     {
         $fixtureData = new BenchmarkFixtureData(
-            slug: isset($data['slug']) && is_string($data['slug']) ? $data['slug'] : '',
-            name: isset($data['name']) && is_string($data['name']) ? $data['name'] : '',
-            category: isset($data['category']) && is_string($data['category']) ? $data['category'] : '',
-            code: isset($data['code']) && is_string($data['code']) ? mb_trim($data['code']) : '',
+            slug: $this->extractStringField($data, 'slug'),
+            name: $this->extractStringField($data, 'name'),
+            category: $this->extractStringField($data, 'category'),
+            code: $this->extractCodeField($data),
             phpVersions: $this->extractStringArray($data, 'phpVersions'),
-            description: isset($data['description']) && is_string($data['description']) ? $data['description'] : '',
+            description: $this->extractStringField($data, 'description'),
             tags: $this->extractStringArray($data, 'tags'),
-            icon: isset($data['icon']) && is_string($data['icon']) ? $data['icon'] : null,
+            icon: $this->extractNullableStringField($data, 'icon'),
         );
 
+        $this->validateFixtureData($fixtureData, $filename);
+
+        return $this->buildBenchmarkEntity($fixtureData);
+    }
+
+    /**
+     * @param array<mixed> $data
+     */
+    private function extractStringField(array $data, string $key): string
+    {
+        return isset($data[$key]) && is_string($data[$key]) ? $data[$key] : '';
+    }
+
+    /**
+     * @param array<mixed> $data
+     */
+    private function extractNullableStringField(array $data, string $key): ?string
+    {
+        return isset($data[$key]) && is_string($data[$key]) ? $data[$key] : null;
+    }
+
+    /**
+     * @param array<mixed> $data
+     */
+    private function extractCodeField(array $data): string
+    {
+        $code = $this->extractStringField($data, 'code');
+
+        return '' !== $code ? mb_trim($code) : '';
+    }
+
+    private function validateFixtureData(BenchmarkFixtureData $fixtureData, string $filename): void
+    {
         $violations = $this->validator->validate($fixtureData);
 
         if (0 < count($violations)) {
@@ -89,7 +122,10 @@ class YamlBenchmarkFixtures extends Fixture
 
             throw new RuntimeException(sprintf('Validation failed for %s: %s', $filename, implode(', ', $errors)));
         }
+    }
 
+    private function buildBenchmarkEntity(BenchmarkFixtureData $fixtureData): Benchmark
+    {
         return new Benchmark(
             slug: $fixtureData->slug,
             name: $fixtureData->name,
