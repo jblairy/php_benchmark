@@ -1,9 +1,12 @@
+// Stats card component styles (generic wrapper for statistics displays)
+// Follows BEM methodology: Block__Element--Modifier
+
 .stats-card {
     &__container {
         background-color: $color-background;
         border-radius: 5px;
-        padding: $spacing-lg;
-        margin-bottom: $spacing-lg;
+        padding: $spacing-md;
+        margin-bottom: $spacing-md;
         box-shadow: $shadow-md;
     }
 
