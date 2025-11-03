@@ -258,7 +258,7 @@ handleBenchmarkUpdate(data) {
    - Troubleshooting section
    - Security recommendations
 
-2. **`docs/infrastructure/MERCURE_IMPLEMENTATION_SUMMARY.md`** (this file)
+2. **`docs/infrastructure/mercure-implementation-summary.md`** (this file)
    - Implementation overview
    - Files created/modified
    - Testing instructions
@@ -291,7 +291,7 @@ handleBenchmarkUpdate(data) {
 
 ### Documentation
 - `docs/infrastructure/mercure-realtime.md`
-- `docs/infrastructure/MERCURE_IMPLEMENTATION_SUMMARY.md`
+- `docs/infrastructure/mercure-implementation-summary.md`
 
 ---
 

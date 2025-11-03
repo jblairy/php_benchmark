@@ -4,13 +4,15 @@ A modern, benchmarking framework for PHP that allows testing performance of diff
 
 ## Features
 
-- **Performance Testing**: 40+ automated benchmarks covering arrays, strings, loops, OOP, and more
+- **Performance Testing**: 100+ automated benchmarks covering arrays, strings, loops, OOP, and more
 - **Version Comparison**: Test performance across different PHP versions (5.6 to 8.5)
 - **Parallel Execution**: Concurrent benchmark execution using Spatie\Async (100 parallel tasks)
 - **Docker Isolation**: Each PHP version runs in isolated Docker containers
-- **Web Dashboard**: Visual charts and statistics at `/dashboard`
+- **Web Dashboard**: Visual charts and statistics at `/dashboard` with real-time updates
+- **Real-Time Progress**: Live benchmark progress using Mercure (Server-Sent Events)
+- **Database Persistence**: Benchmark definitions stored in MariaDB via YAML fixtures
 - **Clean Architecture**: Domain-driven design with hexagonal ports & adapters
-- **Modular Architecture**: Easily add your own test cases
+- **Fixture-Based**: Easily add benchmarks via YAML files
 
 ## Requirements
 
@@ -22,8 +24,14 @@ A modern, benchmarking framework for PHP that allows testing performance of diff
 ```bash
 git clone https://github.com/jblairy/php-benchmark.git
 cd php-benchmark
-make up
+make up              # Start Docker containers
+make db.refresh      # Create database and load benchmark fixtures
 ```
+
+The `make db.refresh` command will:
+1. Create the MariaDB database
+2. Run migrations to create tables
+3. Load 100+ benchmark definitions from YAML fixtures
 
 ## Usage
 
@@ -81,24 +89,32 @@ See **[CLAUDE.md](CLAUDE.md)** for detailed developer guidelines.
 
 ### Creating Custom Benchmarks
 
-Quick example:
+Benchmarks are now defined as YAML files in `fixtures/benchmarks/`:
 
-```php
-use Jblairy\PhpBenchmark\Domain\Benchmark\Contract\AbstractBenchmark;
-use Jblairy\PhpBenchmark\Domain\PhpVersion\Attribute\All;
+```yaml
+# fixtures/benchmarks/my-benchmark.yaml
+slug: my-benchmark
+name: 'My Custom Benchmark'
+category: 'Custom'
+description: 'Description of what this benchmark tests'
+icon: 🚀
+tags:
+  - custom
+  - performance
+phpVersions:
+  - php84
+  - php85
+code: |
+  // Your benchmark code here
+  $result = [];
+  for ($i = 0; $i < 10000; $i++) {
+      $result[] = $i * 2;
+  }
+```
 
-final class MyBenchmark extends AbstractBenchmark
-{
-    #[All]
-    public function execute(): void
-    {
-        // Your benchmark code here
-        $result = [];
-        for ($i = 0; $i < 10000; $i++) {
-            $result[] = $i * 2;
-        }
-    }
-}
+**Load the new benchmark:**
+```bash
+make fixtures   # or make db.refresh to reload all
 ```
 
 📖 **Full guide**: [docs/guides/creating-benchmarks.md](docs/guides/creating-benchmarks.md)

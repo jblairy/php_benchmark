@@ -8,8 +8,8 @@ Complete guide to real-time benchmark progress with Mercure.
 docs/infrastructure/
 ├── mercure-realtime.md              # Architecture & Configuration (Complete)
 ├── mercure-practical-guide.md       # Debugging & Usage (Hands-on)
-├── MERCURE_IMPLEMENTATION_SUMMARY.md # What was built (Summary)
-└── MERCURE_INDEX.md                 # This file (Navigation)
+├── mercure-implementation-summary.md # What was built (Summary)
+└── mercure-index.md                 # This file (Navigation)
 
 scripts/
 ├── mercure-verify.sh                # Configuration checker
@@ -83,7 +83,7 @@ scripts/
 ---
 
 ### 3. Implementation Summary
-**File**: [MERCURE_IMPLEMENTATION_SUMMARY.md](MERCURE_IMPLEMENTATION_SUMMARY.md)
+**File**: [mercure-implementation-summary.md](mercure-implementation-summary.md)
 
 **Read this if**:
 - You want a high-level overview
@@ -98,9 +98,9 @@ scripts/
 - Future enhancements
 
 **Best sections**:
-- [What Was Implemented](MERCURE_IMPLEMENTATION_SUMMARY.md#what-was-implemented)
-- [Testing](MERCURE_IMPLEMENTATION_SUMMARY.md#testing)
-- [Architecture Compliance](MERCURE_IMPLEMENTATION_SUMMARY.md#architecture-compliance)
+- [What Was Implemented](mercure-implementation-summary.md#what-was-implemented)
+- [Testing](mercure-implementation-summary.md#testing)
+- [Architecture Compliance](mercure-implementation-summary.md#architecture-compliance)
 
 ---
 
@@ -407,7 +407,7 @@ jobs:
 ### Documentation
 - [Complete Architecture Guide](mercure-realtime.md)
 - [Debugging & Practical Usage](mercure-practical-guide.md)
-- [Implementation Summary](MERCURE_IMPLEMENTATION_SUMMARY.md)
+- [Implementation Summary](mercure-implementation-summary.md)
 - [Docker Setup](docker.md#real-time-updates)
 - [Scripts Documentation](../../scripts/README.md)
 

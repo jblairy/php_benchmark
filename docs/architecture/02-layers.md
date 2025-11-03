@@ -9,9 +9,10 @@ The **Domain Layer** is the heart of the application. It contains pure business 
 ```
 src/Domain/
 ├── Benchmark/
-│   ├── Contract/              # Base abstractions
-│   │   ├── AbstractBenchmark.php
-│   │   └── Benchmark.php      # Interface
+│   ├── Event/                 # Domain Events
+│   │   ├── BenchmarkStarted.php
+│   │   ├── BenchmarkProgress.php
+│   │   └── BenchmarkCompleted.php
 │   │
 │   ├── Exception/             # Domain-specific exceptions
 │   │   ├── BenchmarkNotFound.php
@@ -29,16 +30,20 @@ src/Domain/
 │   │   ├── ResultPersisterPort.php
 │   │   └── ScriptExecutorPort.php
 │   │
-│   ├── Service/               # Domain Services
-│   │   └── SingleBenchmarkExecutor.php
+│   └── Service/               # Domain Services
+│       └── SingleBenchmarkExecutor.php
+│
+├── Dashboard/
+│   ├── Model/                 # Dashboard Value Objects
+│   │   ├── BenchmarkMetrics.php
+│   │   ├── BenchmarkStatistics.php
+│   │   └── PercentileMetrics.php
 │   │
-│   └── Test/                  # Benchmark implementations
-│       ├── Loop.php
-│       ├── ArrayMap/
-│       │   ├── MapWithArrayMap.php
-│       │   └── MapWithForeach.php
-│       ├── StringConcatenation/
-│       └── ... (40+ benchmarks)
+│   ├── Port/                  # Dashboard Ports
+│   │   └── DashboardRepositoryPort.php
+│   │
+│   └── Service/               # Dashboard Services
+│       └── StatisticsCalculator.php
 │
 └── PhpVersion/
     ├── Attribute/             # PHP version targeting
@@ -47,6 +52,9 @@ src/Domain/
     │   └── ...
     └── Enum/
         └── PhpVersion.php
+
+Note: Benchmarks are now stored in database via YAML fixtures (fixtures/benchmarks/*.yaml)
+      and loaded by Infrastructure layer (see Persistence section)
 ```
 
 ### Namespace Pattern
@@ -170,7 +178,8 @@ The **Infrastructure Layer** contains all technical implementations: frameworks,
 ```
 src/Infrastructure/
 ├── Cli/                       # Command Line Interface
-│   └── BenchmarkCommand.php
+│   └── Command/
+│       └── BenchmarkCommand.php
 │
 ├── Execution/                 # Benchmark execution
 │   ├── CodeExtraction/
@@ -180,19 +189,31 @@ src/Infrastructure/
 │   └── ScriptBuilding/
 │       └── InstrumentedScriptBuilder.php
 │
+├── Mercure/                   # Real-time events
+│   └── EventSubscriber/
+│       └── BenchmarkProgressSubscriber.php
+│
 ├── Persistence/               # Data persistence
 │   ├── Doctrine/
 │   │   ├── Entity/
-│   │   │   └── Pulse.php
+│   │   │   ├── Benchmark.php        # Benchmark definitions (from YAML)
+│   │   │   └── Pulse.php            # Execution results
+│   │   ├── Fixtures/
+│   │   │   └── YamlBenchmarkFixtures.php   # Loads benchmarks from YAML
 │   │   ├── Repository/
+│   │   │   ├── DoctrineDashboardRepository.php
 │   │   │   └── PulseRepository.php
 │   │   └── DoctrinePulseResultPersister.php
 │   └── InMemory/
 │       └── InMemoryBenchmarkRepository.php
 │
 └── Web/                       # HTTP layer
-    └── Controller/
-        └── DashboardController.php
+    ├── Component/
+    │   └── BenchmarkProgressComponent.php  # Live Component
+    ├── Controller/
+    │   └── DashboardController.php
+    └── Presentation/
+        └── ChartBuilder.php
 ```
 
 ### Namespace Pattern

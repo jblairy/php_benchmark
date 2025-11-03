@@ -1,6 +1,38 @@
 # Creating Benchmarks
 
-## Quick Start
+⚠️ **Important**: As of November 2025, benchmarks are now defined as **YAML fixtures** instead of PHP classes.
+
+📖 **See the complete guide**: [fixtures.md](fixtures.md)
+
+## Quick Start (New Method - YAML Fixtures)
+
+1. Create a YAML file in `fixtures/benchmarks/`
+2. Define your benchmark metadata and code
+3. Load with `make fixtures`
+
+**Example:**
+```yaml
+# fixtures/benchmarks/string-concat.yaml
+slug: string-concat
+name: 'String Concatenation'
+category: 'String Operations'
+phpVersions: [php84, php85]
+code: |
+  $result = '';
+  for ($i = 0; $i < 10000; $i++) {
+      $result .= 'test' . $i;
+  }
+```
+
+📖 **Full YAML fixtures guide**: [fixtures.md](fixtures.md)
+
+---
+
+## Legacy Method (PHP Classes - Deprecated)
+
+This method is kept for reference but **new benchmarks should use YAML fixtures**.
+
+### Quick Start
 
 1. Create a class in `src/Domain/Benchmark/Test/`
 2. Extend `AbstractBenchmark`

@@ -14,10 +14,10 @@
 ## 🐳 Infrastructure
 
 - **[infrastructure/docker.md](infrastructure/docker.md)** - Docker architecture, services, and execution flow
-- **[infrastructure/MERCURE_INDEX.md](infrastructure/MERCURE_INDEX.md)** - **⭐ Mercure complete guide (START HERE)**
+- **[infrastructure/mercure-index.md](infrastructure/mercure-index.md)** - **⭐ Mercure real-time guide (START HERE)**
   - [mercure-realtime.md](infrastructure/mercure-realtime.md) - Architecture & Configuration
   - [mercure-practical-guide.md](infrastructure/mercure-practical-guide.md) - Debugging & Usage
-  - [MERCURE_IMPLEMENTATION_SUMMARY.md](infrastructure/MERCURE_IMPLEMENTATION_SUMMARY.md) - Implementation Summary
+  - [mercure-implementation-summary.md](infrastructure/mercure-implementation-summary.md) - Implementation Summary
 
 ## 💡 Concepts
 
@@ -26,6 +26,7 @@
 ## 📖 Guides
 
 - **[guides/creating-benchmarks.md](guides/creating-benchmarks.md)** - How to create benchmarks
+- **[guides/fixtures.md](guides/fixtures.md)** - **⭐ Benchmark fixtures system (YAML)**
 
 ## 🔧 Tools
 
