@@ -91,7 +91,7 @@ final class ReflectionCodeExtractor implements CodeExtractorPort
             if (!isset($fileLines[$i])) {
                 continue;
             }
-            
+
             if ($this->shouldSkipLine($fileLines[$i])) {
                 continue;
             }
