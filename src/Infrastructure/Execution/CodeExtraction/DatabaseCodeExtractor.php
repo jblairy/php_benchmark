@@ -22,12 +22,10 @@ final class DatabaseCodeExtractor implements CodeExtractorPort
 
     public function extractCode(Benchmark $benchmark, PhpVersion $phpVersion): string
     {
-        // If it's a DatabaseBenchmark, get code directly from entity
         if ($benchmark instanceof DatabaseBenchmark) {
             return $benchmark->getMethodBody($phpVersion);
         }
 
-        // Fallback to reflection for old-style PHP class benchmarks
         return $this->fallbackExtractor->extractCode($benchmark, $phpVersion);
     }
 }

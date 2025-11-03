@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Jblairy\PhpBenchmark\Domain\Benchmark\Contract\Benchmark;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkConfiguration;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkResult;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ResultPersisterPort;
@@ -28,11 +29,7 @@ final readonly class DoctrinePulseResultPersister implements ResultPersisterPort
 
     private function createPulseEntity(BenchmarkConfiguration $benchmarkConfiguration, BenchmarkResult $benchmarkResult): Pulse
     {
-        // For database benchmarks, use slug as identifier
-        // For legacy PHP class benchmarks, use class name
-        $benchmarkIdentifier = $benchmarkConfiguration->benchmark instanceof DatabaseBenchmark
-            ? $benchmarkConfiguration->benchmark->getSlug()
-            : $benchmarkConfiguration->benchmark::class;
+        $benchmarkIdentifier = $this->resolveBenchmarkIdentifier($benchmarkConfiguration->benchmark);
 
         return Pulse::create(
             $benchmarkResult->executionTimeMs,
@@ -41,5 +38,14 @@ final readonly class DoctrinePulseResultPersister implements ResultPersisterPort
             $benchmarkConfiguration->phpVersion,
             $benchmarkIdentifier,
         );
+    }
+
+    private function resolveBenchmarkIdentifier(Benchmark $benchmark): string
+    {
+        if ($benchmark instanceof DatabaseBenchmark) {
+            return $benchmark->getSlug();
+        }
+
+        return $benchmark::class;
     }
 }
