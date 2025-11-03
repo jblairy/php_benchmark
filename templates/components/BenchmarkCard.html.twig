@@ -1,6 +1,6 @@
 <div {{ attributes.defaults({
         class: 'stats-card__container benchmark-card',
-        'data-controller': 'benchmark-card-live',
+        'data-controller': 'benchmark-card-live toggle',
         'data-benchmark-card-live-benchmark-id-value': this.benchmarkId,
         'data-benchmark-card-live-benchmark-name-value': this.benchmarkName,
         'data-description': this.description,
@@ -16,7 +16,17 @@
         <div>
             <div>
                 <div class="benchmark-card__header">
-                    <div class="benchmark-card__category-badge">{{ this.category }}</div>
+                    <div class="benchmark-card__header-top">
+                        <div class="benchmark-card__category-badge">{{ this.category }}</div>
+                        <button type="button" 
+                                class="benchmark-card__toggle-button"
+                                data-action="click->toggle#toggle"
+                                data-toggle-target="button"
+                                title="Afficher le graphique">
+                            <span data-toggle-target="iconChart">📊</span>
+                            <span data-toggle-target="iconTable" style="display: none;">📋</span>
+                        </button>
+                    </div>
                     <h2 class="benchmark-card__title">
                         {% if this.icon %}{{ this.icon }} {% endif %}{{ this.shortName }}
                     </h2>
@@ -46,11 +56,12 @@
                 </div>
                 {% endif %}
 
-                <div class="benchmark-card__chart-container chart__container chart__container--visible">
+                <div class="benchmark-card__chart-container chart__container"
+                     data-toggle-target="chart">
                     {{ render_chart(this.chart) }}
                 </div>
 
-                <div class="benchmark-card__table-wrapper">
+                <div class="benchmark-card__table-wrapper" data-toggle-target="table">
                     <table class="benchmark-card__table">
                     <thead class="benchmark-card__table-header">
                     <tr>

@@ -4,10 +4,16 @@
 .stats-card {
     &__container {
         background-color: $color-background;
-        border-radius: 5px;
+        border-radius: 12px;
         padding: $spacing-md;
         margin-bottom: $spacing-md;
-        box-shadow: $shadow-md;
+        box-shadow: $shadow-card;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        
+        &:hover {
+            transform: translateY(-4px);
+            box-shadow: $shadow-card-hover;
+        }
     }
 
     &__flex {

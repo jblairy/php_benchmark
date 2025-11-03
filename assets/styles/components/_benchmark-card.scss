@@ -5,6 +5,14 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: visible;
+    animation: slideInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+    
+    // Cascade effect - each card appears with a delay
+    @for $i from 1 through 20 {
+        &:nth-child(#{$i}) {
+            animation-delay: #{$i * 0.08}s;
+        }
+    }
 
     // Loading indicator overlay - non-intrusive
     &__loading-overlay {
@@ -40,9 +48,39 @@
 
     // Header section
     &__header {
-        margin-bottom: $spacing-lg;
-        padding-bottom: $spacing-lg;
+        margin: (-$spacing-md) (-$spacing-md) $spacing-lg (-$spacing-md);
+        padding: $spacing-xl $spacing-md $spacing-lg $spacing-md;
+        background: linear-gradient(135deg, #fafbfc 0%, #ffffff 100%);
+        border-radius: 12px 12px 0 0;
         border-bottom: 2px solid #e2e8f0;
+    }
+    
+    &__header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: $spacing-md;
+    }
+    
+    &__toggle-button {
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+        
+        &:active {
+            transform: translateY(0);
+        }
     }
 
     &__category-badge {
@@ -56,7 +94,13 @@
         letter-spacing: 1px;
         border-radius: 16px;
         margin-bottom: $spacing-md;
-        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        box-shadow: $shadow-badge;
+        transition: all 0.3s ease;
+        
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+        }
     }
 
     &__title-group {
@@ -299,21 +343,37 @@
         }
     }
 
-    // Chart container
+    // Chart container - toggleable with table
     &__chart-container {
-        transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                    opacity 0.3s ease,
-                    margin 0.3s ease;
-        overflow: hidden;
-
-        &:not([style*="display: none"]) {
-            animation: expandIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        display: none;
+        padding: $spacing-lg 0;
+        margin-bottom: $spacing-lg;
+        
+        &--visible {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        canvas {
+            max-height: 350px !important;
+            width: auto !important;
+            height: auto !important;
         }
     }
 
     // Loading state animation
     &--loading {
         animation: cardReload 0.6s ease-in-out;
+    }
+    
+    // Table wrapper - simple toggle
+    &__table-wrapper {
+        display: block;
+        
+        &--hidden {
+            display: none;
+        }
     }
 }
 
@@ -374,5 +434,16 @@
     to {
         max-height: 500px;
         opacity: 1;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
