@@ -1,9 +1,7 @@
 // Main SCSS entry point - All styles follow BEM: Block__Element--Modifier
 @import "variables";
 @import "layout";
-@import "components/table";
 @import "components/card";
-@import "components/buttons";
 @import "components/chart";
 @import "components/benchmark-card";
 @import "components/benchmark-progress";
@@ -29,15 +27,6 @@
 }
 
 // Utility classes
-.empty-message {
-    text-align: center;
-    padding: $spacing-lg;
-    color: $color-text-secondary;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: $shadow-md;
-}
-
 .spinner {
     display: inline-block;
     animation: spin 1s linear infinite;

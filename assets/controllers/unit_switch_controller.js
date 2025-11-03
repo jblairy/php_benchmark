@@ -11,7 +11,6 @@ export default class extends Controller {
     }
 
     connect() {
-        console.log('🔄 Global Unit Switch Controller connected');
         this.updateButtonStates();
     }
 

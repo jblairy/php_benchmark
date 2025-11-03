@@ -12,8 +12,6 @@ export default class extends Controller {
     };
 
     connect() {
-        console.log('📊 Benchmark card connected:', this.benchmarkNameValue);
-        console.log('   - Benchmark ID:', this.benchmarkIdValue);
 
         // Bind the event handler to this instance so we can remove it later
         this.boundHandleEvent = this.handleEvent.bind(this);
@@ -23,7 +21,6 @@ export default class extends Controller {
     }
 
     disconnect() {
-        console.log('🔌 Benchmark card disconnected:', this.benchmarkNameValue);
 
         // Remove the event listener to prevent memory leaks
         if (this.boundHandleEvent) {
@@ -32,28 +29,19 @@ export default class extends Controller {
     }
 
     handleEvent(event) {
-        console.log('📬 Event received by card:', this.benchmarkNameValue);
-        console.log('   - Event detail:', event.detail);
         this.handleDataUpdate(event.detail);
     }
 
     handleDataUpdate(data) {
-        console.log('🔄 handleDataUpdate called for:', this.benchmarkNameValue);
-        console.log('   - This card ID:', this.benchmarkIdValue);
-        console.log('   - Event data ID:', data.benchmarkId);
 
         // Only update if this card matches the updated benchmark
         if (data.benchmarkId !== this.benchmarkIdValue) {
-            console.log('   ⏭️  Skipping, not for this card');
             return;
         }
 
-        console.log('   ✅ MATCH! Updating this card');
-        console.log('   - PHP Versions data:', data.phpVersions);
 
         // Update each PHP version's data
         Object.entries(data.phpVersions || {}).forEach(([phpVersion, stats]) => {
-            console.log(`   - Updating ${phpVersion}:`, stats);
             this.updatePhpVersionStats(phpVersion, stats);
         });
 
@@ -62,20 +50,16 @@ export default class extends Controller {
     }
 
     updatePhpVersionStats(phpVersion, stats) {
-        console.log(`     🔍 Finding column for ${phpVersion}`);
 
         // Find the column for this PHP version
         const headers = this.element.querySelectorAll('th.table__cell--metric');
-        console.log(`     - Found ${headers.length} header cells`);
 
         let columnIndex = -1;
 
         headers.forEach((header, index) => {
             const text = header.textContent.trim();
-            console.log(`       Header ${index}: "${text}"`);
             if (text.includes(phpVersion.replace('php', ''))) {
                 columnIndex = index;
-                console.log(`       ✅ MATCH at index ${index}`);
             }
         });
 
@@ -84,7 +68,6 @@ export default class extends Controller {
             return;
         }
 
-        console.log(`     ✅ Column found at index ${columnIndex}, updating cells...`);
 
         // Update each metric
         this.updateCellValue('p50', columnIndex, stats.p50);
@@ -97,11 +80,9 @@ export default class extends Controller {
     }
 
     updateCellValue(metricName, columnIndex, newValue, hasDecimals = true) {
-        console.log(`       🔍 updateCellValue: ${metricName} col ${columnIndex} = ${newValue}`);
 
         // Find the row for this metric
         const rows = this.element.querySelectorAll('tbody tr');
-        console.log(`       - Found ${rows.length} table rows`);
 
         let targetCell = null;
 
@@ -109,13 +90,10 @@ export default class extends Controller {
             const metricCell = row.querySelector('[data-metric]');
             if (metricCell) {
                 const metric = metricCell.dataset.metric;
-                console.log(`         Row ${rowIndex}: metric="${metric}"`);
 
                 if (metric === metricName) {
                     const cells = row.querySelectorAll('td.table__cell:not(.table__cell--metric)');
-                    console.log(`         ✅ MATCH! Found ${cells.length} data cells`);
                     targetCell = cells[columnIndex];
-                    console.log(`         Target cell:`, targetCell);
                 }
             }
         });
@@ -128,11 +106,9 @@ export default class extends Controller {
         // Get current value
         const currentText = targetCell.textContent.trim().replace(/,/g, '');
         const currentValue = parseFloat(currentText);
-        console.log(`       Current value: ${currentValue}`);
 
         // Check if value actually changed
         if (Math.abs(currentValue - newValue) < 0.00001) {
-            console.log(`       ⏭️  No change (difference too small)`);
             return; // No change
         }
 
@@ -141,12 +117,10 @@ export default class extends Controller {
             ? newValue.toFixed(5).replace(/\.?0+$/, '')
             : newValue.toString();
 
-        console.log(`       ✨ ANIMATING: ${currentValue} → ${newValue} (formatted: ${formattedValue})`);
 
         // Animate the change
         this.animateCellUpdate(targetCell, formattedValue);
 
-        console.log(`       ✅ Updated ${metricName} col ${columnIndex}: ${currentValue} → ${newValue}`);
     }
 
     animateCellUpdate(cell, newValue) {
