@@ -12,53 +12,15 @@
          data-dashboard-mercure-url-value="{{ mercure_public_url }}"
          data-dashboard-mercure-topic-value="benchmark/results">
 
-        {# Sticky notification banner for new results #}
-        <div data-dashboard-mercure-target="banner"
-             style="display: none; position: sticky; top: 0; z-index: 1000; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 0 0 12px 12px; margin-bottom: 20px; animation: slideDown 0.3s ease-out;">
-            <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto;">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <span style="font-size: 24px;">✨</span>
-                    <div>
-                        <strong data-dashboard-mercure-target="bannerText" style="font-size: 16px; display: block;">
-                            Nouveaux résultats disponibles
-                        </strong>
-                        <small style="opacity: 0.9;">Cliquez pour voir les dernières données</small>
-                    </div>
-                </div>
-                <button data-action="click->dashboard-mercure#refreshNow"
-                        style="background: white; color: #667eea; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    🔄 Actualiser maintenant
-                </button>
-            </div>
-        </div>
-
         <h1 class="dashboard__title">Comparaison par version PHP</h1>
 
         <div class="stats-card__container">
             <h2 class="dashboard__subtitle">Vue d'ensemble des benchmarks</h2>
-            <p class="dashboard__subtitle-info" style="color: #666;">
-                🔔 Les nouvelles données apparaissent en haut de la page
+            <p class="dashboard__subtitle-info" style="color: #4caf50; font-weight: 500;">
+                ✨ Mise à jour en temps réel activée - Les valeurs s'animent quand de nouvelles données arrivent
             </p>
         </div>
 
         <twig:BenchmarkList />
     </div>
-
-    <style>
-        @keyframes slideDown {
-            from {
-                transform: translateY(-100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        [data-dashboard-mercure-target="banner"] button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-    </style>
 {% endblock %}

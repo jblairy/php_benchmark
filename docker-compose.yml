@@ -45,6 +45,7 @@ services:
           MERCURE_EXTRA_DIRECTIVES: |
               cors_origins http://localhost:8000 http://127.0.0.1:8000
               anonymous
+              heartbeat 15s
       command: /usr/bin/caddy run --config /etc/caddy/dev.Caddyfile
       ports:
           - "3000:80"

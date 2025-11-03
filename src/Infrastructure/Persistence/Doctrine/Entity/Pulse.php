@@ -46,6 +46,7 @@ class Pulse
         $pulse->memoryUsedBytes = $memoryUsedBytes;
         $pulse->memoryPeakByte = $memoryPeakBytes;
         $pulse->phpVersion = $phpVersion;
+        $pulse->benchId = $className;
         $pulse->name = $className;
 
         return $pulse;
