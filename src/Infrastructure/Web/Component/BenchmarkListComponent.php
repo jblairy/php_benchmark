@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Jblairy\PhpBenchmark\Infrastructure\Web\Component;
 
-use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Repository\PulseRepositoryInterface;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Port\PulseRepositoryPort;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 
@@ -22,7 +22,7 @@ final class BenchmarkListComponent
     private ?array $benchmarks = null;
 
     public function __construct(
-        private readonly PulseRepositoryInterface $pulseRepository,
+        private readonly PulseRepositoryPort $pulseRepository,
     ) {
     }
 

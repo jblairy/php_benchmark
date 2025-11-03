@@ -7,12 +7,13 @@ namespace Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Repository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\BenchmarkMetrics;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Port\PulseRepositoryPort;
 use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Entity\Pulse;
 
 /**
  * @extends ServiceEntityRepository<Pulse>
  */
-class PulseRepository extends ServiceEntityRepository implements PulseRepositoryInterface
+class PulseRepository extends ServiceEntityRepository implements PulseRepositoryPort
 {
     public function __construct(ManagerRegistry $managerRegistry)
     {

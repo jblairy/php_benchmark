@@ -9,6 +9,33 @@ use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\Rules\Rule;
 
+/**
+ * Helper to exclude native PHP classes from architecture rules.
+ * Native PHP classes (exceptions, attributes, reflection) are acceptable dependencies.
+ */
+function allowPhpNativeClasses(string ...$allowedNamespaces): NotHaveDependencyOutsideNamespace
+{
+    $nativePhpClasses = [
+        // PHP Native Exceptions
+        'Exception',
+        'RuntimeException',
+        'InvalidArgumentException',
+        'LogicException',
+        'DomainException',
+
+        // PHP Native Classes
+        'Attribute',
+        'ReflectionClass',
+        'ReflectionMethod',
+        'ReflectionParameter',
+        'DateTimeImmutable',
+        'DateTime',
+        'stdClass',
+    ];
+
+    return new NotHaveDependencyOutsideNamespace($allowedNamespaces[0], array_merge(array_slice($allowedNamespaces, 1), $nativePhpClasses));
+}
+
 return static function (Config $config): void {
     $classSet = ClassSet::fromDir(__DIR__ . '/src');
 
@@ -49,18 +76,18 @@ return static function (Config $config): void {
     // CLEAN ARCHITECTURE - LAYER RULES
     // ========================================
 
-    // Rule 1: Domain Layer - NO external dependencies
+    // Rule 1: Domain Layer - NO external dependencies (except native PHP)
     // Le Domain ne doit dépendre de RIEN (ni Application, ni Infrastructure, ni frameworks)
     $rules[] = Rule::allClasses()
         ->that(new ResideInOneOfTheseNamespaces('Jblairy\PhpBenchmark\Domain'))
-        ->should(new NotHaveDependencyOutsideNamespace('Jblairy\PhpBenchmark\Domain'))
+        ->should(allowPhpNativeClasses('Jblairy\PhpBenchmark\Domain'))
         ->because('Domain must not depend on Application or Infrastructure - Clean Architecture principle');
 
-    // Rule 2: Application Layer - can only depend on Domain
+    // Rule 2: Application Layer - can only depend on Domain (except native PHP)
     // L'Application peut utiliser le Domain, mais pas l'Infrastructure
     $rules[] = Rule::allClasses()
         ->that(new ResideInOneOfTheseNamespaces('Jblairy\PhpBenchmark\Application'))
-        ->should(new NotHaveDependencyOutsideNamespace('Jblairy\PhpBenchmark\Application', ['Jblairy\PhpBenchmark\Domain']))
+        ->should(allowPhpNativeClasses('Jblairy\PhpBenchmark\Application', 'Jblairy\PhpBenchmark\Domain'))
         ->because('Application layer can only depend on Domain layer, not on Infrastructure');
 
     // Rule 3: Infrastructure can depend on Domain and Application (but Application should be minimal)
@@ -104,7 +131,7 @@ return static function (Config $config): void {
     // Rule 8: Value Objects and Entities should be in Domain
     $rules[] = Rule::allClasses()
         ->that(new ResideInOneOfTheseNamespaces('Jblairy\PhpBenchmark\Domain\Benchmark\Model'))
-        ->should(new NotHaveDependencyOutsideNamespace('Jblairy\PhpBenchmark\Domain'))
+        ->should(allowPhpNativeClasses('Jblairy\PhpBenchmark\Domain'))
         ->because('Domain Models must not depend on external layers');
 
     // ========================================
@@ -115,7 +142,7 @@ return static function (Config $config): void {
     // Les tests de benchmark sont des concepts métier
     $rules[] = Rule::allClasses()
         ->that(new ResideInOneOfTheseNamespaces('Jblairy\PhpBenchmark\Domain\Benchmark\Test'))
-        ->should(new NotHaveDependencyOutsideNamespace('Jblairy\PhpBenchmark\Domain'))
+        ->should(allowPhpNativeClasses('Jblairy\PhpBenchmark\Domain'))
         ->because('Benchmark tests are domain concepts and must not depend on external layers');
 
     // Rule 10: Controllers must be in Infrastructure/Web
@@ -127,7 +154,7 @@ return static function (Config $config): void {
     // Rule 11: Use Cases must be in Application and only depend on Domain
     $rules[] = Rule::allClasses()
         ->that(new ResideInOneOfTheseNamespaces('Jblairy\PhpBenchmark\Application\UseCase'))
-        ->should(new NotHaveDependencyOutsideNamespace('Jblairy\PhpBenchmark\Application', ['Jblairy\PhpBenchmark\Domain']))
+        ->should(allowPhpNativeClasses('Jblairy\PhpBenchmark\Application', 'Jblairy\PhpBenchmark\Domain'))
         ->because('Use Cases orchestrate domain logic and must not depend on Infrastructure');
 
     // Rule 12: Commands must be in Infrastructure/Cli
@@ -139,7 +166,7 @@ return static function (Config $config): void {
     // Rule 13: Domain Services must not depend on Infrastructure
     $rules[] = Rule::allClasses()
         ->that(new ResideInOneOfTheseNamespaces('Jblairy\PhpBenchmark\Domain\Benchmark\Service'))
-        ->should(new NotHaveDependencyOutsideNamespace('Jblairy\PhpBenchmark\Domain'))
+        ->should(allowPhpNativeClasses('Jblairy\PhpBenchmark\Domain'))
         ->because('Domain Services must remain pure and only depend on Domain layer');
 
     // Rule 14: Entities (Doctrine) must be in Infrastructure
@@ -152,13 +179,7 @@ return static function (Config $config): void {
     // ANTI-CORRUPTION LAYER RULES
     // ========================================
 
-    // Rule 15: PhpVersion is a Domain concept
-    $rules[] = Rule::allClasses()
-        ->that(new ResideInOneOfTheseNamespaces('Jblairy\PhpBenchmark\Domain\PhpVersion'))
-        ->should(new NotHaveDependencyOutsideNamespace('Jblairy\PhpBenchmark\Domain'))
-        ->because('PhpVersion is a domain concept and must remain pure');
-
-    // Rule 16: Adapters/Implementations must be in Infrastructure
+    // Rule 15: Adapters/Implementations must be in Infrastructure
     // Les adaptateurs (implémentations des Ports) doivent être dans Infrastructure
     $rules[] = Rule::allClasses()
         ->that(new HaveNameMatching('*Adapter'))
@@ -172,13 +193,13 @@ return static function (Config $config): void {
     // Rule 17: Contracts/Interfaces must be in Domain
     $rules[] = Rule::allClasses()
         ->that(new ResideInOneOfTheseNamespaces('Jblairy\PhpBenchmark\Domain\Benchmark\Contract'))
-        ->should(new NotHaveDependencyOutsideNamespace('Jblairy\PhpBenchmark\Domain'))
+        ->should(allowPhpNativeClasses('Jblairy\PhpBenchmark\Domain'))
         ->because('Contracts are core domain concepts and must not depend on external layers');
 
-    // Rule 18: Application Services (ex: ChartBuilder) must be in Application
+    // Rule 18: Application Services must be in Application and only depend on Domain
     $rules[] = Rule::allClasses()
         ->that(new ResideInOneOfTheseNamespaces('Jblairy\PhpBenchmark\Application\Service'))
-        ->should(new NotHaveDependencyOutsideNamespace('Jblairy\PhpBenchmark\Application', ['Jblairy\PhpBenchmark\Domain']))
+        ->should(allowPhpNativeClasses('Jblairy\PhpBenchmark\Application', 'Jblairy\PhpBenchmark\Domain'))
         ->because('Application Services must not depend on Infrastructure or external frameworks');
 
     $config->add($classSet, ...$rules);

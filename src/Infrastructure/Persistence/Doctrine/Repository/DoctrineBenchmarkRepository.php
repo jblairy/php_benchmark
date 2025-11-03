@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine;
+namespace Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Repository;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Contract\Benchmark;
