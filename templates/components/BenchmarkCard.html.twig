@@ -14,19 +14,12 @@
         </div>
 
         <div>
-            <div data-controller="toggle">
+            <div>
                 <div class="benchmark-card__header">
-                    <div class="benchmark-card__title-group">
-                        <div class="benchmark-card__category">{{ this.category }}</div>
-                        <h2 class="benchmark-card__title">
-                            {% if this.icon %}{{ this.icon }} {% endif %}{{ this.shortName }}
-                        </h2>
-                    </div>
-                    <div class="benchmark-card__actions">
-                        <button class="button__toggle" data-action="toggle#toggle">
-                            Show/Hide Chart
-                        </button>
-                    </div>
+                    <div class="benchmark-card__category-badge">{{ this.category }}</div>
+                    <h2 class="benchmark-card__title">
+                        {% if this.icon %}{{ this.icon }} {% endif %}{{ this.shortName }}
+                    </h2>
                 </div>
 
                 {% if this.description %}
@@ -53,7 +46,7 @@
                 </div>
                 {% endif %}
 
-                <div class="benchmark-card__chart-container chart__container" data-toggle-target="chart">
+                <div class="benchmark-card__chart-container chart__container chart__container--visible">
                     {{ render_chart(this.chart) }}
                 </div>
 
