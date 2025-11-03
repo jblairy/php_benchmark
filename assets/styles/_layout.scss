@@ -30,4 +30,22 @@
         color: $color-success;
         font-weight: 500;
     }
+
+    &__benchmarks {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-md;
+    }
+}
+
+// Benchmark list container
+.benchmark-list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+
+    > div {
+        display: flex;
+        flex-direction: column;
+    }
 }

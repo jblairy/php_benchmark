@@ -14,7 +14,10 @@
         <div>
             <div data-controller="toggle unit-switch">
                 <div class="benchmark-card__header">
-                    <h2 class="benchmark-card__title">{{ this.data.benchmarkName }} ({{ this.data.benchmarkId }})</h2>
+                    <div class="benchmark-card__title-group">
+                        <div class="benchmark-card__category">{{ this.category }}</div>
+                        <h2 class="benchmark-card__title">{{ this.shortName }}</h2>
+                    </div>
                     <div class="benchmark-card__actions">
                         <button class="button__toggle" data-action="toggle#toggle">
                             Afficher/Masquer le graphique
@@ -24,6 +27,16 @@
                         </button>
                     </div>
                 </div>
+
+                {% if this.sourceCode %}
+                <div class="benchmark-card__code-section">
+                    <div class="benchmark-card__code-header">
+                        <span class="benchmark-card__code-label">Code testé</span>
+                        <span class="benchmark-card__code-lang">PHP</span>
+                    </div>
+                    <pre class="benchmark-card__code"><code>{{ this.sourceCode }}</code></pre>
+                </div>
+                {% endif %}
 
                 <div class="benchmark-card__chart-container chart__container" data-toggle-target="chart">
                     {{ render_chart(this.chart) }}

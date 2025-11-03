@@ -6,12 +6,14 @@
     </div>
 
     {% if this.benchmarks %}
-        <div data-loading="hide">
+        <div data-loading="hide" class="benchmark-list">
             {% for benchmark in this.benchmarks %}
-                <twig:BenchmarkCard
-                    benchmarkId="{{ benchmark.benchId }}"
-                    benchmarkName="{{ benchmark.name }}"
-                />
+                <div data-benchmark-filter-target="card">
+                    <twig:BenchmarkCard
+                        benchmarkId="{{ benchmark.benchId }}"
+                        benchmarkName="{{ benchmark.name }}"
+                    />
+                </div>
             {% endfor %}
         </div>
     {% endif %}

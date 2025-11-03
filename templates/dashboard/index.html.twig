@@ -8,7 +8,7 @@
 
 {% block body %}
     <div class="dashboard__container"
-         data-controller="dashboard-mercure"
+         data-controller="dashboard-mercure benchmark-filter"
          data-dashboard-mercure-url-value="{{ mercure_public_url }}"
          data-dashboard-mercure-topic-value="benchmark/results">
 
@@ -21,6 +21,108 @@
             </p>
         </div>
 
-        <twig:BenchmarkList />
+        {# Filter and Sort Section #}
+        <div class="filter">
+            <div class="filter__container">
+                {# Search Bar #}
+                <div class="filter__search-section">
+                    <div class="filter__search-wrapper">
+                        <span class="filter__search-icon">🔍</span>
+                        <input
+                            type="text"
+                            class="filter__search-input"
+                            placeholder="Rechercher un benchmark par nom, catégorie ou code..."
+                            data-benchmark-filter-target="searchInput"
+                            data-action="input->benchmark-filter#search"
+                        />
+                    </div>
+                    <button
+                        class="filter__reset-button"
+                        data-action="click->benchmark-filter#resetFilters"
+                        title="Réinitialiser les filtres"
+                    >
+                        ✕ Réinitialiser
+                    </button>
+                </div>
+
+                {# Sort and Filter Buttons #}
+                <div class="filter__controls">
+                    <div class="filter__sort-group">
+                        <span class="filter__label">Trier par :</span>
+                        <button
+                            class="filter__sort-button filter__sort-button--active"
+                            data-benchmark-filter-target="sortButton"
+                            data-sort-by="name"
+                            data-action="click->benchmark-filter#sort"
+                        >
+                            Nom <span class="filter__sort-icon">↑</span>
+                        </button>
+                        <button
+                            class="filter__sort-button"
+                            data-benchmark-filter-target="sortButton"
+                            data-sort-by="category"
+                            data-action="click->benchmark-filter#sort"
+                        >
+                            Catégorie <span class="filter__sort-icon">↕</span>
+                        </button>
+                    </div>
+
+                    <div class="filter__category-group">
+                        <span class="filter__label">Catégorie :</span>
+                        <button
+                            class="filter__category-button filter__category-button--active"
+                            data-benchmark-filter-target="categoryFilter"
+                            data-category="all"
+                            data-action="click->benchmark-filter#filterByCategory"
+                        >
+                            Toutes
+                        </button>
+                        <button
+                            class="filter__category-button"
+                            data-benchmark-filter-target="categoryFilter"
+                            data-category="errorhandling"
+                            data-action="click->benchmark-filter#filterByCategory"
+                        >
+                            ErrorHandling
+                        </button>
+                        <button
+                            class="filter__category-button"
+                            data-benchmark-filter-target="categoryFilter"
+                            data-category="loop"
+                            data-action="click->benchmark-filter#filterByCategory"
+                        >
+                            Loop
+                        </button>
+                        <button
+                            class="filter__category-button"
+                            data-benchmark-filter-target="categoryFilter"
+                            data-category="string"
+                            data-action="click->benchmark-filter#filterByCategory"
+                        >
+                            String
+                        </button>
+                    </div>
+                </div>
+
+                {# Stats #}
+                <div class="filter__stats-container">
+                    <span class="filter__stats">Chargement...</span>
+                </div>
+            </div>
+        </div>
+
+        {# Benchmark Cards Container #}
+        <div class="dashboard__benchmarks">
+            <twig:BenchmarkList />
+
+            {# No Results Message #}
+            <div class="filter__no-results" data-benchmark-filter-target="noResults" style="display: none;">
+                <div class="filter__no-results-icon">🔍</div>
+                <h3 class="filter__no-results-title">Aucun benchmark trouvé</h3>
+                <p class="filter__no-results-text">
+                    Essayez de modifier vos critères de recherche ou de réinitialiser les filtres.
+                </p>
+            </div>
+        </div>
     </div>
 {% endblock %}
