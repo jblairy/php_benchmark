@@ -79,6 +79,43 @@
         flex-wrap: wrap;
     }
 
+    // Description section
+    &__description {
+        padding: $spacing-md;
+        background: #f7fafc;
+        border-left: 4px solid #667eea;
+        border-radius: 4px;
+        color: #4a5568;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: $spacing-md;
+    }
+
+    // Tags section
+    &__tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: $spacing-xs;
+        margin-bottom: $spacing-md;
+    }
+
+    &__tag {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background: #edf2f7;
+        color: #4a5568;
+        font-size: 0.8rem;
+        font-weight: 500;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+
+        &:hover {
+            background: #e2e8f0;
+            border-color: #cbd5e0;
+        }
+    }
+
     // Code section
     &__code-section {
         background: #2d3748;

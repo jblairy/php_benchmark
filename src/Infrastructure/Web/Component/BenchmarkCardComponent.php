@@ -6,7 +6,9 @@ namespace Jblairy\PhpBenchmark\Infrastructure\Web\Component;
 
 use Jblairy\PhpBenchmark\Application\Dashboard\DTO\BenchmarkData;
 use Jblairy\PhpBenchmark\Application\Dashboard\UseCase\GetBenchmarkStatistics;
+use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkRepositoryPort;
 use Jblairy\PhpBenchmark\Domain\PhpVersion\Enum\PhpVersion;
+use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Adapter\DatabaseBenchmark;
 use Jblairy\PhpBenchmark\Infrastructure\Web\Presentation\ChartBuilder;
 use Symfony\UX\Chartjs\Model\Chart;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
@@ -26,10 +28,12 @@ final class BenchmarkCardComponent
 
     private ?BenchmarkData $data = null;
     private ?Chart $chart = null;
+    private ?DatabaseBenchmark $benchmark = null;
 
     public function __construct(
         private readonly GetBenchmarkStatistics $getBenchmarkStatistics,
         private readonly ChartBuilder $chartBuilder,
+        private readonly BenchmarkRepositoryPort $benchmarkRepository,
     ) {
     }
 
@@ -62,62 +66,48 @@ final class BenchmarkCardComponent
         return array_map(fn (PhpVersion $version): string => $version->value, PhpVersion::cases());
     }
 
-    public function getCategory(): string
+    private function getBenchmark(): ?DatabaseBenchmark
     {
-        if ('' === $this->benchmarkName) {
-            return '';
+        if (null === $this->benchmark && '' !== $this->benchmarkId) {
+            $found = $this->benchmarkRepository->findBenchmarkByName($this->benchmarkId);
+            if ($found instanceof DatabaseBenchmark) {
+                $this->benchmark = $found;
+            }
         }
 
-        $parts = explode('\\', $this->benchmarkName);
+        return $this->benchmark;
+    }
 
-        // Return the second-to-last part (before the class name)
-        return count($parts) >= 2 ? $parts[count($parts) - 2] : '';
+    public function getCategory(): string
+    {
+        return $this->getBenchmark()?->getCategory() ?? '';
     }
 
     public function getShortName(): string
     {
-        if ('' === $this->benchmarkName) {
-            return $this->benchmarkId;
-        }
+        return $this->getBenchmark()?->getName() ?? $this->benchmarkId;
+    }
 
-        $parts = explode('\\', $this->benchmarkName);
+    public function getDescription(): string
+    {
+        return $this->getBenchmark()?->getDescription() ?? '';
+    }
 
-        // Return the last part (class name)
-        return end($parts) ?: $this->benchmarkId;
+    /**
+     * @return string[]
+     */
+    public function getTags(): array
+    {
+        return $this->getBenchmark()?->getTags() ?? [];
+    }
+
+    public function getIcon(): ?string
+    {
+        return $this->getBenchmark()?->getIcon();
     }
 
     public function getSourceCode(): string
     {
-        if ('' === $this->benchmarkName) {
-            return '';
-        }
-
-        try {
-            $reflection = new \ReflectionClass($this->benchmarkName);
-            $method = $reflection->getMethod('execute');
-            $filename = $method->getFileName();
-            $startLine = $method->getStartLine();
-            $endLine = $method->getEndLine();
-
-            if (false === $filename || false === $startLine || false === $endLine) {
-                return '';
-            }
-
-            $lines = file($filename);
-            if (false === $lines) {
-                return '';
-            }
-
-            // Extract method code (including signature)
-            $code = implode('', array_slice($lines, $startLine - 1, $endLine - $startLine + 1));
-
-            // Remove method signature and braces to show only the body
-            $code = preg_replace('/^\s*public\s+function\s+execute\([^)]*\)\s*:\s*\w+\s*\{/', '', $code);
-            $code = preg_replace('/\}\s*$/', '', $code);
-
-            return trim($code);
-        } catch (\ReflectionException $e) {
-            return '';
-        }
+        return $this->getBenchmark()?->getEntity()->getCode() ?? '';
     }
 }

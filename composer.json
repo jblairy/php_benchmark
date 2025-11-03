@@ -108,6 +108,7 @@
         }
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^4.3",
         "friendsofphp/php-cs-fixer": "^3.82.2",
         "phparkitect/phparkitect": "*",
         "phpmd/phpmd": "^2.15",
