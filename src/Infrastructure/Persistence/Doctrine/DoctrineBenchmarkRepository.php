@@ -13,12 +13,12 @@ use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Entity\Benchmark as
 
 /**
  * Doctrine implementation of BenchmarkRepositoryPort
- * Loads benchmarks from database and adapts them to Domain interface
+ * Loads benchmarks from database and adapts them to Domain interface.
  */
 final readonly class DoctrineBenchmarkRepository implements BenchmarkRepositoryPort
 {
     public function __construct(
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -33,7 +33,7 @@ final readonly class DoctrineBenchmarkRepository implements BenchmarkRepositoryP
 
         return array_map(
             fn (BenchmarkEntity $entity): Benchmark => new DatabaseBenchmark($entity),
-            $entities
+            $entities,
         );
     }
 
@@ -73,7 +73,7 @@ final readonly class DoctrineBenchmarkRepository implements BenchmarkRepositoryP
             ->getSingleScalarResult();
 
         // Get pulse statistics using SELECT NEW for type safety
-        $result = $this->entityManager
+        return $this->entityManager
             ->createQuery('
                 SELECT NEW ' . DashboardStatsData::class . '(
                     :totalBenchmarks,
@@ -85,7 +85,5 @@ final readonly class DoctrineBenchmarkRepository implements BenchmarkRepositoryP
             ')
             ->setParameter('totalBenchmarks', $totalBenchmarks)
             ->getSingleResult();
-
-        return $result;
     }
 }

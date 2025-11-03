@@ -58,26 +58,6 @@ final class BenchmarkCardComponent
         return $this->chart;
     }
 
-    /**
-     * @return string[]
-     */
-    private function getAllPhpVersions(): array
-    {
-        return array_map(fn (PhpVersion $version): string => $version->value, PhpVersion::cases());
-    }
-
-    private function getBenchmark(): ?DatabaseBenchmark
-    {
-        if (null === $this->benchmark && '' !== $this->benchmarkId) {
-            $found = $this->benchmarkRepository->findBenchmarkByName($this->benchmarkId);
-            if ($found instanceof DatabaseBenchmark) {
-                $this->benchmark = $found;
-            }
-        }
-
-        return $this->benchmark;
-    }
-
     public function getCategory(): string
     {
         return $this->getBenchmark()?->getCategory() ?? '';
@@ -109,5 +89,25 @@ final class BenchmarkCardComponent
     public function getSourceCode(): string
     {
         return $this->getBenchmark()?->getEntity()->getCode() ?? '';
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getAllPhpVersions(): array
+    {
+        return array_map(fn (PhpVersion $version): string => $version->value, PhpVersion::cases());
+    }
+
+    private function getBenchmark(): ?DatabaseBenchmark
+    {
+        if (null === $this->benchmark && '' !== $this->benchmarkId) {
+            $found = $this->benchmarkRepository->findBenchmarkByName($this->benchmarkId);
+            if ($found instanceof DatabaseBenchmark) {
+                $this->benchmark = $found;
+            }
+        }
+
+        return $this->benchmark;
     }
 }

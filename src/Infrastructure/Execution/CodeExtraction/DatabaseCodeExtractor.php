@@ -11,12 +11,12 @@ use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Adapter\DatabaseBen
 
 /**
  * Extracts benchmark code from database-backed benchmarks (YAML fixtures)
- * Alternative to ReflectionCodeExtractor for benchmarks loaded from database
+ * Alternative to ReflectionCodeExtractor for benchmarks loaded from database.
  */
 final class DatabaseCodeExtractor implements CodeExtractorPort
 {
     public function __construct(
-        private readonly ReflectionCodeExtractor $fallbackExtractor
+        private readonly ReflectionCodeExtractor $fallbackExtractor,
     ) {
     }
 
