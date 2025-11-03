@@ -14,15 +14,14 @@
 
     // Search Section
     &__search-section {
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr auto;
         gap: $spacing-md;
         margin-bottom: $spacing-lg;
-        flex-wrap: wrap;
     }
 
     &__search-wrapper {
-        flex: 1;
-        min-width: 300px;
+        min-width: 0;
         position: relative;
     }
 
@@ -42,6 +41,7 @@
         border-radius: 8px;
         font-size: 1rem;
         transition: all 0.2s ease;
+        box-sizing: border-box;
 
         &:focus {
             outline: none;
@@ -64,6 +64,7 @@
         cursor: pointer;
         transition: all 0.2s ease;
         white-space: nowrap;
+        flex-shrink: 0;
 
         &:hover {
             background: #edf2f7;
@@ -213,11 +214,7 @@
 @media (max-width: $breakpoint-tablet) {
     .filter {
         &__search-section {
-            flex-direction: column;
-        }
-
-        &__search-wrapper {
-            min-width: 100%;
+            grid-template-columns: 1fr;
         }
 
         &__reset-button {
