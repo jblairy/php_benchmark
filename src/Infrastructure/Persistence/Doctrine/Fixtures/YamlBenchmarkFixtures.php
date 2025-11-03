@@ -7,10 +7,10 @@ namespace Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Fixtures;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Exception;
-use InvalidArgumentException;
 use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Entity\Benchmark;
 use RuntimeException;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -21,6 +21,7 @@ class YamlBenchmarkFixtures extends Fixture
 {
     public function __construct(
         private readonly string $projectDir,
+        private readonly ValidatorInterface $validator,
     ) {
     }
 
@@ -52,23 +53,10 @@ class YamlBenchmarkFixtures extends Fixture
                     continue;
                 }
 
-                // Ensure it's an associative array with string keys
-                /** @var array<string, mixed> $validData */
-                $validData = array_filter(
-                    $data,
-                    fn ($key): bool => is_string($key),
-                    ARRAY_FILTER_USE_KEY,
-                );
-
-                $benchmark = $this->createBenchmarkFromYaml($validData, $file->getFilename());
+                $benchmark = $this->createBenchmarkFromYaml($data, $file->getFilename());
                 $manager->persist($benchmark);
             } catch (Exception $e) {
-                // Log error but continue loading other fixtures
-                error_log(sprintf(
-                    'Failed to load benchmark fixture %s: %s',
-                    $file->getFilename(),
-                    $e->getMessage(),
-                ));
+                $this->logFixtureLoadingError($file->getFilename(), $e);
             }
         }
 
@@ -76,65 +64,64 @@ class YamlBenchmarkFixtures extends Fixture
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param array<mixed> $data
      */
     private function createBenchmarkFromYaml(array $data, string $filename): Benchmark
     {
-        // Validate and extract slug
-        if (!isset($data['slug']) || !is_string($data['slug'])) {
-            throw new InvalidArgumentException(sprintf('slug field is required and must be string in %s', $filename));
+        $fixtureData = new BenchmarkFixtureData(
+            slug: isset($data['slug']) && is_string($data['slug']) ? $data['slug'] : '',
+            name: isset($data['name']) && is_string($data['name']) ? $data['name'] : '',
+            category: isset($data['category']) && is_string($data['category']) ? $data['category'] : '',
+            code: isset($data['code']) && is_string($data['code']) ? mb_trim($data['code']) : '',
+            phpVersions: $this->extractStringArray($data, 'phpVersions'),
+            description: isset($data['description']) && is_string($data['description']) ? $data['description'] : '',
+            tags: $this->extractStringArray($data, 'tags'),
+            icon: isset($data['icon']) && is_string($data['icon']) ? $data['icon'] : null,
+        );
+
+        $violations = $this->validator->validate($fixtureData);
+
+        if (0 < count($violations)) {
+            $errors = [];
+            foreach ($violations as $violation) {
+                $errors[] = $violation->getPropertyPath() . ': ' . $violation->getMessage();
+            }
+
+            throw new RuntimeException(sprintf('Validation failed for %s: %s', $filename, implode(', ', $errors)));
         }
-        $slug = $data['slug'];
-
-        // Validate and extract name
-        if (!isset($data['name']) || !is_string($data['name'])) {
-            throw new InvalidArgumentException(sprintf('name field is required and must be string in %s', $filename));
-        }
-        $name = $data['name'];
-
-        // Validate and extract category
-        if (!isset($data['category']) || !is_string($data['category'])) {
-            throw new InvalidArgumentException(sprintf('category field is required and must be string in %s', $filename));
-        }
-        $category = $data['category'];
-
-        // Validate and extract code
-        if (!isset($data['code']) || !is_string($data['code'])) {
-            throw new InvalidArgumentException(sprintf('code field is required and must be string in %s', $filename));
-        }
-        $code = mb_trim($data['code']);
-
-        // Validate code is not empty (strict comparison instead of empty())
-        if ('' === $code) {
-            throw new InvalidArgumentException(sprintf('Code field cannot be empty in %s', $filename));
-        }
-
-        // Validate phpVersions
-        if (!isset($data['phpVersions']) || !is_array($data['phpVersions']) || 0 === count($data['phpVersions'])) {
-            throw new InvalidArgumentException(sprintf('phpVersions must be a non-empty array in %s', $filename));
-        }
-
-        // Optional description
-        $description = isset($data['description']) && is_string($data['description']) ? $data['description'] : '';
-
-        // Extract and validate array fields
-        $rawTags = isset($data['tags']) && is_array($data['tags']) ? $data['tags'] : [];
-        $tags = array_values(array_filter($rawTags, 'is_string'));
-
-        // Validate phpVersions array contains only strings
-        $phpVersions = array_values(array_filter($data['phpVersions'], 'is_string'));
-
-        $icon = isset($data['icon']) && is_string($data['icon']) ? $data['icon'] : null;
 
         return new Benchmark(
-            slug: $slug,
-            name: $name,
-            category: $category,
-            description: $description,
-            code: $code,
-            phpVersions: $phpVersions,
-            tags: $tags,
-            icon: $icon,
+            slug: $fixtureData->slug,
+            name: $fixtureData->name,
+            category: $fixtureData->category,
+            description: $fixtureData->description,
+            code: $fixtureData->code,
+            phpVersions: $fixtureData->phpVersions,
+            tags: $fixtureData->tags,
+            icon: $fixtureData->icon,
         );
+    }
+
+    /**
+     * @param array<mixed> $data
+     *
+     * @return string[]
+     */
+    private function extractStringArray(array $data, string $key): array
+    {
+        if (!isset($data[$key]) || !is_array($data[$key])) {
+            return [];
+        }
+
+        return array_values(array_filter($data[$key], 'is_string'));
+    }
+
+    private function logFixtureLoadingError(string $filename, Exception $exception): void
+    {
+        error_log(sprintf(
+            'Failed to load benchmark fixture %s: %s',
+            $filename,
+            $exception->getMessage(),
+        ));
     }
 }

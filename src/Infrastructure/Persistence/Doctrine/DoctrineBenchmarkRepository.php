@@ -40,25 +40,7 @@ final readonly class DoctrineBenchmarkRepository implements BenchmarkRepositoryP
 
     public function findBenchmarkByName(string $name): ?Benchmark
     {
-        // Search by slug (exact match)
-        $entity = $this->entityManager
-            ->getRepository(BenchmarkEntity::class)
-            ->findOneBy(['slug' => $name]);
-
-        if ($entity instanceof BenchmarkEntity) {
-            return new DatabaseBenchmark($entity);
-        }
-
-        // Search by name (partial match for backward compatibility)
-        $entity = $this->entityManager
-            ->getRepository(BenchmarkEntity::class)
-            ->findOneBy(['name' => $name]);
-
-        if ($entity instanceof BenchmarkEntity) {
-            return new DatabaseBenchmark($entity);
-        }
-
-        return null;
+        return $this->findBenchmarkBySlug($name) ?? $this->findBenchmarkByNameLegacy($name);
     }
 
     public function hasBenchmark(string $name): bool
@@ -68,26 +50,9 @@ final readonly class DoctrineBenchmarkRepository implements BenchmarkRepositoryP
 
     public function getDashboardStats(): DashboardStats
     {
-        // Count total benchmarks
-        $totalBenchmarks = (int) $this->entityManager
-            ->createQuery('SELECT COUNT(b.id) FROM ' . BenchmarkEntity::class . ' b')
-            ->getSingleScalarResult();
+        $totalBenchmarks = $this->countTotalBenchmarks();
+        $result = $this->fetchPulseStatistics($totalBenchmarks);
 
-        // Get pulse statistics using SELECT NEW for type safety
-        $result = $this->entityManager
-            ->createQuery('
-                SELECT NEW ' . DashboardStats::class . '(
-                    :totalBenchmarks,
-                    COUNT(DISTINCT p.phpVersion),
-                    COUNT(DISTINCT p.benchId),
-                    COUNT(p.id)
-                )
-                FROM Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Entity\Pulse p
-            ')
-            ->setParameter('totalBenchmarks', $totalBenchmarks)
-            ->getSingleResult();
-
-        // Type guard for PHPStan - Doctrine SELECT NEW guarantees this type
         if (!$result instanceof DashboardStats) {
             throw new RuntimeException('Unexpected result type from Doctrine SELECT NEW query');
         }
@@ -107,7 +72,55 @@ final readonly class DoctrineBenchmarkRepository implements BenchmarkRepositoryP
             ->setMaxResults($limit)
             ->getResult();
 
-        // Ensure results is an array before mapping
+        return $this->extractCategoryNamesFromQueryResults($results);
+    }
+
+    private function findBenchmarkBySlug(string $slug): ?Benchmark
+    {
+        $entity = $this->entityManager
+            ->getRepository(BenchmarkEntity::class)
+            ->findOneBy(['slug' => $slug]);
+
+        return $entity instanceof BenchmarkEntity ? new DatabaseBenchmark($entity) : null;
+    }
+
+    private function findBenchmarkByNameLegacy(string $name): ?Benchmark
+    {
+        $entity = $this->entityManager
+            ->getRepository(BenchmarkEntity::class)
+            ->findOneBy(['name' => $name]);
+
+        return $entity instanceof BenchmarkEntity ? new DatabaseBenchmark($entity) : null;
+    }
+
+    private function countTotalBenchmarks(): int
+    {
+        return (int) $this->entityManager
+            ->createQuery('SELECT COUNT(b.id) FROM ' . BenchmarkEntity::class . ' b')
+            ->getSingleScalarResult();
+    }
+
+    private function fetchPulseStatistics(int $totalBenchmarks): mixed
+    {
+        return $this->entityManager
+            ->createQuery('
+                SELECT NEW ' . DashboardStats::class . '(
+                    :totalBenchmarks,
+                    COUNT(DISTINCT p.phpVersion),
+                    COUNT(DISTINCT p.benchId),
+                    COUNT(p.id)
+                )
+                FROM Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Entity\Pulse p
+            ')
+            ->setParameter('totalBenchmarks', $totalBenchmarks)
+            ->getSingleResult();
+    }
+
+    /**
+     * @return string[]
+     */
+    private function extractCategoryNamesFromQueryResults(mixed $results): array
+    {
         if (!is_array($results)) {
             return [];
         }
