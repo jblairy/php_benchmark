@@ -13,6 +13,13 @@ use Jblairy\PhpBenchmark\Domain\Dashboard\Model\PercentileMetrics;
  */
 final readonly class StatisticsCalculator
 {
+    private const int PERCENTILE_BASE = 100;
+    private const int PERCENTILE_P50 = 50;
+    private const int PERCENTILE_P80 = 80;
+    private const int PERCENTILE_P90 = 90;
+    private const int PERCENTILE_P95 = 95;
+    private const int PERCENTILE_P99 = 99;
+
     public function calculate(BenchmarkMetrics $benchmarkMetrics): BenchmarkStatistics
     {
         if ($benchmarkMetrics->isEmpty()) {
@@ -23,11 +30,11 @@ final readonly class StatisticsCalculator
         sort($sortedTimes);
 
         $percentileMetrics = new PercentileMetrics(
-            p50: $this->calculatePercentile($sortedTimes, 50),
-            p80: $this->calculatePercentile($sortedTimes, 80),
-            p90: $this->calculatePercentile($sortedTimes, 90),
-            p95: $this->calculatePercentile($sortedTimes, 95),
-            p99: $this->calculatePercentile($sortedTimes, 99),
+            p50: $this->calculatePercentile($sortedTimes, self::PERCENTILE_P50),
+            p80: $this->calculatePercentile($sortedTimes, self::PERCENTILE_P80),
+            p90: $this->calculatePercentile($sortedTimes, self::PERCENTILE_P90),
+            p95: $this->calculatePercentile($sortedTimes, self::PERCENTILE_P95),
+            p99: $this->calculatePercentile($sortedTimes, self::PERCENTILE_P99),
         );
 
         return new BenchmarkStatistics(
@@ -52,7 +59,7 @@ final readonly class StatisticsCalculator
             return 0.0;
         }
 
-        $index = (int) ceil($percentile / 100 * $count) - 1;
+        $index = (int) ceil($percentile / self::PERCENTILE_BASE * $count) - 1;
 
         return $sortedData[$index] ?? end($sortedData);
     }

@@ -30,9 +30,9 @@ final readonly class ChartBuilder
         $chart->setData([
             'labels' => $this->formatVersionLabels($allPhpVersions),
             'datasets' => [
-                $this->createDataset('p50 (ms)', $p50Data, 'rgba(54, 162, 235, 0.5)', 'rgba(54, 162, 235, 1)'),
-                $this->createDataset('p90 (ms)', $p90Data, 'rgba(255, 159, 64, 0.5)', 'rgba(255, 159, 64, 1)'),
-                $this->createDataset('Average (ms)', $avgData, 'rgba(75, 192, 192, 0.5)', 'rgba(75, 192, 192, 1)'),
+                $this->createDataset('p50 (ms)', $p50Data, ChartColor::P50_BACKGROUND, ChartColor::P50_BORDER),
+                $this->createDataset('p90 (ms)', $p90Data, ChartColor::P90_BACKGROUND, ChartColor::P90_BORDER),
+                $this->createDataset('Average (ms)', $avgData, ChartColor::AVG_BACKGROUND, ChartColor::AVG_BORDER),
             ],
         ]);
 
