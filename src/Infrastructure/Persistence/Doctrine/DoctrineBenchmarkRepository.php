@@ -10,6 +10,7 @@ use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkRepositoryPort;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\DashboardStats;
 use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Adapter\DatabaseBenchmark;
 use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Entity\Benchmark as BenchmarkEntity;
+use RuntimeException;
 
 /**
  * Doctrine implementation of BenchmarkRepositoryPort
@@ -73,8 +74,7 @@ final readonly class DoctrineBenchmarkRepository implements BenchmarkRepositoryP
             ->getSingleScalarResult();
 
         // Get pulse statistics using SELECT NEW for type safety
-        /** @var DashboardStats */
-        return $this->entityManager
+        $result = $this->entityManager
             ->createQuery('
                 SELECT NEW ' . DashboardStats::class . '(
                     :totalBenchmarks,
@@ -86,6 +86,13 @@ final readonly class DoctrineBenchmarkRepository implements BenchmarkRepositoryP
             ')
             ->setParameter('totalBenchmarks', $totalBenchmarks)
             ->getSingleResult();
+
+        // Type guard for PHPStan - Doctrine SELECT NEW guarantees this type
+        if (!$result instanceof DashboardStats) {
+            throw new RuntimeException('Unexpected result type from Doctrine SELECT NEW query');
+        }
+
+        return $result;
     }
 
     public function getTopCategories(int $limit = 3): array
