@@ -21,8 +21,6 @@
 
 ## 💡 Concepts
 
-- **[concepts/value-objects-vs-entities.md](concepts/value-objects-vs-entities.md)** - DDD patterns explained
-
 ## 📖 Guides
 
 - **[guides/creating-benchmarks.md](guides/creating-benchmarks.md)** - How to create benchmarks

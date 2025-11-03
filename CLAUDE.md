@@ -37,9 +37,6 @@ This includes:
     │   ├── 03-ports-adapters.md
     │   └── 04-execution-flow.md
     ├── concepts/
-    │   ├── clean-architecture.md
-    │   ├── ddd-patterns.md
-    │   └── value-objects-vs-entities.md
     └── guides/
         ├── creating-benchmarks.md
         ├── testing.md
@@ -348,7 +345,6 @@ Jblairy\PhpBenchmark\
 - [Ports & Adapters](docs/architecture/03-ports-adapters.md) - Hexagonal architecture
 
 **Concepts:**
-- [Value Objects vs Entities](docs/concepts/value-objects-vs-entities.md) - DDD patterns explained
 
 **Guides:**
 - [Creating Benchmarks](docs/guides/creating-benchmarks.md) - Step-by-step tutorial
