@@ -76,7 +76,7 @@ final class PhpVersionTest extends TestCase
         $version = PhpVersion::PHP_8_4;
 
         $isModern = match (true) {
-            $version === PhpVersion::PHP_8_3 || $version === PhpVersion::PHP_8_4 => true,
+            PhpVersion::PHP_8_3 === $version || PhpVersion::PHP_8_4 === $version => true,
             default => false,
         };
 

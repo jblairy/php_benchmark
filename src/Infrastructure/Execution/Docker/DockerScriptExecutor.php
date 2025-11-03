@@ -100,7 +100,7 @@ final class DockerScriptExecutor implements ScriptExecutorPort
     private function cleanupTempFile(string $tempFile): void
     {
         if (file_exists($tempFile)) {
-            @unlink($tempFile);
+            unlink($tempFile);
         }
     }
 

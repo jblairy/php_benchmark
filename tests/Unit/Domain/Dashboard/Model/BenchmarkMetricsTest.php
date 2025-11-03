@@ -6,6 +6,7 @@ namespace Jblairy\PhpBenchmark\Tests\Unit\Domain\Dashboard\Model;
 
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\BenchmarkMetrics;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 final class BenchmarkMetricsTest extends TestCase
 {
@@ -95,7 +96,7 @@ final class BenchmarkMetricsTest extends TestCase
             memoryPeaks: [100.0],
         );
 
-        $reflection = new \ReflectionClass($metrics);
+        $reflection = new ReflectionClass($metrics);
         self::assertTrue($reflection->isReadOnly());
     }
 }
