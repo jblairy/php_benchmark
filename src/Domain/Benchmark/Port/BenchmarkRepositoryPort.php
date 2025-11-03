@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jblairy\PhpBenchmark\Domain\Benchmark\Port;
 
+use Jblairy\PhpBenchmark\Application\Dashboard\DTO\DashboardStatsData;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Contract\Benchmark;
 
 /**
@@ -20,4 +21,9 @@ interface BenchmarkRepositoryPort
     public function findBenchmarkByName(string $name): ?Benchmark;
 
     public function hasBenchmark(string $name): bool;
+
+    /**
+     * Get dashboard overview statistics.
+     */
+    public function getDashboardStats(): DashboardStatsData;
 }
