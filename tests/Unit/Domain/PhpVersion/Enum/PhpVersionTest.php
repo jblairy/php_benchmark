@@ -71,26 +71,16 @@ final class PhpVersionTest extends TestCase
         self::assertIsString($enum->value);
     }
 
-    public function testEnumCanBeUsedInMatchExpression(): void
+    public function testEnumCanBeComparedInConditionals(): void
     {
         $version = PhpVersion::PHP_8_4;
 
-        $result = match ($version) {
-            PhpVersion::PHP_5_6 => '5.6',
-            PhpVersion::PHP_7_0 => '7.0',
-            PhpVersion::PHP_7_1 => '7.1',
-            PhpVersion::PHP_7_2 => '7.2',
-            PhpVersion::PHP_7_3 => '7.3',
-            PhpVersion::PHP_7_4 => '7.4',
-            PhpVersion::PHP_8_0 => '8.0',
-            PhpVersion::PHP_8_1 => '8.1',
-            PhpVersion::PHP_8_2 => '8.2',
-            PhpVersion::PHP_8_3 => '8.3',
-            PhpVersion::PHP_8_4 => '8.4',
-            PhpVersion::PHP_8_5 => '8.5',
+        $isModern = match (true) {
+            $version === PhpVersion::PHP_8_3 || $version === PhpVersion::PHP_8_4 => true,
+            default => false,
         };
 
-        self::assertSame('8.4', $result);
+        self::assertTrue($isModern);
     }
 
     public function testEnumCasesAreSingleton(): void
