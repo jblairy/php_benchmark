@@ -1,4 +1,9 @@
-<div {{ attributes }} class="stats-card__container">
+<div {{ attributes.defaults({
+        class: 'stats-card__container',
+        'data-controller': 'benchmark-card-live',
+        'data-benchmark-card-live-benchmark-id-value': this.benchmarkId,
+        'data-benchmark-card-live-benchmark-name-value': this.benchmarkName
+    }) }}>
     <div data-loading="delay|show">
         <div class="stats-card__flex">
             <h2 class="stats-card__title">{{ this.benchmarkName }} ({{ this.benchmarkId }})</h2>
@@ -40,7 +45,7 @@
                     </thead>
                     <tbody>
                     <tr class="table__row">
-                        <td class="table__cell table__cell--metric">Échantillons</td>
+                        <td class="table__cell table__cell--metric" data-metric="count">Échantillons</td>
                         {% for stats in this.data.phpVersions %}
                             <td class="table__cell">{{ stats.count }}</td>
                         {% endfor %}
@@ -182,4 +187,32 @@
             </div>
         </div>
     {% endif %}
+
+    <style>
+    /* Real-time update animations */
+    .cell-updating {
+        animation: cellHighlight 1s ease-out;
+    }
+
+    @keyframes cellHighlight {
+        0% {
+            background-color: #4caf50;
+            color: white;
+            transform: scale(1.05);
+        }
+        50% {
+            background-color: #81c784;
+            color: white;
+        }
+        100% {
+            background-color: transparent;
+            color: inherit;
+            transform: scale(1);
+        }
+    }
+
+    .stats-card__container {
+        transition: box-shadow 0.3s ease;
+    }
+    </style>
 </div>
