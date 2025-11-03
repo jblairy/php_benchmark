@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Jblairy\PhpBenchmark\Infrastructure\Cli;
 
 use Exception;
-use InvalidArgumentException;
 use Jblairy\PhpBenchmark\Application\UseCase\BenchmarkOrchestrator;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Contract\Benchmark;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkConfiguration;

@@ -21,7 +21,7 @@ final readonly class BenchmarkResult
         $executionTime = $data['execution_time_ms'] ?? 0;
         $memoryUsed = $data['memory_used_bytes'] ?? 0;
         $memoryPeak = $data['memory_peak_bytes'] ?? 0;
-        
+
         return new self(
             executionTimeMs: is_numeric($executionTime) ? (float) $executionTime : 0.0,
             memoryUsedBytes: is_numeric($memoryUsed) ? (float) $memoryUsed : 0.0,

@@ -80,7 +80,7 @@ final readonly class StatisticsCalculator
         }
 
         $maxValue = max($values);
-        
+
         return is_float($maxValue) || is_int($maxValue) ? (float) $maxValue : 0.0;
     }
 
