@@ -1,3 +1,7 @@
+// Generic table component styles
+// Follows BEM methodology: Block__Element--Modifier
+// Note: Specific tables (like benchmark-card) may have their own styles
+
 .table {
     width: 100%;
     border-collapse: collapse;
@@ -8,6 +12,14 @@
         background-color: $color-background;
         font-weight: bold;
         color: $color-text-secondary;
+    }
+
+    &__row {
+        transition: background-color 0.2s ease;
+
+        &:hover {
+            background-color: $color-background-light;
+        }
     }
 
     &__cell {
@@ -23,12 +35,6 @@
         &--best-value {
             font-weight: bold;
             color: $color-success;
-        }
-    }
-
-    &__row {
-        &:hover {
-            background-color: $color-background-light;
         }
     }
 }

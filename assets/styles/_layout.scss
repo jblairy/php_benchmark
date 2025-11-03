@@ -1,8 +1,19 @@
+// Layout styles
+// Follows BEM methodology: Block__Element--Modifier
+
 .dashboard {
     &__container {
-        max-width: $breakpoint-desktop;
+        max-width: 100%;
         margin: 0 auto;
         padding: $spacing-lg;
+
+        @media (min-width: $breakpoint-xlarge) {
+            max-width: $breakpoint-large;
+        }
+
+        @media (min-width: $breakpoint-ultra) {
+            max-width: $breakpoint-xlarge;
+        }
     }
 
     &__title {
@@ -13,5 +24,10 @@
     &__subtitle {
         color: $color-text;
         margin-bottom: $spacing-lg;
+    }
+
+    &__subtitle-info {
+        color: $color-success;
+        font-weight: 500;
     }
 }

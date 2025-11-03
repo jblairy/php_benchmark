@@ -20,11 +20,18 @@ export default class extends Controller {
         });
 
         // Mise à jour du libellé de l'unité dans l'en-tête
-        const metrics = ['p50', 'p80', 'p90', 'p95', 'p99', 'Moyenne'];
+        const metrics = [
+            { key: 'p50', label: 'p50' },
+            { key: 'p80', label: 'p80' },
+            { key: 'p90', label: 'p90' },
+            { key: 'p95', label: 'p95' },
+            { key: 'p99', label: 'p99' },
+            { key: 'avg', label: 'Moyenne' }
+        ];
         metrics.forEach(metric => {
-            const header = this.element.querySelector(`[data-metric="${metric}"]`);
+            const header = this.element.querySelector(`[data-metric="${metric.key}"]`);
             if (header) {
-                header.textContent = `${metric} (${this.currentUnitValue})`;
+                header.textContent = `${metric.label} (${this.currentUnitValue})`;
             }
         });
     }

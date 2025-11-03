@@ -69,22 +69,22 @@ export default class extends Controller {
 
     showStarted(data) {
         // Update benchmark name and PHP version
-        const nameEl = this.element.querySelector('.benchmark-name');
+        const nameEl = this.element.querySelector('.benchmark-progress__name');
         if (nameEl) {
             nameEl.textContent = `${data.benchmarkName} (${data.benchmarkId})`;
         }
 
-        const badgeEl = this.element.querySelector('.php-version-badge');
+        const badgeEl = this.element.querySelector('.benchmark-progress__badge');
         if (badgeEl) {
             badgeEl.textContent = data.phpVersion.toUpperCase();
-            badgeEl.style.display = 'inline-block';
+            badgeEl.classList.remove('benchmark-progress__badge--hidden');
         }
 
         // Hide all status divs
         this.hideAllStatus();
 
         // Show started status
-        const startedEl = this.element.querySelector('.status-started');
+        const startedEl = this.element.querySelector('.benchmark-progress__status--started');
         if (startedEl) {
             startedEl.style.display = 'block';
         }
@@ -97,7 +97,7 @@ export default class extends Controller {
         this.hideAllStatus();
 
         // Show running status
-        const runningEl = this.element.querySelector('.status-running');
+        const runningEl = this.element.querySelector('.benchmark-progress__status--running');
         if (runningEl) {
             runningEl.style.display = 'block';
         }
@@ -107,12 +107,12 @@ export default class extends Controller {
             ? (data.currentIteration / data.totalIterations) * 100
             : 0;
 
-        const progressBar = this.element.querySelector('.progress-bar');
+        const progressBar = this.element.querySelector('.benchmark-progress__progress-bar');
         if (progressBar) {
             progressBar.style.width = `${progress}%`;
         }
 
-        const progressText = this.element.querySelector('.progress-text');
+        const progressText = this.element.querySelector('.benchmark-progress__progress-text');
         if (progressText) {
             progressText.textContent = `${data.currentIteration} / ${data.totalIterations}`;
         }
@@ -125,7 +125,7 @@ export default class extends Controller {
         this.hideAllStatus();
 
         // Show completed status
-        const completedEl = this.element.querySelector('.status-completed');
+        const completedEl = this.element.querySelector('.benchmark-progress__status--completed');
         if (completedEl) {
             completedEl.style.display = 'block';
         }
@@ -134,7 +134,7 @@ export default class extends Controller {
     }
 
     hideAllStatus() {
-        const statusDivs = this.element.querySelectorAll('[class^="status-"]');
+        const statusDivs = this.element.querySelectorAll('[class*="benchmark-progress__status--"]');
         statusDivs.forEach(el => el.style.display = 'none');
     }
 }
