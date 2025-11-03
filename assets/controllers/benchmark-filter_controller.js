@@ -13,7 +13,6 @@ export default class extends Controller {
     };
 
     connect() {
-        console.log('🔍 Benchmark Filter Controller connected');
         this.updateView();
     }
 

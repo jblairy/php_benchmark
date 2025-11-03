@@ -12,14 +12,10 @@ export default class extends Controller {
     eventSource = null;
 
     connect() {
-        console.log('🔌 Mercure Progress Controller connected');
-        console.log('📡 Mercure URL:', this.urlValue);
-        console.log('📢 Topic:', this.topicValue);
         this.subscribeToMercure();
     }
 
     disconnect() {
-        console.log('🔌 Mercure Progress Controller disconnected');
         if (this.eventSource) {
             this.eventSource.close();
         }
@@ -29,16 +25,13 @@ export default class extends Controller {
         const url = new URL(this.urlValue);
         url.searchParams.append('topic', this.topicValue);
 
-        console.log('🔗 Subscribing to:', url.toString());
 
         this.eventSource = new EventSource(url);
 
         this.eventSource.onopen = () => {
-            console.log('✅ Mercure connection established');
         };
 
         this.eventSource.onmessage = (event) => {
-            console.log('📬 Raw event data:', event.data);
             const data = JSON.parse(event.data);
             this.handleBenchmarkUpdate(data);
         };
@@ -50,7 +43,6 @@ export default class extends Controller {
     }
 
     handleBenchmarkUpdate(data) {
-        console.log('📨 Mercure event received:', data);
 
         switch (data.type) {
             case 'benchmark.started':
@@ -89,7 +81,6 @@ export default class extends Controller {
             startedEl.style.display = 'block';
         }
 
-        console.log('✅ Started:', data.benchmarkName, data.phpVersion);
     }
 
     showProgress(data) {
@@ -117,7 +108,6 @@ export default class extends Controller {
             progressText.textContent = `${data.currentIteration} / ${data.totalIterations}`;
         }
 
-        console.log('⏱️ Progress:', `${data.currentIteration}/${data.totalIterations}`, `${progress.toFixed(1)}%`);
     }
 
     showCompleted(data) {
@@ -130,7 +120,6 @@ export default class extends Controller {
             completedEl.style.display = 'block';
         }
 
-        console.log('✅ Completed!');
     }
 
     hideAllStatus() {
