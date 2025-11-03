@@ -102,30 +102,16 @@
                         >
                             All
                         </button>
+                        {% for category in top_categories %}
                         <button
                             class="filter__category-button"
                             data-benchmark-filter-target="categoryFilter"
-                            data-category="errorhandling"
+                            data-category="{{ category|lower }}"
                             data-action="click->benchmark-filter#filterByCategory"
                         >
-                            ErrorHandling
+                            {{ category }}
                         </button>
-                        <button
-                            class="filter__category-button"
-                            data-benchmark-filter-target="categoryFilter"
-                            data-category="loop"
-                            data-action="click->benchmark-filter#filterByCategory"
-                        >
-                            Loop
-                        </button>
-                        <button
-                            class="filter__category-button"
-                            data-benchmark-filter-target="categoryFilter"
-                            data-category="string"
-                            data-action="click->benchmark-filter#filterByCategory"
-                        >
-                            String
-                        </button>
+                        {% endfor %}
                     </div>
                 </div>
 

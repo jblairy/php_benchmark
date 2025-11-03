@@ -22,6 +22,7 @@ final class DashboardController extends AbstractController
         return $this->render('dashboard/index.html.twig', [
             'mercure_public_url' => $_ENV['MERCURE_PUBLIC_URL'] ?? 'http://localhost:3000/.well-known/mercure',
             'stats' => $this->benchmarkRepository->getDashboardStats(),
+            'top_categories' => $this->benchmarkRepository->getTopCategories(3),
         ]);
     }
 }
