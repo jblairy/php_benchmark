@@ -23,8 +23,9 @@ services:
     # Clean Architecture - Port implementations
 
     # Code Extraction (Port -> Adapter)
+    # Uses DatabaseCodeExtractor to support YAML fixtures from database
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\CodeExtractorPort:
-        class: Jblairy\PhpBenchmark\Infrastructure\Execution\CodeExtraction\ReflectionCodeExtractor
+        class: Jblairy\PhpBenchmark\Infrastructure\Execution\CodeExtraction\DatabaseCodeExtractor
 
     # Benchmark Repository (Port -> Adapter)
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkRepositoryPort:
