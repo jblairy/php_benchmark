@@ -18,10 +18,14 @@ final readonly class BenchmarkResult
      */
     public static function fromArray(array $data): self
     {
+        $executionTime = $data['execution_time_ms'] ?? 0;
+        $memoryUsed = $data['memory_used_bytes'] ?? 0;
+        $memoryPeak = $data['memory_peak_bytes'] ?? 0;
+        
         return new self(
-            executionTimeMs: (float) ($data['execution_time_ms'] ?? 0),
-            memoryUsedBytes: (float) ($data['memory_used_bytes'] ?? 0),
-            memoryPeakBytes: (float) ($data['memory_peak_bytes'] ?? 0),
+            executionTimeMs: is_numeric($executionTime) ? (float) $executionTime : 0.0,
+            memoryUsedBytes: is_numeric($memoryUsed) ? (float) $memoryUsed : 0.0,
+            memoryPeakBytes: is_numeric($memoryPeak) ? (float) $memoryPeak : 0.0,
         );
     }
 }

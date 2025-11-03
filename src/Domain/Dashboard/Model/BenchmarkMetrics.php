@@ -10,9 +10,9 @@ namespace Jblairy\PhpBenchmark\Domain\Dashboard\Model;
 final readonly class BenchmarkMetrics
 {
     /**
-     * @param float[] $executionTimes
-     * @param float[] $memoryUsages
-     * @param float[] $memoryPeaks
+     * @param array<int, float> $executionTimes
+     * @param array<int, float> $memoryUsages
+     * @param array<int, float> $memoryPeaks
      */
     public function __construct(
         public string $benchmarkId,

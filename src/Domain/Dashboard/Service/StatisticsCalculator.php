@@ -57,6 +57,9 @@ final readonly class StatisticsCalculator
         return $sortedData[$index] ?? end($sortedData);
     }
 
+    /**
+     * @param array<int, float> $values
+     */
     private function calculateAverage(array $values): float
     {
         $count = count($values);
@@ -67,13 +70,18 @@ final readonly class StatisticsCalculator
         return array_sum($values) / $count;
     }
 
+    /**
+     * @param array<int, float> $values
+     */
     private function calculateMax(array $values): float
     {
         if ([] === $values) {
             return 0.0;
         }
 
-        return max($values);
+        $maxValue = max($values);
+        
+        return is_float($maxValue) || is_int($maxValue) ? (float) $maxValue : 0.0;
     }
 
     private function createEmptyStatistics(BenchmarkMetrics $benchmarkMetrics): BenchmarkStatistics

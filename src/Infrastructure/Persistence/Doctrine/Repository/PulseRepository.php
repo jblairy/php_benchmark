@@ -48,10 +48,11 @@ class PulseRepository extends ServiceEntityRepository implements PulseRepository
             function (array $row): BenchmarkMetrics {
                 /** @var array{bench_id: string, name: string, php_version: string, execution_times: string, memory_usages: string, memory_peaks: string} $row */
                 /** @var array<float> $executionTimes */
+                /** @var array<int, float> $executionTimes */
                 $executionTimes = json_decode($row['execution_times'], true);
-                /** @var array<float> $memoryUsages */
+                /** @var array<int, float> $memoryUsages */
                 $memoryUsages = json_decode($row['memory_usages'], true);
-                /** @var array<float> $memoryPeaks */
+                /** @var array<int, float> $memoryPeaks */
                 $memoryPeaks = json_decode($row['memory_peaks'], true);
 
                 return new BenchmarkMetrics(

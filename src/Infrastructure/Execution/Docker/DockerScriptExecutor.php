@@ -77,7 +77,15 @@ final class DockerScriptExecutor implements ScriptExecutorPort
             throw new RuntimeException('Expected array from JSON decode');
         }
 
-        return BenchmarkResult::fromArray($data);
+        // Ensure it's an associative array with string keys
+        /** @var array<string, mixed> $validData */
+        $validData = array_filter(
+            $data,
+            fn ($key): bool => is_string($key),
+            ARRAY_FILTER_USE_KEY,
+        );
+
+        return BenchmarkResult::fromArray($validData);
     }
 
     private function cleanupTempFile(string $tempFile): void
