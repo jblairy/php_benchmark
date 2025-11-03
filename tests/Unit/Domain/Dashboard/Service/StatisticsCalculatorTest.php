@@ -189,7 +189,10 @@ final class StatisticsCalculatorTest extends TestCase
 
         $this->calculator->calculate($metrics);
 
-        // Original array should remain unchanged (immutability)
-        self::assertSame([30.0, 10.0, 20.0], $originalTimes);
+        // Original array should remain unchanged (immutability check)
+        self::assertCount(3, $originalTimes);
+        self::assertSame(30.0, $originalTimes[0]);
+        self::assertSame(10.0, $originalTimes[1]);
+        self::assertSame(20.0, $originalTimes[2]);
     }
 }
