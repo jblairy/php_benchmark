@@ -7,6 +7,7 @@ namespace Jblairy\PhpBenchmark\Infrastructure\Cli;
 use Exception;
 use Jblairy\PhpBenchmark\Application\UseCase\BenchmarkOrchestrator;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Contract\Benchmark;
+use Jblairy\PhpBenchmark\Domain\Benchmark\Exception\BenchmarkNotFound;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkConfiguration;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkRepositoryPort;
 use Jblairy\PhpBenchmark\Domain\PhpVersion\Enum\PhpVersion;
@@ -37,12 +38,12 @@ final readonly class BenchmarkCommand
         #[Option]
         int $iterations = 0,
         #[Option]
-        ?string $php_version = null,
+        ?string $phpVersion = null,
     ): int {
         $symfonyStyle = new SymfonyStyle($input, $output);
 
         $testName = $test;
-        $phpVersionName = $php_version;
+        $phpVersionName = $phpVersion;
 
         if (0 >= $iterations) {
             $symfonyStyle->error('Iterations must be greater than 0');
@@ -51,14 +52,7 @@ final readonly class BenchmarkCommand
         }
 
         try {
-            if (null !== $testName && null !== $phpVersionName) {
-                $this->executeSingleBenchmark($symfonyStyle, $testName, $phpVersionName, $iterations);
-            } elseif (null !== $testName) {
-                $this->executeBenchmarkAllVersions($symfonyStyle, $testName, $iterations);
-            } else {
-                $this->executeAllBenchmarks($symfonyStyle, $iterations);
-            }
-
+            $this->executeAppropriateStrategy($symfonyStyle, $testName, $phpVersionName, $iterations);
             $symfonyStyle->success('Benchmark(s) completed successfully!');
 
             return Command::SUCCESS;
@@ -67,6 +61,27 @@ final readonly class BenchmarkCommand
 
             return Command::FAILURE;
         }
+    }
+
+    private function executeAppropriateStrategy(
+        SymfonyStyle $io,
+        ?string $testName,
+        ?string $phpVersionName,
+        int $iterations,
+    ): void {
+        if (null !== $testName && null !== $phpVersionName) {
+            $this->executeSingleBenchmark($io, $testName, $phpVersionName, $iterations);
+
+            return;
+        }
+
+        if (null !== $testName) {
+            $this->executeBenchmarkAllVersions($io, $testName, $iterations);
+
+            return;
+        }
+
+        $this->executeAllBenchmarks($io, $iterations);
     }
 
     private function executeSingleBenchmark(
@@ -129,7 +144,7 @@ final readonly class BenchmarkCommand
         $benchmark = $this->benchmarkRepositoryPort->findBenchmarkByName($name);
 
         if (!$benchmark instanceof Benchmark) {
-            throw new \Jblairy\PhpBenchmark\Domain\Benchmark\Exception\BenchmarkNotFound($name);
+            throw new BenchmarkNotFound($name);
         }
 
         return $benchmark;

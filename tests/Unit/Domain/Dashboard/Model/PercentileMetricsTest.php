@@ -6,6 +6,7 @@ namespace Jblairy\PhpBenchmark\Tests\Unit\Domain\Dashboard\Model;
 
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\PercentileMetrics;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 final class PercentileMetricsTest extends TestCase
 {
@@ -105,7 +106,7 @@ final class PercentileMetricsTest extends TestCase
             p99: 30.0,
         );
 
-        $reflection = new \ReflectionClass($metrics);
+        $reflection = new ReflectionClass($metrics);
         self::assertTrue($reflection->isReadOnly());
     }
 
