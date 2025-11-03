@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Jblairy\PhpBenchmark\Infrastructure\Execution\ScriptBuilding;
 
-final readonly class InstrumentedScriptBuilder
+use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptBuilderPort;
+
+final readonly class InstrumentedScriptBuilder implements ScriptBuilderPort
 {
     public function build(string $methodBody): string
     {

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Jblairy\PhpBenchmark\Application\Dashboard\DTO\DashboardStatsData;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Contract\Benchmark;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkRepositoryPort;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Model\DashboardStats;
 use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Adapter\DatabaseBenchmark;
 use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Entity\Benchmark as BenchmarkEntity;
 
@@ -65,7 +65,7 @@ final readonly class DoctrineBenchmarkRepository implements BenchmarkRepositoryP
         return $this->findBenchmarkByName($name) instanceof Benchmark;
     }
 
-    public function getDashboardStats(): DashboardStatsData
+    public function getDashboardStats(): DashboardStats
     {
         // Count total benchmarks
         $totalBenchmarks = (int) $this->entityManager
@@ -73,10 +73,10 @@ final readonly class DoctrineBenchmarkRepository implements BenchmarkRepositoryP
             ->getSingleScalarResult();
 
         // Get pulse statistics using SELECT NEW for type safety
-        /** @var DashboardStatsData */
+        /** @var DashboardStats */
         return $this->entityManager
             ->createQuery('
-                SELECT NEW ' . DashboardStatsData::class . '(
+                SELECT NEW ' . DashboardStats::class . '(
                     :totalBenchmarks,
                     COUNT(DISTINCT p.phpVersion),
                     COUNT(DISTINCT p.benchId),

@@ -9,14 +9,14 @@ use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkResult;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\ExecutionContext;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkExecutorPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\CodeExtractorPort;
+use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptBuilderPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptExecutorPort;
-use Jblairy\PhpBenchmark\Infrastructure\Execution\ScriptBuilding\InstrumentedScriptBuilder;
 
 final readonly class SingleBenchmarkExecutor implements BenchmarkExecutorPort
 {
     public function __construct(
         private CodeExtractorPort $codeExtractorPort,
-        private InstrumentedScriptBuilder $instrumentedScriptBuilder,
+        private ScriptBuilderPort $scriptBuilderPort,
         private ScriptExecutorPort $scriptExecutorPort,
     ) {
     }
@@ -28,7 +28,7 @@ final readonly class SingleBenchmarkExecutor implements BenchmarkExecutorPort
             $benchmarkConfiguration->phpVersion,
         );
 
-        $script = $this->instrumentedScriptBuilder->build($code);
+        $script = $this->scriptBuilderPort->build($code);
 
         $executionContext = new ExecutionContext(
             phpVersion: $benchmarkConfiguration->phpVersion,
