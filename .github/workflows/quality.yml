@@ -1,0 +1,88 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main, develop, chore/*, feature/*, fix/* ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  quality-checks:
+    name: Quality Checks (PHP 8.4)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, dom, filter, json
+          coverage: none
+          tools: composer:v2
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Run PHPStan (Level Max)
+        run: vendor/bin/phpstan analyse --no-progress --error-format=github
+
+      - name: Run PHP-CS-Fixer (Check only)
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
+
+      - name: Run PHPUnit Tests
+        run: vendor/bin/phpunit --testdox
+
+      - name: Run PHPMD
+        run: vendor/bin/phpmd src github rulesets.xml
+
+  phpunit-coverage:
+    name: PHPUnit with Coverage
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, dom, filter, json
+          coverage: xdebug
+          tools: composer:v2
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Run PHPUnit with Coverage
+        run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
