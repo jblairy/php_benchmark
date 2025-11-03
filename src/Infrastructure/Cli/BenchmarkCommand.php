@@ -131,7 +131,7 @@ final readonly class BenchmarkCommand
         $benchmark = $this->benchmarkRepositoryPort->findBenchmarkByName($name);
 
         if (!$benchmark instanceof Benchmark) {
-            throw new InvalidArgumentException(sprintf('Benchmark "%s" not found', $name));
+            throw new \Jblairy\PhpBenchmark\Domain\Benchmark\Exception\BenchmarkNotFound($name);
         }
 
         return $benchmark;
