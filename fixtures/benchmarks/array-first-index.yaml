@@ -1,0 +1,27 @@
+slug: first-item-in-array
+name: 'Array First with [0]'
+category: 'Array Operations'
+description: 'Get first element of array using direct index access [0]'
+icon: 🔢
+tags:
+  - array
+  - first
+  - index
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $array = range(1, 1000);
+  for ($i = 0; $i < 10000; $i++) {
+      $first = $array[0];
+  }

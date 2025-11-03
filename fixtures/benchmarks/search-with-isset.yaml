@@ -1,0 +1,24 @@
+slug: search-with-isset
+name: 'Search With Isset'
+category: ArraySearch
+description: ''
+tags: {  }
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $haystack = array_flip(range(1, 1000));
+
+          for ($i = 0; 10000 > $i; ++$i) {
+              $result = isset($haystack[750]);
+          }

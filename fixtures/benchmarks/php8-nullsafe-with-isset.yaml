@@ -1,0 +1,31 @@
+slug: nullsafe-with-isset-check
+name: 'Nullsafe with isset() Check'
+category: 'PHP 8 Features'
+description: 'Use isset() to check properties before access'
+icon: ☑️
+tags:
+  - isset
+  - null
+  - check
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  class User {
+      public $profile = null;
+  }
+
+  $user = new User();
+  for ($i = 0; $i < 100000; $i++) {
+      $name = isset($user->profile->name) ? $user->profile->name : null;
+  }

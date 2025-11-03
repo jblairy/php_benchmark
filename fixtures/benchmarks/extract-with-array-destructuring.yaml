@@ -1,0 +1,22 @@
+slug: extract-with-array-destructuring
+name: 'Extract With Array Destructuring'
+category: ValueExtraction
+description: ''
+tags: {  }
+phpVersions:
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $data = [1, 2, 3];
+
+          for ($i = 0; 100000 > $i; ++$i) {
+              [$a, $b, $c] = $data;
+          }

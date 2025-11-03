@@ -1,0 +1,24 @@
+slug: str-starts-with-substr
+name: 'Str Starts With Substr'
+category: Php8Features
+description: ''
+tags: {  }
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $text = 'Hello World';
+
+          for ($i = 0; 100000 > $i; ++$i) {
+              $result = 'Hello' === mb_substr($text, 0, 5);
+          }

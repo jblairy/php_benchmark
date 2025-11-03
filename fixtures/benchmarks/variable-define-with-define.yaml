@@ -1,0 +1,27 @@
+slug: define-with-define
+name: 'Define with define()'
+category: 'Variable Optimization'
+description: 'Define constant using define() function'
+icon: 🔑
+tags:
+  - define
+  - constant
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  define('MY_CONSTANT', 42);
+
+  for ($i = 0; $i < 100000; $i++) {
+      $result = constant('MY_CONSTANT');
+  }

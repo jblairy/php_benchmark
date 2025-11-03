@@ -1,0 +1,27 @@
+slug: array-first-reset
+name: 'Array First with reset()'
+category: 'Array Operations'
+description: 'Get first element of array using reset() function'
+icon: 🔢
+tags:
+  - array
+  - first
+  - reset
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $array = range(1, 1000);
+  for ($i = 0; $i < 10000; $i++) {
+      $first = reset($array);
+  }

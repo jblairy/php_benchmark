@@ -1,0 +1,32 @@
+slug: call-static-method
+name: 'Call Static Method'
+category: 'Static vs Instance'
+description: 'Benchmarks calling a static method'
+icon: 🔧
+tags:
+  - static
+  - method
+  - oop
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  class TestClass {
+      public static function getValue() {
+          return 42;
+      }
+  }
+
+  for ($i = 0; $i < 100000; $i++) {
+      $result = TestClass::getValue();
+  }

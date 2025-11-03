@@ -1,0 +1,22 @@
+slug: abs-with-ternary
+name: 'Abs With Ternary'
+category: Numeric
+description: ''
+tags: {  }
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  for ($i = -50000; 50000 > $i; ++$i) {
+              $result = 0 > $i ? -$i : $i;
+          }

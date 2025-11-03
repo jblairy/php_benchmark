@@ -1,0 +1,24 @@
+slug: clone-with-new-instance
+name: 'Clone With New Instance'
+category: ObjectCloning
+description: ''
+tags: {  }
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  for ($i = 0; 100000 > $i; ++$i) {
+              $copy = new stdClass();
+              $copy->value = 123;
+              $copy->name = 'test';
+          }

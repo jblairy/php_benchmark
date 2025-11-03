@@ -1,0 +1,19 @@
+slug: sort-with-usort
+name: 'Sort With Usort'
+category: Sorting
+description: ''
+tags: {  }
+phpVersions:
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  for ($i = 0; 1000 > $i; ++$i) {
+              $data = range(1, 1000);
+              shuffle($data);
+              usort($data, fn ($a, $b): int => $a <=> $b);
+          }

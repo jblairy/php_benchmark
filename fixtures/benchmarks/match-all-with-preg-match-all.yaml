@@ -1,0 +1,24 @@
+slug: match-all-with-preg-match-all
+name: 'Match All With Preg Match All'
+category: Regex
+description: ''
+tags: {  }
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $text = 'Numbers: 123, 456, 789, 012, 345';
+
+          for ($i = 0; 50000 > $i; ++$i) {
+              preg_match_all('/\d+/', $text, $matches);
+          }

@@ -1,0 +1,17 @@
+slug: call-with-closure
+name: 'Call With Closure'
+category: Callbacks
+description: ''
+tags: {  }
+phpVersions:
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  for ($i = 0; 100000 > $i; ++$i) {
+              $result = (fn ($x): int => $x * 2)($i);
+          }

@@ -1,0 +1,25 @@
+slug: iterate-with-foreach
+name: 'Iterate With Foreach'
+category: Iteration
+description: ''
+tags: {  }
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $data = range(1, 10000);
+          $sum = 0;
+
+          foreach ($data as $value) {
+              $sum += $value;
+          }

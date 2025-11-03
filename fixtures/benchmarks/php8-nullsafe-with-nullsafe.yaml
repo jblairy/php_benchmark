@@ -1,0 +1,25 @@
+slug: nullsafe-with-nullsafe
+name: 'Nullsafe Operator (PHP 8+)'
+category: 'PHP 8 Features'
+description: 'Use nullsafe operator ?-> to safely access properties'
+icon: ✨
+tags:
+  - php8
+  - nullsafe
+  - operator
+phpVersions:
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  class User {
+      public $profile = null;
+  }
+
+  $user = new User();
+  for ($i = 0; $i < 100000; $i++) {
+      $name = $user?->profile?->name;
+  }

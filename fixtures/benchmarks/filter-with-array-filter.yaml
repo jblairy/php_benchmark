@@ -1,0 +1,17 @@
+slug: filter-with-array-filter
+name: 'Filter With Array Filter'
+category: AdvancedArrays
+description: ''
+tags: {  }
+phpVersions:
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $data = range(1, 10000);
+
+          array_filter($data, fn ($item): bool => 0 === $item % 2);

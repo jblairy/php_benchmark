@@ -1,0 +1,20 @@
+slug: column-with-array-map
+name: 'Column With Array Map'
+category: AdvancedArrays
+description: ''
+tags: {  }
+phpVersions:
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $data = [];
+          for ($i = 0; 1000 > $i; ++$i) {
+              $data[] = ['id' => $i, 'name' => 'User' . $i, 'email' => 'user' . $i . '@test.com'];
+          }
+
+          array_map(fn (array $item): string => $item['name'], $data);

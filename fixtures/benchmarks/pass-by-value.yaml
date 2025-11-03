@@ -1,0 +1,31 @@
+slug: pass-by-value
+name: 'Pass by Value'
+category: 'References'
+description: 'Function calls with parameters passed by value'
+icon: 📋
+tags:
+  - value
+  - function
+  - parameters
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  function incrementByValue($value) {
+      return $value + 1;
+  }
+
+  $counter = 0;
+  for ($i = 0; $i < 100000; $i++) {
+      $counter = incrementByValue($counter);
+  }

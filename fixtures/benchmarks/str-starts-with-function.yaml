@@ -1,0 +1,18 @@
+slug: str-starts-with-function
+name: 'Str Starts With Function'
+category: Php8Features
+description: ''
+tags: {  }
+phpVersions:
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $text = 'Hello World';
+
+          for ($i = 0; 100000 > $i; ++$i) {
+              $result = str_starts_with($text, 'Hello');
+          }

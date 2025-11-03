@@ -1,0 +1,24 @@
+slug: array-key-first
+name: 'Array Key First (PHP 7.3+)'
+category: 'Array Operations'
+description: 'Get first key of array using array_key_first() function (PHP 7.3+)'
+icon: 🔑
+tags:
+  - array
+  - first
+  - key
+  - php73
+phpVersions:
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $array = range(1, 1000);
+  for ($i = 0; $i < 10000; $i++) {
+      $firstKey = array_key_first($array);
+  }

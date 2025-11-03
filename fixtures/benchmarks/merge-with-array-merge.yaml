@@ -1,0 +1,26 @@
+slug: merge-with-array-merge
+name: 'Merge With Array Merge'
+category: ArrayMerge
+description: ''
+tags: {  }
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $array1 = range(1, 100);
+          $array2 = range(101, 200);
+          $array3 = range(201, 300);
+
+          for ($i = 0; 10000 > $i; ++$i) {
+              $result = array_merge($array1, $array2, $array3);
+          }

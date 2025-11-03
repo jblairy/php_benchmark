@@ -1,0 +1,25 @@
+slug: check-with-property-exists
+name: 'Check With Property Exists'
+category: ObjectOperations
+description: ''
+tags: {  }
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $obj = new stdClass();
+          $obj->value = 123;
+
+          for ($i = 0; 100000 > $i; ++$i) {
+              $result = property_exists($obj, 'value');
+          }

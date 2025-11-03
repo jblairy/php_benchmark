@@ -1,0 +1,23 @@
+slug: compare-with-match
+name: 'Compare With Match'
+category: MatchExpression
+description: ''
+tags: {  }
+phpVersions:
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  for ($i = 0; 100000 > $i; ++$i) {
+              $value = $i % 5;
+              $result = match ($value) {
+                  0 => 'zero',
+                  1 => 'one',
+                  2 => 'two',
+                  3 => 'three',
+                  default => 'other',
+              };
+          }

@@ -1,0 +1,30 @@
+slug: pipe-operator
+name: 'Pipe Operator Simulation'
+category: 'Function Operations'
+description: 'Simulates pipe operator with nested function calls'
+icon: 🔀
+tags:
+  - function
+  - pipe
+  - composition
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  function double($x) { return $x * 2; }
+  function addFive($x) { return $x + 5; }
+  function square($x) { return $x * $x; }
+
+  for ($i = 0; $i < 100000; $i++) {
+      $result = square(addFive(double(10)));
+  }

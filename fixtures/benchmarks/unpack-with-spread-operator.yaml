@@ -1,0 +1,32 @@
+slug: unpack-with-spread-operator
+name: 'Unpack with Spread Operator'
+category: 'Unpacking'
+description: 'Unpack array arguments using spread operator ... (PHP 5.6+)'
+icon: 💫
+tags:
+  - unpack
+  - spread
+  - operator
+  - php56
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  function sum($a, $b, $c) {
+      return $a + $b + $c;
+  }
+
+  $args = [1, 2, 3];
+  for ($i = 0; $i < 100000; $i++) {
+      $result = sum(...$args);
+  }

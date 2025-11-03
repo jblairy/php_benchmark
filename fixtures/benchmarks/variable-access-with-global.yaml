@@ -1,0 +1,33 @@
+slug: access-with-global
+name: 'Access Global Variable'
+category: 'Variable Optimization'
+description: 'Access variable using global keyword'
+icon: 🌍
+tags:
+  - global
+  - variable
+  - scope
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $globalValue = 42;
+
+  function accessGlobal() {
+      global $globalValue;
+      return $globalValue;
+  }
+
+  for ($i = 0; $i < 100000; $i++) {
+      $result = accessGlobal();
+  }

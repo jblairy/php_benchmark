@@ -1,0 +1,25 @@
+slug: reduce-with-foreach
+name: 'Reduce With Foreach'
+category: AdvancedArrays
+description: ''
+tags: {  }
+phpVersions:
+  - php56
+  - php70
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $data = range(1, 10000);
+          $result = 0;
+
+          foreach ($data as $item) {
+              $result += $item;
+          }
