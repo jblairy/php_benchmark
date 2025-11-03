@@ -49,7 +49,7 @@ phpcsfixer-fix:
 	docker-compose run --rm main vendor/bin/php-cs-fixer fix
 
 phpstan:
-	docker-compose run --rm main vendor/bin/phpstan analyse
+	docker-compose run --rm main vendor/bin/phpstan analyse --memory-limit=512M
 
 phpmd:
 	docker-compose run --rm main vendor/bin/phpmd ./src ansi rulesets.xml
