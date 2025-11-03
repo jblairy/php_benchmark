@@ -24,6 +24,10 @@ final readonly class BenchmarkOrchestrator
         $this->asyncBenchmarkRunner->run($benchmarkConfiguration);
     }
 
+    /**
+     * @param Benchmark[] $benchmarks
+     * @param PhpVersion[] $phpVersions
+     */
     public function executeMultiple(array $benchmarks, array $phpVersions, int $iterations): void
     {
         foreach ($benchmarks as $benchmark) {

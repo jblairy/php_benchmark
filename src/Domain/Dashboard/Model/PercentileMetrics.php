@@ -18,6 +18,9 @@ final readonly class PercentileMetrics
     ) {
     }
 
+    /**
+     * @param array<string, float> $data
+     */
     public static function fromArray(array $data): self
     {
         return new self(

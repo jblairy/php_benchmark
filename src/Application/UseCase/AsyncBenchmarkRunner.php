@@ -46,7 +46,7 @@ final readonly class AsyncBenchmarkRunner
         $results = [];
 
         for ($i = 0; $i < $benchmarkConfiguration->iterations; ++$i) {
-            $pool->add(fn (): \Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkResult => $this->benchmarkExecutorPort->execute($benchmarkConfiguration))->then(function ($result) use ($benchmarkConfiguration, &$completedIterations, &$results, $benchmarkId, $benchmarkName, $phpVersion, $totalIterations): void {
+            $pool->add(fn (): \Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkResult => $this->benchmarkExecutorPort->execute($benchmarkConfiguration))->then(function (\Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkResult $result) use ($benchmarkConfiguration, &$completedIterations, &$results, $benchmarkId, $benchmarkName, $phpVersion, $totalIterations): void {
                 $this->resultPersisterPort->persist($benchmarkConfiguration, $result);
                 $results[] = $result;
                 ++$completedIterations;
