@@ -100,9 +100,18 @@ final readonly class DoctrineBenchmarkRepository implements BenchmarkRepositoryP
             ->setMaxResults($limit)
             ->getResult();
 
-        return array_map(
-            fn (array $row): string => (string) ($row['category'] ?? ''),
-            $results,
-        );
+        // Ensure results is an array before mapping
+        if (!is_array($results)) {
+            return [];
+        }
+
+        $categories = [];
+        foreach ($results as $row) {
+            if (is_array($row) && isset($row['category']) && is_string($row['category'])) {
+                $categories[] = $row['category'];
+            }
+        }
+
+        return $categories;
     }
 }
