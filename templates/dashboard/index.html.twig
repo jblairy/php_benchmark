@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Comparaison par version PHP{% endblock %}
+{% block title %}PHP Version Comparison{% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
@@ -12,13 +12,38 @@
          data-dashboard-mercure-url-value="{{ mercure_public_url }}"
          data-dashboard-mercure-topic-value="benchmark/results">
 
-        <h1 class="dashboard__title">Comparaison par version PHP</h1>
+        <h1 class="dashboard__title">PHP Performance Benchmarks</h1>
 
-        <div class="stats-card__container">
-            <h2 class="dashboard__subtitle">Vue d'ensemble des benchmarks</h2>
-            <p class="dashboard__subtitle-info">
-                ✨ Mise à jour en temps réel activée - Les valeurs s'animent quand de nouvelles données arrivent
-            </p>
+        {# Statistics Overview #}
+        <div class="stats-overview">
+            <div class="stats-overview__card">
+                <div class="stats-overview__icon">📦</div>
+                <div class="stats-overview__content">
+                    <div class="stats-overview__value">{{ total_benchmarks }}</div>
+                    <div class="stats-overview__label">Available Benchmarks</div>
+                </div>
+            </div>
+            <div class="stats-overview__card">
+                <div class="stats-overview__icon">🚀</div>
+                <div class="stats-overview__content">
+                    <div class="stats-overview__value">{{ php_versions_tested }}</div>
+                    <div class="stats-overview__label">PHP Versions</div>
+                </div>
+            </div>
+            <div class="stats-overview__card">
+                <div class="stats-overview__icon">✅</div>
+                <div class="stats-overview__content">
+                    <div class="stats-overview__value">{{ benchmarks_executed }}</div>
+                    <div class="stats-overview__label">Benchmarks Executed</div>
+                </div>
+            </div>
+            <div class="stats-overview__card">
+                <div class="stats-overview__icon">⚡</div>
+                <div class="stats-overview__content">
+                    <div class="stats-overview__value">{{ total_executions }}</div>
+                    <div class="stats-overview__label">Total Test Runs</div>
+                </div>
+            </div>
         </div>
 
         {# Filter and Sort Section #}
@@ -31,7 +56,7 @@
                         <input
                             type="text"
                             class="filter__search-input"
-                            placeholder="Rechercher un benchmark par nom, catégorie ou code..."
+                            placeholder="Search benchmarks by name, category or code..."
                             data-benchmark-filter-target="searchInput"
                             data-action="input->benchmark-filter#search"
                         />
@@ -39,23 +64,23 @@
                     <button
                         class="filter__reset-button"
                         data-action="click->benchmark-filter#resetFilters"
-                        title="Réinitialiser les filtres"
+                        title="Reset filters"
                     >
-                        ✕ Réinitialiser
+                        ✕ Reset
                     </button>
                 </div>
 
                 {# Sort and Filter Buttons #}
                 <div class="filter__controls">
                     <div class="filter__sort-group">
-                        <span class="filter__label">Trier par :</span>
+                        <span class="filter__label">Sort by:</span>
                         <button
                             class="filter__sort-button filter__sort-button--active"
                             data-benchmark-filter-target="sortButton"
                             data-sort-by="name"
                             data-action="click->benchmark-filter#sort"
                         >
-                            Nom <span class="filter__sort-icon">↑</span>
+                            Name <span class="filter__sort-icon">↑</span>
                         </button>
                         <button
                             class="filter__sort-button"
@@ -63,19 +88,19 @@
                             data-sort-by="category"
                             data-action="click->benchmark-filter#sort"
                         >
-                            Catégorie <span class="filter__sort-icon">↕</span>
+                            Category <span class="filter__sort-icon">↕</span>
                         </button>
                     </div>
 
                     <div class="filter__category-group">
-                        <span class="filter__label">Catégorie :</span>
+                        <span class="filter__label">Category:</span>
                         <button
                             class="filter__category-button filter__category-button--active"
                             data-benchmark-filter-target="categoryFilter"
                             data-category="all"
                             data-action="click->benchmark-filter#filterByCategory"
                         >
-                            Toutes
+                            All
                         </button>
                         <button
                             class="filter__category-button"
@@ -106,7 +131,7 @@
 
                 {# Stats #}
                 <div class="filter__stats-container">
-                    <span class="filter__stats">Chargement...</span>
+                    <span class="filter__stats">Loading...</span>
                 </div>
             </div>
         </div>
@@ -118,9 +143,9 @@
             {# No Results Message #}
             <div class="filter__no-results" data-benchmark-filter-target="noResults" style="display: none;">
                 <div class="filter__no-results-icon">🔍</div>
-                <h3 class="filter__no-results-title">Aucun benchmark trouvé</h3>
+                <h3 class="filter__no-results-title">No benchmarks found</h3>
                 <p class="filter__no-results-text">
-                    Essayez de modifier vos critères de recherche ou de réinitialiser les filtres.
+                    Try modifying your search criteria or reset the filters.
                 </p>
             </div>
         </div>
