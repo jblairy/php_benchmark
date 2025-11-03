@@ -27,6 +27,7 @@
 
 - **[guides/creating-benchmarks.md](guides/creating-benchmarks.md)** - How to create benchmarks
 - **[guides/fixtures.md](guides/fixtures.md)** - **⭐ Benchmark fixtures system (YAML)**
+- **[guides/atomic-commits.md](guides/atomic-commits.md)** - **⭐ Git atomic commits best practices**
 
 ## 🔧 Tools
 
