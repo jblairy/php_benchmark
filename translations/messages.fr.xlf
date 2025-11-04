@@ -5,6 +5,26 @@
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
+      <trans-unit id="0T7N_mY" resname="categories.performance">
+        <source>categories.performance</source>
+        <target>Performance</target>
+      </trans-unit>
+      <trans-unit id="BtXG1sI" resname="categories.throughput">
+        <source>categories.throughput</source>
+        <target>Débit</target>
+      </trans-unit>
+      <trans-unit id="h0oCAhm" resname="categories.stability">
+        <source>categories.stability</source>
+        <target>Stabilité</target>
+      </trans-unit>
+      <trans-unit id="6G1Wr2G" resname="categories.memory">
+        <source>categories.memory</source>
+        <target>Mémoire</target>
+      </trans-unit>
+      <trans-unit id="Nm6iHAy" resname="categories.context">
+        <source>categories.context</source>
+        <target>Contexte</target>
+      </trans-unit>
       <trans-unit id="0r2N5sl" resname="metrics.count.label">
         <source>metrics.count.label</source>
         <target>Échantillons</target>
@@ -45,13 +65,21 @@
         <source>metrics.p99.description</source>
         <target>99e percentile. 99% des exécutions sont plus rapides que cette valeur. Identifie la tail latency (latence de queue) dans les pires cas.</target>
       </trans-unit>
-      <trans-unit id="IbYQokV" resname="metrics.minmax.label">
-        <source>metrics.minmax.label</source>
-        <target>Min / Max (ms)</target>
+      <trans-unit id="lR7nLQH" resname="metrics.min.label">
+        <source>metrics.min.label</source>
+        <target>Min (ms)</target>
       </trans-unit>
-      <trans-unit id="Yr7QYhl" resname="metrics.minmax.description">
-        <source>metrics.minmax.description</source>
-        <target>Temps d'exécution minimum et maximum observés. Indique la plage complète de variation des performances (best case / worst case).</target>
+      <trans-unit id="DQ3Mwso" resname="metrics.min.description">
+        <source>metrics.min.description</source>
+        <target>Temps d'exécution minimum observé. Représente le meilleur cas possible (best case).</target>
+      </trans-unit>
+      <trans-unit id="QRcQjpS" resname="metrics.max.label">
+        <source>metrics.max.label</source>
+        <target>Max (ms)</target>
+      </trans-unit>
+      <trans-unit id="g.bBE2W" resname="metrics.max.description">
+        <source>metrics.max.description</source>
+        <target>Temps d'exécution maximum observé. Représente le pire cas possible (worst case).</target>
       </trans-unit>
       <trans-unit id="OV2CT1." resname="metrics.std_dev.label">
         <source>metrics.std_dev.label</source>
@@ -92,6 +120,14 @@
       <trans-unit id="IWTqtko" resname="metrics.memory_peak.description">
         <source>metrics.memory_peak.description</source>
         <target>Pic maximal de mémoire atteint pendant l'exécution. Indique la consommation mémoire dans le pire cas.</target>
+      </trans-unit>
+      <trans-unit id="IbYQokV" resname="metrics.minmax.label">
+        <source>metrics.minmax.label</source>
+        <target>Min / Max (ms)</target>
+      </trans-unit>
+      <trans-unit id="Yr7QYhl" resname="metrics.minmax.description">
+        <source>metrics.minmax.description</source>
+        <target>Temps d'exécution minimum et maximum observés. Indique la plage complète de variation des performances (best case / worst case).</target>
       </trans-unit>
       <trans-unit id="FuwxCxG" resname="metrics.avg.label">
         <source>metrics.avg.label</source>

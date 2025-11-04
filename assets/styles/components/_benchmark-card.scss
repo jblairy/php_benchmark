@@ -272,6 +272,27 @@
         &:hover {
             background-color: rgba(0, 0, 0, 0.02);
         }
+        
+        // Category header rows
+        &--category {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-top: 2px solid #cbd5e0;
+            border-bottom: 1px solid #e2e8f0;
+            
+            &:hover {
+                background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
+            }
+        }
+    }
+    
+    &__table-cell--category {
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        padding: 0.75rem;
+        text-align: left;
     }
 
     &__table-cell {

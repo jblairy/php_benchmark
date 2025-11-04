@@ -1,3 +1,10 @@
+categories:
+  performance: "Performance"
+  throughput: "Débit"
+  stability: "Stabilité"
+  memory: "Mémoire"
+  context: "Contexte"
+
 metrics:
   count:
     label: "Échantillons"
@@ -19,9 +26,13 @@ metrics:
     label: "p99 (ms)"
     description: "99e percentile. 99% des exécutions sont plus rapides que cette valeur. Identifie la tail latency (latence de queue) dans les pires cas."
   
-  minmax:
-    label: "Min / Max (ms)"
-    description: "Temps d'exécution minimum et maximum observés. Indique la plage complète de variation des performances (best case / worst case)."
+  min:
+    label: "Min (ms)"
+    description: "Temps d'exécution minimum observé. Représente le meilleur cas possible (best case)."
+  
+  max:
+    label: "Max (ms)"
+    description: "Temps d'exécution maximum observé. Représente le pire cas possible (worst case)."
   
   std_dev:
     label: "Écart-type (ms)"
