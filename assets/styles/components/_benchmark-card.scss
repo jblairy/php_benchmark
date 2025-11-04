@@ -199,6 +199,8 @@
         overflow-x: auto;
         overflow-y: visible;
         margin: 0.5rem 0;
+        padding-top: 3rem; // Space for tooltips to display above
+        margin-top: -2.5rem; // Compensate padding to maintain layout
         border-radius: 8px;
         box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
         scrollbar-width: thin;
@@ -317,6 +319,25 @@
             animation: cellPulse 1s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
         }
+        
+        // Stability color badges for CV%
+        &--stability-good {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: #059669;
+            font-weight: 600;
+        }
+        
+        &--stability-medium {
+            background-color: rgba(251, 191, 36, 0.15);
+            color: #d97706;
+            font-weight: 600;
+        }
+        
+        &--stability-poor {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: #dc2626;
+            font-weight: 600;
+        }
     }
 
     // Chart container - toggleable with table
@@ -422,4 +443,10 @@
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+// Metric label styles
+.metric-label {
+    display: inline-block;
+    margin-right: 0.25rem;
 }

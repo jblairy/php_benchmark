@@ -1,0 +1,65 @@
+// Floating Tooltip - Hover-based tooltip that appears above viewport
+.tooltip-floating {
+    position: fixed;
+    background: #1e293b;
+    color: #f1f5f9;
+    padding: 0.625rem 0.875rem;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    line-height: 1.5;
+    max-width: 320px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+    pointer-events: none;
+    
+    // Hidden by default
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    
+    // Visible state
+    &--visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    // When shown below trigger (if not enough space above)
+    &--below {
+        transform: translateY(-4px);
+        
+        &.tooltip-floating--visible {
+            transform: translateY(0);
+        }
+    }
+}
+
+// Metric tooltip trigger button
+.metric-tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    font-size: 0.75rem;
+    user-select: none;
+    color: #94a3b8;
+    transition: color 0.2s ease, transform 0.2s ease;
+    padding: 0.125rem;
+    border: none;
+    background: transparent;
+    
+    &:hover {
+        color: #3b82f6;
+        transform: scale(1.1);
+    }
+    
+    &:active {
+        transform: scale(0.95);
+    }
+    
+    &:focus {
+        outline: 2px solid rgba(59, 130, 246, 0.5);
+        outline-offset: 2px;
+        border-radius: 4px;
+        color: #3b82f6;
+    }
+}

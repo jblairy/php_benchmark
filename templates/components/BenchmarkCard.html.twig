@@ -75,13 +75,29 @@
                     </thead>
                     <tbody>
                     <tr class="benchmark-card__table-row">
-                        <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="count">Échantillons</td>
+                        <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="count">
+                            <span class="metric-label">{{ 'metrics.count.label'|trans }}</span>
+                            <button type="button" 
+                                    class="metric-tooltip" 
+                                    data-controller="tooltip"
+                                    data-tooltip-text-value="{{ 'metrics.count.description'|trans }}"
+                                    data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                    aria-label="Plus d'informations">ℹ️</button>
+                        </td>
                         {% for stats in this.data.phpVersions %}
                             <td class="benchmark-card__table-cell">{{ stats.count }}</td>
                         {% endfor %}
                     </tr>
                     <tr class="benchmark-card__table-row">
-                        <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="p50">p50 (ms)</td>
+                        <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="p50">
+                            <span class="metric-label">{{ 'metrics.p50.label'|trans }}</span>
+                            <button type="button" 
+                                    class="metric-tooltip" 
+                                    data-controller="tooltip"
+                                    data-tooltip-text-value="{{ 'metrics.p50.description'|trans }}"
+                                    data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                    aria-label="Plus d'informations">ℹ️</button>
+                        </td>
                         {% set best_p50 = 999999 %}
                         {% for stats in this.data.phpVersions %}
                             {% if stats.getP50() < best_p50 %}
@@ -97,25 +113,17 @@
                             </td>
                         {% endfor %}
                     </tr>
-                    <tr class="benchmark-card__table-row">
-                        <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="p80">p80 (ms)</td>
-                        {% set best_p80 = 999999 %}
-                        {% for stats in this.data.phpVersions %}
-                            {% if stats.getP80() < best_p80 %}
-                                {% set best_p80 = stats.getP80() %}
-                            {% endif %}
-                        {% endfor %}
 
-                        {% for stats in this.data.phpVersions %}
-                            <td class="benchmark-card__table-cell {% if stats.getP80() == best_p80 %}benchmark-card__table-cell--best-value{% endif %}"
-                                data-unit-switch-target="cell"
-                                data-value="{{ stats.getP80() }}">
-                                {{ stats.getP80()|number_format(5) }}
-                            </td>
-                        {% endfor %}
-                    </tr>
                     <tr class="benchmark-card__table-row">
-                        <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="p90">p90 (ms)</td>
+                        <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="p90">
+                            <span class="metric-label">{{ 'metrics.p90.label'|trans }}</span>
+                            <button type="button" 
+                                    class="metric-tooltip" 
+                                    data-controller="tooltip"
+                                    data-tooltip-text-value="{{ 'metrics.p90.description'|trans }}"
+                                    data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                    aria-label="Plus d'informations">ℹ️</button>
+                        </td>
                         {% set best_p90 = 999999 %}
                         {% for stats in this.data.phpVersions %}
                             {% if stats.getP90() < best_p90 %}
@@ -132,7 +140,15 @@
                         {% endfor %}
                     </tr>
                     <tr class="benchmark-card__table-row">
-                        <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="p95">p95 (ms)</td>
+                        <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="p95">
+                            <span class="metric-label">{{ 'metrics.p95.label'|trans }}</span>
+                            <button type="button" 
+                                    class="metric-tooltip" 
+                                    data-controller="tooltip"
+                                    data-tooltip-text-value="{{ 'metrics.p95.description'|trans }}"
+                                    data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                    aria-label="Plus d'informations">ℹ️</button>
+                        </td>
                         {% set best_p95 = 999999 %}
                         {% for stats in this.data.phpVersions %}
                             {% if stats.getP95() < best_p95 %}
@@ -149,7 +165,15 @@
                         {% endfor %}
                     </tr>
                     <tr class="benchmark-card__table-row">
-                        <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="p99">p99 (ms)</td>
+                        <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="p99">
+                            <span class="metric-label">{{ 'metrics.p99.label'|trans }}</span>
+                            <button type="button" 
+                                    class="metric-tooltip" 
+                                    data-controller="tooltip"
+                                    data-tooltip-text-value="{{ 'metrics.p99.description'|trans }}"
+                                    data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                    aria-label="Plus d'informations">ℹ️</button>
+                        </td>
                         {% set best_p99 = 999999 %}
                         {% for stats in this.data.phpVersions %}
                             {% if stats.getP99() < best_p99 %}
@@ -166,7 +190,92 @@
                         {% endfor %}
                     </tr>
                     <tr class="benchmark-card__table-row">
-                        <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="avg">Moyenne (ms)</td>
+                        <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="minmax">
+                            <span class="metric-label">{{ 'metrics.minmax.label'|trans }}</span>
+                            <button type="button" 
+                                    class="metric-tooltip" 
+                                    data-controller="tooltip"
+                                    data-tooltip-text-value="{{ 'metrics.minmax.description'|trans }}"
+                                    data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                    aria-label="Plus d'informations">ℹ️</button>
+                        </td>
+                        {% set best_min = 999999 %}
+                        {% for stats in this.data.phpVersions %}
+                            {% if stats.min < best_min %}
+                                {% set best_min = stats.min %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for stats in this.data.phpVersions %}
+                            <td class="benchmark-card__table-cell {% if stats.min == best_min %}benchmark-card__table-cell--best-value{% endif %}">
+                                <span data-unit-switch-target="cell" data-value="{{ stats.min }}">{{ stats.min|number_format(5) }}</span> / <span data-unit-switch-target="cell" data-value="{{ stats.max }}">{{ stats.max|number_format(5) }}</span>
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="benchmark-card__table-row">
+                        <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="stdDev">
+                            <span class="metric-label">{{ 'metrics.std_dev.label'|trans }}</span>
+                            <button type="button" 
+                                    class="metric-tooltip" 
+                                    data-controller="tooltip"
+                                    data-tooltip-text-value="{{ 'metrics.std_dev.description'|trans }}"
+                                    data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                    aria-label="Plus d'informations">ℹ️</button>
+                        </td>
+                        {% set best_stdDev = 999999 %}
+                        {% for stats in this.data.phpVersions %}
+                            {% if stats.stdDev < best_stdDev %}
+                                {% set best_stdDev = stats.stdDev %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for stats in this.data.phpVersions %}
+                            <td class="benchmark-card__table-cell {% if stats.stdDev == best_stdDev %}benchmark-card__table-cell--best-value{% endif %}">
+                                <span data-unit-switch-target="cell" data-value="{{ stats.stdDev }}">{{ stats.stdDev|number_format(5) }}</span>
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="benchmark-card__table-row">
+                        <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="cv">
+                            <span class="metric-label">{{ 'metrics.cv.label'|trans }}</span>
+                            <button type="button" 
+                                    class="metric-tooltip" 
+                                    data-controller="tooltip"
+                                    data-tooltip-text-value="{{ 'metrics.cv.description'|trans }}"
+                                    data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                    aria-label="Plus d'informations">ℹ️</button>
+                        </td>
+                        {% set best_cv = 999999 %}
+                        {% for stats in this.data.phpVersions %}
+                            {% if stats.cv < best_cv %}
+                                {% set best_cv = stats.cv %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for stats in this.data.phpVersions %}
+                            {% set stability_class = '' %}
+                            {% if stats.cv < 5 %}
+                                {% set stability_class = 'benchmark-card__table-cell--stability-good' %}
+                            {% elseif stats.cv < 15 %}
+                                {% set stability_class = 'benchmark-card__table-cell--stability-medium' %}
+                            {% else %}
+                                {% set stability_class = 'benchmark-card__table-cell--stability-poor' %}
+                            {% endif %}
+                            <td class="benchmark-card__table-cell {{ stability_class }} {% if stats.cv == best_cv %}benchmark-card__table-cell--best-value{% endif %}">
+                                {{ stats.cv|number_format(2) }}%
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="benchmark-card__table-row">
+                        <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="avg">
+                            <span class="metric-label">{{ 'metrics.avg.label'|trans }}</span>
+                            <button type="button" 
+                                    class="metric-tooltip" 
+                                    data-controller="tooltip"
+                                    data-tooltip-text-value="{{ 'metrics.avg.description'|trans }}"
+                                    data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                    aria-label="Plus d'informations">ℹ️</button>
+                        </td>
                         {% set best_avg = 999999 %}
                         {% for stats in this.data.phpVersions %}
                             {% if stats.avg < best_avg %}
@@ -183,7 +292,38 @@
                         {% endfor %}
                     </tr>
                     <tr class="benchmark-card__table-row">
-                        <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="memoryUsed">Mémoire utilisée (Mo)</td>
+                        <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="throughput">
+                            <span class="metric-label">{{ 'metrics.throughput.label'|trans }}</span>
+                            <button type="button" 
+                                    class="metric-tooltip" 
+                                    data-controller="tooltip"
+                                    data-tooltip-text-value="{{ 'metrics.throughput.description'|trans }}"
+                                    data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                    aria-label="Plus d'informations">ℹ️</button>
+                        </td>
+                        {% set best_throughput = 0 %}
+                        {% for stats in this.data.phpVersions %}
+                            {% if stats.throughput > best_throughput %}
+                                {% set best_throughput = stats.throughput %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for stats in this.data.phpVersions %}
+                            <td class="benchmark-card__table-cell {% if stats.throughput == best_throughput %}benchmark-card__table-cell--best-value{% endif %}">
+                                {{ stats.throughput|number_format(0, '.', ',') }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="benchmark-card__table-row">
+                        <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="memoryUsed">
+                            <span class="metric-label">{{ 'metrics.memory_used.label'|trans }}</span>
+                            <button type="button" 
+                                    class="metric-tooltip" 
+                                    data-controller="tooltip"
+                                    data-tooltip-text-value="{{ 'metrics.memory_used.description'|trans }}"
+                                    data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                    aria-label="Plus d'informations">ℹ️</button>
+                        </td>
                         {% set best_memory = 999999999999 %}
                         {% for stats in this.data.phpVersions %}
                             {% if stats.memoryUsed < best_memory %}
@@ -198,7 +338,15 @@
                         {% endfor %}
                     </tr>
                     <tr class="benchmark-card__table-row">
-                        <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="memoryPeak">Pic de mémoire (Mo)</td>
+                        <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="memoryPeak">
+                            <span class="metric-label">{{ 'metrics.memory_peak.label'|trans }}</span>
+                            <button type="button" 
+                                    class="metric-tooltip" 
+                                    data-controller="tooltip"
+                                    data-tooltip-text-value="{{ 'metrics.memory_peak.description'|trans }}"
+                                    data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                    aria-label="Plus d'informations">ℹ️</button>
+                        </td>
                         {% set best_memory_peak = 999999999999 %}
                         {% for stats in this.data.phpVersions %}
                             {% if stats.memoryPeak < best_memory_peak %}
