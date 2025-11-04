@@ -1,0 +1,169 @@
+                {# Configuration Menu #}
+                <div class="config-menu-backdrop" 
+                     data-config-menu-target="backdrop"
+                     data-action="click->config-menu#closeMenu"></div>
+                
+                <div class="config-menu" data-config-menu-target="menu">
+                    <div class="config-menu__header">
+                        <h3 class="config-menu__title">{{ 'config_menu.title'|trans }}</h3>
+                        <button type="button" 
+                                class="config-menu__close"
+                                data-action="click->config-menu#closeMenu">×</button>
+                    </div>
+                    
+                    <div class="config-menu__content">
+                        {# PHP Versions Section #}
+                        <div class="config-menu__section">
+                            <div class="config-menu__section-title">
+                                📊 {{ 'config_menu.php_versions'|trans }}
+                            </div>
+                            
+                            <div class="config-menu__actions">
+                                <button type="button" 
+                                        class="config-menu__action-btn"
+                                        data-action="click->config-menu#selectAllPhp">
+                                    {{ 'config_menu.select_all'|trans }}
+                                </button>
+                                <button type="button" 
+                                        class="config-menu__action-btn"
+                                        data-action="click->config-menu#deselectAllPhp">
+                                    {{ 'config_menu.deselect_all'|trans }}
+                                </button>
+                            </div>
+                            
+                            <div class="config-menu__checkbox-group">
+                                {% for phpVersion in ["php56", "php70", "php71", "php72", "php73", "php74", "php80", "php81", "php82", "php83", "php84", "php85"] %}
+                                    <label class="config-menu__checkbox-item">
+                                        <input type="checkbox" 
+                                               class="config-menu__checkbox"
+                                               value="{{ phpVersion }}"
+                                               data-config-menu-target="phpVersion"
+                                               data-action="change->config-menu#togglePhpVersion"
+                                               checked>
+                                        <span class="config-menu__checkbox-label">
+                                            PHP {{ phpVersion|replace({'php': ''}) }}
+                                        </span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        {# Metrics Section #}
+                        <div class="config-menu__section">
+                            <div class="config-menu__section-title">
+                                📈 {{ 'config_menu.metrics'|trans }}
+                            </div>
+                            
+                            <div class="config-menu__actions">
+                                <button type="button" 
+                                        class="config-menu__action-btn"
+                                        data-action="click->config-menu#selectAllMetrics">
+                                    {{ 'config_menu.select_all'|trans }}
+                                </button>
+                                <button type="button" 
+                                        class="config-menu__action-btn"
+                                        data-action="click->config-menu#deselectAllMetrics">
+                                    {{ 'config_menu.deselect_all'|trans }}
+                                </button>
+                            </div>
+                            
+                            <div class="config-menu__checkbox-group">
+                                <label class="config-menu__checkbox-item">
+                                    <input type="checkbox" class="config-menu__checkbox" value="p50" data-config-menu-target="metric" data-action="change->config-menu#toggleMetric" checked>
+                                    <span class="config-menu__checkbox-label">{{ 'metrics.p50.label'|trans }}</span>
+                                </label>
+                                <label class="config-menu__checkbox-item">
+                                    <input type="checkbox" class="config-menu__checkbox" value="min" data-config-menu-target="metric" data-action="change->config-menu#toggleMetric" checked>
+                                    <span class="config-menu__checkbox-label">{{ 'metrics.min.label'|trans }}</span>
+                                </label>
+                                <label class="config-menu__checkbox-item">
+                                    <input type="checkbox" class="config-menu__checkbox" value="max" data-config-menu-target="metric" data-action="change->config-menu#toggleMetric" checked>
+                                    <span class="config-menu__checkbox-label">{{ 'metrics.max.label'|trans }}</span>
+                                </label>
+                                <label class="config-menu__checkbox-item">
+                                    <input type="checkbox" class="config-menu__checkbox" value="p90" data-config-menu-target="metric" data-action="change->config-menu#toggleMetric" checked>
+                                    <span class="config-menu__checkbox-label">{{ 'metrics.p90.label'|trans }}</span>
+                                </label>
+                                <label class="config-menu__checkbox-item">
+                                    <input type="checkbox" class="config-menu__checkbox" value="p95" data-config-menu-target="metric" data-action="change->config-menu#toggleMetric" checked>
+                                    <span class="config-menu__checkbox-label">{{ 'metrics.p95.label'|trans }}</span>
+                                </label>
+                                <label class="config-menu__checkbox-item">
+                                    <input type="checkbox" class="config-menu__checkbox" value="p99" data-config-menu-target="metric" data-action="change->config-menu#toggleMetric" checked>
+                                    <span class="config-menu__checkbox-label">{{ 'metrics.p99.label'|trans }}</span>
+                                </label>
+                                <label class="config-menu__checkbox-item">
+                                    <input type="checkbox" class="config-menu__checkbox" value="throughput" data-config-menu-target="metric" data-action="change->config-menu#toggleMetric" checked>
+                                    <span class="config-menu__checkbox-label">{{ 'metrics.throughput.label'|trans }}</span>
+                                </label>
+                                <label class="config-menu__checkbox-item">
+                                    <input type="checkbox" class="config-menu__checkbox" value="stdDev" data-config-menu-target="metric" data-action="change->config-menu#toggleMetric" checked>
+                                    <span class="config-menu__checkbox-label">{{ 'metrics.std_dev.label'|trans }}</span>
+                                </label>
+                                <label class="config-menu__checkbox-item">
+                                    <input type="checkbox" class="config-menu__checkbox" value="cv" data-config-menu-target="metric" data-action="change->config-menu#toggleMetric" checked>
+                                    <span class="config-menu__checkbox-label">{{ 'metrics.cv.label'|trans }}</span>
+                                </label>
+                                <label class="config-menu__checkbox-item">
+                                    <input type="checkbox" class="config-menu__checkbox" value="memoryUsed" data-config-menu-target="metric" data-action="change->config-menu#toggleMetric" checked>
+                                    <span class="config-menu__checkbox-label">{{ 'metrics.memory_used.label'|trans }}</span>
+                                </label>
+                                <label class="config-menu__checkbox-item">
+                                    <input type="checkbox" class="config-menu__checkbox" value="memoryPeak" data-config-menu-target="metric" data-action="change->config-menu#toggleMetric" checked>
+                                    <span class="config-menu__checkbox-label">{{ 'metrics.memory_peak.label'|trans }}</span>
+                                </label>
+                                <label class="config-menu__checkbox-item">
+                                    <input type="checkbox" class="config-menu__checkbox" value="count" data-config-menu-target="metric" data-action="change->config-menu#toggleMetric" checked>
+                                    <span class="config-menu__checkbox-label">{{ 'metrics.count.label'|trans }}</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        {# Time Unit Section #}
+                        <div class="config-menu__section">
+                            <div class="config-menu__section-title">
+                                ⏱️ {{ 'config_menu.time_unit'|trans }}
+                            </div>
+                            
+                            <div class="config-menu__radio-group">
+                                <label class="config-menu__radio-item">
+                                    <input type="radio" 
+                                           class="config-menu__radio"
+                                           name="time_unit"
+                                           value="ms"
+                                           data-config-menu-target="unitRadio"
+                                           data-action="change->config-menu#changeUnit"
+                                           checked>
+                                    <span class="config-menu__radio-label">
+                                        {{ 'config_menu.unit_ms'|trans }}
+                                        <small>{{ 'config_menu.unit_ms_desc'|trans }}</small>
+                                    </span>
+                                </label>
+                                <label class="config-menu__radio-item">
+                                    <input type="radio" 
+                                           class="config-menu__radio"
+                                           name="time_unit"
+                                           value="us"
+                                           data-config-menu-target="unitRadio"
+                                           data-action="change->config-menu#changeUnit">
+                                    <span class="config-menu__radio-label">
+                                        {{ 'config_menu.unit_us'|trans }}
+                                        <small>{{ 'config_menu.unit_us_desc'|trans }}</small>
+                                    </span>
+                                </label>
+                                <label class="config-menu__radio-item">
+                                    <input type="radio" 
+                                           class="config-menu__radio"
+                                           name="time_unit"
+                                           value="ns"
+                                           data-config-menu-target="unitRadio"
+                                           data-action="change->config-menu#changeUnit">
+                                    <span class="config-menu__radio-label">
+                                        {{ 'config_menu.unit_ns'|trans }}
+                                        <small>{{ 'config_menu.unit_ns_desc'|trans }}</small>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>

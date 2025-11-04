@@ -55,34 +55,35 @@ export default class extends Controller {
     applyPhpVersionFilter() {
         const selectedVersions = this.getSelectedPhpVersions();
         
-        // Get table
-        const table = this.element.querySelector('.benchmark-card__table');
-        if (!table) return;
+        // Get ALL tables on the page
+        const tables = document.querySelectorAll('.benchmark-card__table');
+        
+        tables.forEach(table => {
+            // Get all PHP version columns (header + data)
+            const headers = table.querySelectorAll('thead th');
+            const rows = table.querySelectorAll('tbody tr');
 
-        // Get all PHP version columns (header + data)
-        const headers = table.querySelectorAll('thead th');
-        const rows = table.querySelectorAll('tbody tr');
-
-        // Find indices of PHP versions in header
-        const versionIndices = [];
-        headers.forEach((header, index) => {
-            const text = header.textContent.trim();
-            const match = text.match(/PHP\s*(\d+\.\d+|\d+)/);
-            if (match) {
-                const versionKey = `php${match[1].replace('.', '')}`;
-                const isVisible = selectedVersions.includes(versionKey);
-                header.style.display = isVisible ? '' : 'none';
-                versionIndices.push({ index, visible: isVisible });
-            }
-        });
-
-        // Hide/show corresponding cells in each row
-        rows.forEach(row => {
-            const cells = row.querySelectorAll('td');
-            versionIndices.forEach(({ index, visible }) => {
-                if (cells[index]) {
-                    cells[index].style.display = visible ? '' : 'none';
+            // Find indices of PHP versions in header
+            const versionIndices = [];
+            headers.forEach((header, index) => {
+                const text = header.textContent.trim();
+                const match = text.match(/PHP\s*(\d+\.\d+|\d+)/);
+                if (match) {
+                    const versionKey = `php${match[1].replace('.', '')}`;
+                    const isVisible = selectedVersions.includes(versionKey);
+                    header.style.display = isVisible ? '' : 'none';
+                    versionIndices.push({ index, visible: isVisible });
                 }
+            });
+
+            // Hide/show corresponding cells in each row
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                versionIndices.forEach(({ index, visible }) => {
+                    if (cells[index]) {
+                        cells[index].style.display = visible ? '' : 'none';
+                    }
+                });
             });
         });
     }
@@ -114,17 +115,20 @@ export default class extends Controller {
 
     applyMetricFilter() {
         const selectedMetrics = this.getSelectedMetrics();
-        const table = this.element.querySelector('.benchmark-card__table');
-        if (!table) return;
-
-        const rows = table.querySelectorAll('tbody tr:not(.benchmark-card__table-row--category)');
-        rows.forEach(row => {
-            const metricCell = row.querySelector('[data-metric]');
-            if (metricCell) {
-                const metric = metricCell.dataset.metric;
-                const isVisible = selectedMetrics.includes(metric);
-                row.style.display = isVisible ? '' : 'none';
-            }
+        
+        // Get ALL tables on the page
+        const tables = document.querySelectorAll('.benchmark-card__table');
+        
+        tables.forEach(table => {
+            const rows = table.querySelectorAll('tbody tr:not(.benchmark-card__table-row--category)');
+            rows.forEach(row => {
+                const metricCell = row.querySelector('[data-metric]');
+                if (metricCell) {
+                    const metric = metricCell.dataset.metric;
+                    const isVisible = selectedMetrics.includes(metric);
+                    row.style.display = isVisible ? '' : 'none';
+                }
+            });
         });
     }
 
@@ -136,7 +140,8 @@ export default class extends Controller {
     }
 
     applyUnitConversion(unit) {
-        const cells = this.element.querySelectorAll('[data-unit-switch-target="cell"]');
+        // Get ALL cells on the page
+        const cells = document.querySelectorAll('[data-unit-switch-target="cell"]');
         
         cells.forEach(cell => {
             const msValue = parseFloat(cell.dataset.value);
