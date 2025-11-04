@@ -12,6 +12,7 @@ final readonly class ExecutionContext
         public PhpVersion $phpVersion,
         public string $scriptContent,
         public string $benchmarkClassName,
+        public string $benchmarkSlug = 'unknown',
     ) {
     }
 }

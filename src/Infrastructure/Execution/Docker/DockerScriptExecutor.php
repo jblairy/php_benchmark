@@ -7,23 +7,50 @@ namespace Jblairy\PhpBenchmark\Infrastructure\Execution\Docker;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkResult;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\ExecutionContext;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptExecutorPort;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 
 final class DockerScriptExecutor implements ScriptExecutorPort
 {
     private const string TEMP_DIR = '/srv/php_benchmark/var/tmp';
 
+    public function __construct(
+        private readonly LoggerInterface $logger,
+    ) {
+    }
+
     public function executeScript(ExecutionContext $executionContext): BenchmarkResult
     {
         $tempFile = $this->createTempScriptFile($executionContext->scriptContent);
+
+        $this->logger->info('Executing benchmark', [
+            'benchmark_slug' => $executionContext->benchmarkSlug,
+            'benchmark_class' => $executionContext->benchmarkClassName,
+            'php_version' => $executionContext->phpVersion->value,
+            'script_file' => $tempFile,
+        ]);
 
         try {
             $output = $this->executeInDocker($executionContext->phpVersion->value, $tempFile);
             $result = $this->parseOutput($output);
             $this->cleanupTempFile($tempFile);
 
+            $this->logger->info('Benchmark executed successfully', [
+                'benchmark_slug' => $executionContext->benchmarkSlug,
+                'php_version' => $executionContext->phpVersion->value,
+            ]);
+
             return $result;
         } catch (RuntimeException $runtimeException) {
+            $this->logger->error('Benchmark execution failed', [
+                'benchmark_slug' => $executionContext->benchmarkSlug,
+                'benchmark_class' => $executionContext->benchmarkClassName,
+                'php_version' => $executionContext->phpVersion->value,
+                'script_file' => $tempFile,
+                'error' => $runtimeException->getMessage(),
+                'script_preview' => substr($executionContext->scriptContent, 0, 200),
+            ]);
+
             throw $this->enrichExceptionWithContext($runtimeException, $executionContext, $tempFile);
         }
     }
@@ -110,7 +137,13 @@ final class DockerScriptExecutor implements ScriptExecutorPort
         string $tempFile,
     ): RuntimeException {
         return new RuntimeException(
-            $runtimeException->getMessage() . sprintf(' [Benchmark: %s, File: %s]', $executionContext->benchmarkClassName, $tempFile),
+            $runtimeException->getMessage() . sprintf(
+                ' [Benchmark Slug: %s, Class: %s, PHP Version: %s, File: %s]',
+                $executionContext->benchmarkSlug,
+                $executionContext->benchmarkClassName,
+                $executionContext->phpVersion->value,
+                $tempFile
+            ),
             (int) $runtimeException->getCode(),
             $runtimeException,
         );

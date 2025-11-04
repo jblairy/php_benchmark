@@ -30,10 +30,17 @@ final readonly class SingleBenchmarkExecutor implements BenchmarkExecutorPort
 
         $script = $this->scriptBuilderPort->build($code);
 
+        // Try to get slug if benchmark has the method (DatabaseBenchmark adapter)
+        $slug = 'unknown';
+        if (method_exists($benchmarkConfiguration->benchmark, 'getSlug')) {
+            $slug = $benchmarkConfiguration->benchmark->getSlug();
+        }
+
         $executionContext = new ExecutionContext(
             phpVersion: $benchmarkConfiguration->phpVersion,
             scriptContent: $script,
             benchmarkClassName: $benchmarkConfiguration->benchmark::class,
+            benchmarkSlug: $slug,
         );
 
         return $this->scriptExecutorPort->executeScript($executionContext);
