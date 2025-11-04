@@ -31,10 +31,6 @@ metrics:
     label: "Stabilité (CV%)"
     description: "Coefficient de Variation en pourcentage. Mesure la variabilité relative des performances. CV < 5% = excellent, 5-15% = bon, > 15% = instable."
   
-  avg:
-    label: "Moyenne (ms)"
-    description: "Temps d'exécution moyen. Attention : peut être biaisée par les valeurs extrêmes. Préférer la médiane (p50)."
-  
   throughput:
     label: "Débit (ops/sec)"
     description: "Nombre d'opérations par seconde. Plus la valeur est élevée, meilleures sont les performances. Calculé par : 1000 / temps_moyen."

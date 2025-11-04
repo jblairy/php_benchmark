@@ -266,31 +266,7 @@
                             </td>
                         {% endfor %}
                     </tr>
-                    <tr class="benchmark-card__table-row">
-                        <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="avg">
-                            <span class="metric-label">{{ 'metrics.avg.label'|trans }}</span>
-                            <button type="button" 
-                                    class="metric-tooltip" 
-                                    data-controller="tooltip"
-                                    data-tooltip-text-value="{{ 'metrics.avg.description'|trans }}"
-                                    data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
-                                    aria-label="Plus d'informations">ℹ️</button>
-                        </td>
-                        {% set best_avg = 999999 %}
-                        {% for stats in this.data.phpVersions %}
-                            {% if stats.avg < best_avg %}
-                                {% set best_avg = stats.avg %}
-                            {% endif %}
-                        {% endfor %}
 
-                        {% for stats in this.data.phpVersions %}
-                            <td class="benchmark-card__table-cell {% if stats.avg == best_avg %}benchmark-card__table-cell--best-value{% endif %}"
-                                data-unit-switch-target="cell"
-                                data-value="{{ stats.avg }}">
-                                {{ stats.avg|number_format(5) }}
-                            </td>
-                        {% endfor %}
-                    </tr>
                     <tr class="benchmark-card__table-row">
                         <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="throughput">
                             <span class="metric-label">{{ 'metrics.throughput.label'|trans }}</span>

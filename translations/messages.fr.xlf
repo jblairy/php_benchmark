@@ -69,14 +69,6 @@
         <source>metrics.cv.description</source>
         <target><![CDATA[Coefficient de Variation en pourcentage. Mesure la variabilité relative des performances. CV < 5% = excellent, 5-15% = bon, > 15% = instable.]]></target>
       </trans-unit>
-      <trans-unit id="FuwxCxG" resname="metrics.avg.label">
-        <source>metrics.avg.label</source>
-        <target>Moyenne (ms)</target>
-      </trans-unit>
-      <trans-unit id="RD8uqGv" resname="metrics.avg.description">
-        <source>metrics.avg.description</source>
-        <target>Temps d'exécution moyen. Attention : peut être biaisée par les valeurs extrêmes. Préférer la médiane (p50).</target>
-      </trans-unit>
       <trans-unit id="x9RiPiJ" resname="metrics.throughput.label">
         <source>metrics.throughput.label</source>
         <target>Débit (ops/sec)</target>
@@ -100,6 +92,14 @@
       <trans-unit id="IWTqtko" resname="metrics.memory_peak.description">
         <source>metrics.memory_peak.description</source>
         <target>Pic maximal de mémoire atteint pendant l'exécution. Indique la consommation mémoire dans le pire cas.</target>
+      </trans-unit>
+      <trans-unit id="FuwxCxG" resname="metrics.avg.label">
+        <source>metrics.avg.label</source>
+        <target>Moyenne (ms)</target>
+      </trans-unit>
+      <trans-unit id="RD8uqGv" resname="metrics.avg.description">
+        <source>metrics.avg.description</source>
+        <target>Temps d'exécution moyen. Attention : peut être biaisée par les valeurs extrêmes. Préférer la médiane (p50).</target>
       </trans-unit>
     </body>
   </file>
