@@ -8,7 +8,7 @@
 
 {% block body %}
     <div class="dashboard__container"
-         data-controller="dashboard-mercure benchmark-filter unit-switch"
+         data-controller="dashboard-mercure benchmark-filter"
          data-dashboard-mercure-url-value="{{ mercure_public_url }}"
          data-dashboard-mercure-topic-value="benchmark/results">
 
@@ -118,26 +118,6 @@
                 {# Stats #}
                 <div class="filter__stats-container">
                     <span class="filter__stats">Loading...</span>
-                    
-                    {# Global Unit Switch - Compact pill-shaped toggle #}
-                    <div class="filter__unit-toggle">
-                        <button 
-                            class="filter__unit-toggle-option filter__unit-toggle-option--active"
-                            data-unit-switch-target="msButton"
-                            data-unit="ms"
-                            data-action="click->unit-switch#toggle"
-                            title="Milliseconds">
-                            ms
-                        </button>
-                        <button 
-                            class="filter__unit-toggle-option"
-                            data-unit-switch-target="nsButton"
-                            data-unit="ns"
-                            data-action="click->unit-switch#toggle"
-                            title="Nanoseconds">
-                            ns
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
