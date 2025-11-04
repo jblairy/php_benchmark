@@ -49,6 +49,9 @@ jobs:
       - name: Run PHPMD
         run: vendor/bin/phpmd src github rulesets.xml
 
+      - name: Run PHPArkitect (Architecture validation)
+        run: vendor/bin/phparkitect check
+
   phpunit-coverage:
     name: PHPUnit with Coverage
     runs-on: ubuntu-latest
