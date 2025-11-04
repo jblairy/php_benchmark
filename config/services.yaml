@@ -51,15 +51,20 @@ services:
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptBuilderPort:
         class: Jblairy\PhpBenchmark\Infrastructure\Execution\ScriptBuilding\InstrumentedScriptBuilder
 
+    # Event Dispatcher (Port -> Adapter)
+    Jblairy\PhpBenchmark\Domain\Benchmark\Port\EventDispatcherPort:
+        class: Jblairy\PhpBenchmark\Infrastructure\Async\SymfonyEventDispatcherAdapter
+
+    # Async Executor (Port -> Adapter)
+    Jblairy\PhpBenchmark\Domain\Benchmark\Port\AsyncExecutorPort:
+        class: Jblairy\PhpBenchmark\Infrastructure\Async\SpatieAsyncExecutorAdapter
+        arguments:
+            $concurrency: 100
+
     # Benchmark auto-tagging (moved from Domain to keep it framework-agnostic)
     _instanceof:
         Jblairy\PhpBenchmark\Domain\Benchmark\Contract\Benchmark:
             tags: ['app.benchmark']
-
-    # Application Use Cases with dependencies
-    Jblairy\PhpBenchmark\Application\UseCase\AsyncBenchmarkRunner:
-        arguments:
-            $concurrency: 100
 
     # Domain Services (need explicit registration since Domain is excluded)
     Jblairy\PhpBenchmark\Domain\Dashboard\Service\StatisticsCalculator: ~
