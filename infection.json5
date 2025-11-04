@@ -1,0 +1,43 @@
+{
+  // Infection - Mutation Testing Configuration
+  // See: https://infection.readthedocs.io/
+  
+  "$schema": "vendor/infection/infection/resources/schema.json",
+  
+  // Source code directories to mutate
+  "source": {
+    "directories": ["src/Domain", "src/Application"],
+    "excludes": [
+      "src/Domain/Benchmark/Test",
+      "src/Domain/PhpVersion/Enum/PhpVersion.php"
+    ]
+  },
+  
+  // Test configuration
+  "phpUnit": {
+    "configDir": "."
+  },
+  
+  // Logging options
+  "logs": {
+    "text": "var/infection/infection.log",
+    "html": "var/infection/html",
+    "summary": "var/infection/summary.log"
+  },
+  
+  // Minimum required mutation score
+  "minMsi": 80,
+  "minCoveredMsi": 85,
+  
+  // Timeout for mutated tests (in seconds)
+  "timeout": 10,
+  
+  // Which mutators to run
+  // See: https://infection.readthedocs.io/en/latest/mutators.html
+  "mutators": {
+    "@default": true
+  },
+  
+  // Report options
+  "testFramework": "phpunit"
+}
