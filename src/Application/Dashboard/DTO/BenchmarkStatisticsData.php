@@ -34,19 +34,44 @@ final readonly class BenchmarkStatisticsData
     }
 
     /**
-     * Magic getter for backward compatibility with templates.
-     * Allows accessing $stats.p50 instead of $stats.percentiles.p50.
+     * Convenience getter for p50 percentile.
+     * Allows accessing $stats.p50 instead of $stats.percentiles.p50 in templates.
      */
-    public function __get(string $name): mixed
+    public function getP50(): float
     {
-        return match ($name) {
-            'p50' => $this->percentiles->p50,
-            'p80' => $this->percentiles->p80,
-            'p90' => $this->percentiles->p90,
-            'p95' => $this->percentiles->p95,
-            'p99' => $this->percentiles->p99,
-            default => throw new RuntimeException(sprintf('Undefined property: %s', $name)),
-        };
+        return $this->percentiles->p50;
+    }
+
+    /**
+     * Convenience getter for p80 percentile.
+     */
+    public function getP80(): float
+    {
+        return $this->percentiles->p80;
+    }
+
+    /**
+     * Convenience getter for p90 percentile.
+     */
+    public function getP90(): float
+    {
+        return $this->percentiles->p90;
+    }
+
+    /**
+     * Convenience getter for p95 percentile.
+     */
+    public function getP95(): float
+    {
+        return $this->percentiles->p95;
+    }
+
+    /**
+     * Convenience getter for p99 percentile.
+     */
+    public function getP99(): float
+    {
+        return $this->percentiles->p99;
     }
 
     public static function fromDomain(BenchmarkStatistics $benchmarkStatistics): self
