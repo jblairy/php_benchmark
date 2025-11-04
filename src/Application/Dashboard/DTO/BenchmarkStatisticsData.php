@@ -11,13 +11,8 @@ use RuntimeException;
 /**
  * Data Transfer Object for benchmark statistics.
  *
- * Used to transfer data from Application layer to Infrastructure (Controller)
- *
- * @property float $p50
- * @property float $p80
- * @property float $p90
- * @property float $p95
- * @property float $p99
+ * Used to transfer data from Application layer to Infrastructure (Controller/Twig)
+ * Percentiles are exposed directly as properties for easier Twig template access.
  */
 final readonly class BenchmarkStatisticsData
 {
@@ -30,48 +25,13 @@ final readonly class BenchmarkStatisticsData
         public PercentileMetrics $percentiles,
         public float $memoryUsed,
         public float $memoryPeak,
+        // Percentile shortcuts for Twig templates
+        public float $p50,
+        public float $p80,
+        public float $p90,
+        public float $p95,
+        public float $p99,
     ) {
-    }
-
-    /**
-     * Convenience getter for p50 percentile.
-     * Allows accessing $stats.p50 instead of $stats.percentiles.p50 in templates.
-     */
-    public function getP50(): float
-    {
-        return $this->percentiles->p50;
-    }
-
-    /**
-     * Convenience getter for p80 percentile.
-     */
-    public function getP80(): float
-    {
-        return $this->percentiles->p80;
-    }
-
-    /**
-     * Convenience getter for p90 percentile.
-     */
-    public function getP90(): float
-    {
-        return $this->percentiles->p90;
-    }
-
-    /**
-     * Convenience getter for p95 percentile.
-     */
-    public function getP95(): float
-    {
-        return $this->percentiles->p95;
-    }
-
-    /**
-     * Convenience getter for p99 percentile.
-     */
-    public function getP99(): float
-    {
-        return $this->percentiles->p99;
     }
 
     public static function fromDomain(BenchmarkStatistics $benchmarkStatistics): self
@@ -85,6 +45,12 @@ final readonly class BenchmarkStatisticsData
             percentiles: $benchmarkStatistics->percentiles,
             memoryUsed: $benchmarkStatistics->averageMemoryUsed,
             memoryPeak: $benchmarkStatistics->peakMemoryUsed,
+            // Expose percentiles as direct properties for Twig
+            p50: $benchmarkStatistics->percentiles->p50,
+            p80: $benchmarkStatistics->percentiles->p80,
+            p90: $benchmarkStatistics->percentiles->p90,
+            p95: $benchmarkStatistics->percentiles->p95,
+            p99: $benchmarkStatistics->percentiles->p99,
         );
     }
 }
