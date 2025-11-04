@@ -6,13 +6,12 @@ namespace Jblairy\PhpBenchmark\Application\Dashboard\DTO;
 
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\BenchmarkStatistics;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\PercentileMetrics;
-use RuntimeException;
 
 /**
  * Data Transfer Object for benchmark statistics.
  *
  * Used to transfer data from Application layer to Infrastructure (Controller/Twig)
- * Percentiles are exposed directly as properties for easier Twig template access.
+ * Percentiles are accessible via the percentiles property or convenience methods.
  */
 final readonly class BenchmarkStatisticsData
 {
@@ -25,12 +24,6 @@ final readonly class BenchmarkStatisticsData
         public PercentileMetrics $percentiles,
         public float $memoryUsed,
         public float $memoryPeak,
-        // Percentile shortcuts for Twig templates
-        public float $p50,
-        public float $p80,
-        public float $p90,
-        public float $p95,
-        public float $p99,
     ) {
     }
 
@@ -45,12 +38,31 @@ final readonly class BenchmarkStatisticsData
             percentiles: $benchmarkStatistics->percentiles,
             memoryUsed: $benchmarkStatistics->averageMemoryUsed,
             memoryPeak: $benchmarkStatistics->peakMemoryUsed,
-            // Expose percentiles as direct properties for Twig
-            p50: $benchmarkStatistics->percentiles->p50,
-            p80: $benchmarkStatistics->percentiles->p80,
-            p90: $benchmarkStatistics->percentiles->p90,
-            p95: $benchmarkStatistics->percentiles->p95,
-            p99: $benchmarkStatistics->percentiles->p99,
         );
+    }
+
+    public function getP50(): float
+    {
+        return $this->percentiles->p50;
+    }
+
+    public function getP80(): float
+    {
+        return $this->percentiles->p80;
+    }
+
+    public function getP90(): float
+    {
+        return $this->percentiles->p90;
+    }
+
+    public function getP95(): float
+    {
+        return $this->percentiles->p95;
+    }
+
+    public function getP99(): float
+    {
+        return $this->percentiles->p99;
     }
 }
