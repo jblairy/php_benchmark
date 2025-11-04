@@ -1,4 +1,4 @@
-.PHONY: up start run fixtures db.reset db.refresh phpcsfixer phpcsfixer-fix phpstan quality phpmd phparkitect assets.refresh
+.PHONY: up start run fixtures db.reset db.refresh phpcsfixer phpcsfixer-fix phpstan quality phpmd phparkitect infection assets.refresh
 
 up:
 	docker-compose up -d --remove-orphans
@@ -59,6 +59,28 @@ phparkitect:
 
 rector:
 	docker-compose run --rm main vendor/bin/rector
+
+test:
+	docker-compose run --rm main vendor/bin/phpunit
+
+test-coverage:
+	@echo "📊 Generating code coverage..."
+	docker-compose run --rm main phpdbg -qrr vendor/bin/phpunit --coverage-xml=var/coverage/coverage-xml --log-junit=var/coverage/junit.xml
+
+infection:
+	@echo "🧬 Running Infection mutation testing..."
+	@echo "⚠️  This may take several minutes..."
+	@echo "📊 Step 1/2: Generating code coverage with PHPUnit..."
+	@docker-compose run --rm main phpdbg -qrr vendor/bin/phpunit --coverage-xml=var/coverage/coverage-xml --log-junit=var/coverage/junit.xml
+	@echo "🧬 Step 2/2: Running mutations..."
+	docker-compose run --rm main vendor/bin/infection --coverage=var/coverage --threads=4 --show-mutations --min-msi=80 --min-covered-msi=85
+
+infection-report:
+	@echo "🧬 Running Infection mutation testing (report only, no MSI threshold)..."
+	@echo "📊 Step 1/2: Generating code coverage with PHPUnit..."
+	@docker-compose run --rm main phpdbg -qrr vendor/bin/phpunit --coverage-xml=var/coverage/coverage-xml --log-junit=var/coverage/junit.xml
+	@echo "🧬 Step 2/2: Running mutations..."
+	docker-compose run --rm main vendor/bin/infection --coverage=var/coverage --threads=4 --show-mutations
 
 quality: phpcsfixer-fix phpstan phpmd phparkitect
 
