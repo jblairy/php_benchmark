@@ -11,7 +11,6 @@ final readonly class PercentileMetrics
 {
     public function __construct(
         public float $p50,
-        public float $p80,
         public float $p90,
         public float $p95,
         public float $p99,
@@ -25,7 +24,6 @@ final readonly class PercentileMetrics
     {
         return new self(
             p50: $data['p50'] ?? 0.0,
-            p80: $data['p80'] ?? 0.0,
             p90: $data['p90'] ?? 0.0,
             p95: $data['p95'] ?? 0.0,
             p99: $data['p99'] ?? 0.0,

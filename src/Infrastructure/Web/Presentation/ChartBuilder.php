@@ -25,14 +25,14 @@ final readonly class ChartBuilder
     {
         $chart = $this->chartBuilder->createChart(Chart::TYPE_BAR);
 
-        [$p50Data, $p90Data, $avgData] = $this->prepareChartData($benchmarkData, $allPhpVersions);
+        [$p50Data, $p90Data, $p99Data] = $this->prepareChartData($benchmarkData, $allPhpVersions);
 
         $chart->setData([
             'labels' => $this->formatVersionLabels($allPhpVersions),
             'datasets' => [
                 $this->createDataset('p50 (ms)', $p50Data, ChartColor::P50_BACKGROUND, ChartColor::P50_BORDER),
                 $this->createDataset('p90 (ms)', $p90Data, ChartColor::P90_BACKGROUND, ChartColor::P90_BORDER),
-                $this->createDataset('Average (ms)', $avgData, ChartColor::AVG_BACKGROUND, ChartColor::AVG_BORDER),
+                $this->createDataset('p99 (ms)', $p99Data, ChartColor::P99_BACKGROUND, ChartColor::P99_BORDER),
             ],
         ]);
 
@@ -50,16 +50,16 @@ final readonly class ChartBuilder
     {
         $p50Data = [];
         $p90Data = [];
-        $avgData = [];
+        $p99Data = [];
 
         foreach ($allPhpVersions as $phpVersion) {
             $stats = $benchmarkData->phpVersions[$phpVersion] ?? null;
             $p50Data[] = $stats?->getP50();
             $p90Data[] = $stats?->getP90();
-            $avgData[] = $stats?->avg;
+            $p99Data[] = $stats?->getP99();
         }
 
-        return [$p50Data, $p90Data, $avgData];
+        return [$p50Data, $p90Data, $p99Data];
     }
 
     /**

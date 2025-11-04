@@ -18,6 +18,11 @@ final readonly class BenchmarkStatistics
         public PercentileMetrics $percentiles,
         public float $averageMemoryUsed,
         public float $peakMemoryUsed,
+        public float $minExecutionTime,
+        public float $maxExecutionTime,
+        public float $standardDeviation,
+        public float $coefficientOfVariation,
+        public float $throughput,
     ) {
     }
 }

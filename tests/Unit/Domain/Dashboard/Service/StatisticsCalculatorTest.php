@@ -37,6 +37,11 @@ final class StatisticsCalculatorTest extends TestCase
         self::assertSame(0.0, $statistics->averageExecutionTime);
         self::assertSame(0.0, $statistics->averageMemoryUsed);
         self::assertSame(0.0, $statistics->peakMemoryUsed);
+        self::assertSame(0.0, $statistics->minExecutionTime);
+        self::assertSame(0.0, $statistics->maxExecutionTime);
+        self::assertSame(0.0, $statistics->standardDeviation);
+        self::assertSame(0.0, $statistics->coefficientOfVariation);
+        self::assertSame(0.0, $statistics->throughput);
         self::assertSame(0.0, $statistics->percentiles->p50);
         self::assertSame(0.0, $statistics->percentiles->p90);
         self::assertSame(0.0, $statistics->percentiles->p99);
@@ -59,6 +64,12 @@ final class StatisticsCalculatorTest extends TestCase
         self::assertSame(10.5, $statistics->averageExecutionTime);
         self::assertSame(1024.0, $statistics->averageMemoryUsed);
         self::assertSame(2048.0, $statistics->peakMemoryUsed);
+        self::assertSame(10.5, $statistics->minExecutionTime);
+        self::assertSame(10.5, $statistics->maxExecutionTime);
+        self::assertSame(0.0, $statistics->standardDeviation); // Only 1 value, stdDev = 0
+        self::assertSame(0.0, $statistics->coefficientOfVariation); // stdDev = 0, so CV = 0
+        // Throughput = 1000 / 10.5 ≈ 95.238 ops/sec
+        self::assertEqualsWithDelta(95.238, $statistics->throughput, 0.001);
         self::assertSame(10.5, $statistics->percentiles->p50);
         self::assertSame(10.5, $statistics->percentiles->p90);
         self::assertSame(10.5, $statistics->percentiles->p99);
@@ -81,6 +92,14 @@ final class StatisticsCalculatorTest extends TestCase
         self::assertSame(20.0, $statistics->averageExecutionTime);
         self::assertSame(200.0, $statistics->averageMemoryUsed);
         self::assertSame(350.0, $statistics->peakMemoryUsed);
+        self::assertSame(10.0, $statistics->minExecutionTime);
+        self::assertSame(30.0, $statistics->maxExecutionTime);
+        // Standard deviation: sqrt(((10-20)^2 + (20-20)^2 + (30-20)^2) / 2) = sqrt(200/2) = 10.0
+        self::assertSame(10.0, $statistics->standardDeviation);
+        // CV = (10.0 / 20.0) * 100 = 50%
+        self::assertSame(50.0, $statistics->coefficientOfVariation);
+        // Throughput = 1000 / 20.0 = 50.0 ops/sec
+        self::assertSame(50.0, $statistics->throughput);
     }
 
     public function testCalculatePercentilesWithSortedData(): void
@@ -100,9 +119,6 @@ final class StatisticsCalculatorTest extends TestCase
         // P50 (50th percentile / median) = 5th value
         self::assertSame(5.0, $statistics->percentiles->p50);
 
-        // P80 (80th percentile) = 8th value
-        self::assertSame(8.0, $statistics->percentiles->p80);
-
         // P90 (90th percentile) = 9th value
         self::assertSame(9.0, $statistics->percentiles->p90);
 
@@ -111,6 +127,10 @@ final class StatisticsCalculatorTest extends TestCase
 
         // P99 (99th percentile) = 10th value (last)
         self::assertSame(10.0, $statistics->percentiles->p99);
+
+        // Min/Max
+        self::assertSame(1.0, $statistics->minExecutionTime);
+        self::assertSame(10.0, $statistics->maxExecutionTime);
     }
 
     public function testCalculatePercentilesWithUnsortedData(): void

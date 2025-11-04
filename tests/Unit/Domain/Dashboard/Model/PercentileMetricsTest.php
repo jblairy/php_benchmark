@@ -14,14 +14,12 @@ final class PercentileMetricsTest extends TestCase
     {
         $metrics = new PercentileMetrics(
             p50: 10.5,
-            p80: 15.2,
             p90: 18.7,
             p95: 22.1,
             p99: 30.5,
         );
 
         self::assertSame(10.5, $metrics->p50);
-        self::assertSame(15.2, $metrics->p80);
         self::assertSame(18.7, $metrics->p90);
         self::assertSame(22.1, $metrics->p95);
         self::assertSame(30.5, $metrics->p99);
@@ -31,7 +29,6 @@ final class PercentileMetricsTest extends TestCase
     {
         $data = [
             'p50' => 12.5,
-            'p80' => 16.0,
             'p90' => 20.0,
             'p95' => 25.0,
             'p99' => 35.0,
@@ -40,7 +37,6 @@ final class PercentileMetricsTest extends TestCase
         $metrics = PercentileMetrics::fromArray($data);
 
         self::assertSame(12.5, $metrics->p50);
-        self::assertSame(16.0, $metrics->p80);
         self::assertSame(20.0, $metrics->p90);
         self::assertSame(25.0, $metrics->p95);
         self::assertSame(35.0, $metrics->p99);
@@ -53,7 +49,6 @@ final class PercentileMetricsTest extends TestCase
         $metrics = PercentileMetrics::fromArray($data);
 
         self::assertSame(0.0, $metrics->p50);
-        self::assertSame(0.0, $metrics->p80);
         self::assertSame(0.0, $metrics->p90);
         self::assertSame(0.0, $metrics->p95);
         self::assertSame(0.0, $metrics->p99);
@@ -69,7 +64,6 @@ final class PercentileMetricsTest extends TestCase
         $metrics = PercentileMetrics::fromArray($data);
 
         self::assertSame(10.0, $metrics->p50);
-        self::assertSame(0.0, $metrics->p80);
         self::assertSame(20.0, $metrics->p90);
         self::assertSame(0.0, $metrics->p95);
         self::assertSame(0.0, $metrics->p99);
@@ -79,7 +73,6 @@ final class PercentileMetricsTest extends TestCase
     {
         $data = [
             'p50' => 10.0,
-            'p80' => 15.0,
             'p90' => 20.0,
             'p95' => 25.0,
             'p99' => 30.0,
@@ -90,7 +83,6 @@ final class PercentileMetricsTest extends TestCase
         $metrics = PercentileMetrics::fromArray($data);
 
         self::assertSame(10.0, $metrics->p50);
-        self::assertSame(15.0, $metrics->p80);
         self::assertSame(20.0, $metrics->p90);
         self::assertSame(25.0, $metrics->p95);
         self::assertSame(30.0, $metrics->p99);
@@ -100,7 +92,6 @@ final class PercentileMetricsTest extends TestCase
     {
         $metrics = new PercentileMetrics(
             p50: 10.0,
-            p80: 15.0,
             p90: 20.0,
             p95: 25.0,
             p99: 30.0,
@@ -114,15 +105,13 @@ final class PercentileMetricsTest extends TestCase
     {
         $metrics = new PercentileMetrics(
             p50: 10.0,
-            p80: 15.0,
             p90: 20.0,
             p95: 25.0,
             p99: 30.0,
         );
 
         // Verify semantic meaning: higher percentiles should have higher or equal values
-        self::assertLessThanOrEqual($metrics->p80, $metrics->p50);
-        self::assertLessThanOrEqual($metrics->p90, $metrics->p80);
+        self::assertLessThanOrEqual($metrics->p90, $metrics->p50);
         self::assertLessThanOrEqual($metrics->p95, $metrics->p90);
         self::assertLessThanOrEqual($metrics->p99, $metrics->p95);
     }

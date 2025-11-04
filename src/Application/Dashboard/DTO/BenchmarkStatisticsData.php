@@ -24,6 +24,11 @@ final readonly class BenchmarkStatisticsData
         public PercentileMetrics $percentiles,
         public float $memoryUsed,
         public float $memoryPeak,
+        public float $min,
+        public float $max,
+        public float $stdDev,
+        public float $cv,
+        public float $throughput,
     ) {
     }
 
@@ -38,17 +43,17 @@ final readonly class BenchmarkStatisticsData
             percentiles: $benchmarkStatistics->percentiles,
             memoryUsed: $benchmarkStatistics->averageMemoryUsed,
             memoryPeak: $benchmarkStatistics->peakMemoryUsed,
+            min: $benchmarkStatistics->minExecutionTime,
+            max: $benchmarkStatistics->maxExecutionTime,
+            stdDev: $benchmarkStatistics->standardDeviation,
+            cv: $benchmarkStatistics->coefficientOfVariation,
+            throughput: $benchmarkStatistics->throughput,
         );
     }
 
     public function getP50(): float
     {
         return $this->percentiles->p50;
-    }
-
-    public function getP80(): float
-    {
-        return $this->percentiles->p80;
     }
 
     public function getP90(): float

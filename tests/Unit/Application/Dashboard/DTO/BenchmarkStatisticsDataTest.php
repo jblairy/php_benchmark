@@ -18,7 +18,6 @@ final class BenchmarkStatisticsDataTest extends TestCase
         // Arrange
         $percentiles = new PercentileMetrics(
             p50: 1.5,
-            p80: 2.0,
             p90: 2.5,
             p95: 3.0,
             p99: 4.0,
@@ -34,6 +33,11 @@ final class BenchmarkStatisticsDataTest extends TestCase
             percentiles: $percentiles,
             memoryUsed: 1024.5,
             memoryPeak: 2048.0,
+            min: 1.0,
+            max: 5.0,
+            stdDev: 0.5,
+            cv: 27.78,
+            throughput: 555.56,
         );
 
         // Assert
@@ -45,8 +49,12 @@ final class BenchmarkStatisticsDataTest extends TestCase
         self::assertSame($percentiles, $dto->percentiles);
         self::assertSame(1024.5, $dto->memoryUsed);
         self::assertSame(2048.0, $dto->memoryPeak);
+        self::assertSame(1.0, $dto->min);
+        self::assertSame(5.0, $dto->max);
+        self::assertSame(0.5, $dto->stdDev);
+        self::assertSame(27.78, $dto->cv);
+        self::assertSame(555.56, $dto->throughput);
         self::assertSame(1.5, $dto->getP50());
-        self::assertSame(2.0, $dto->getP80());
         self::assertSame(2.5, $dto->getP90());
         self::assertSame(3.0, $dto->getP95());
         self::assertSame(4.0, $dto->getP99());
@@ -57,7 +65,6 @@ final class BenchmarkStatisticsDataTest extends TestCase
         // Arrange
         $percentiles = new PercentileMetrics(
             p50: 1.5,
-            p80: 2.0,
             p90: 2.5,
             p95: 3.0,
             p99: 4.0,
@@ -72,11 +79,15 @@ final class BenchmarkStatisticsDataTest extends TestCase
             percentiles: $percentiles,
             memoryUsed: 1024.5,
             memoryPeak: 2048.0,
+            min: 1.0,
+            max: 5.0,
+            stdDev: 0.5,
+            cv: 27.78,
+            throughput: 555.56,
         );
 
         // Act & Assert - All percentiles accessible via getter methods
         self::assertSame(1.5, $dto->getP50());
-        self::assertSame(2.0, $dto->getP80());
         self::assertSame(2.5, $dto->getP90());
         self::assertSame(3.0, $dto->getP95());
         self::assertSame(4.0, $dto->getP99());
@@ -87,7 +98,6 @@ final class BenchmarkStatisticsDataTest extends TestCase
         // Arrange
         $percentiles = new PercentileMetrics(
             p50: 1.5,
-            p80: 2.0,
             p90: 2.5,
             p95: 3.0,
             p99: 4.0,
@@ -102,6 +112,11 @@ final class BenchmarkStatisticsDataTest extends TestCase
             percentiles: $percentiles,
             averageMemoryUsed: 1024.5,
             peakMemoryUsed: 2048.0,
+            minExecutionTime: 1.0,
+            maxExecutionTime: 5.0,
+            standardDeviation: 0.5,
+            coefficientOfVariation: 27.78,
+            throughput: 555.56,
         );
 
         // Act
@@ -116,6 +131,9 @@ final class BenchmarkStatisticsDataTest extends TestCase
         self::assertSame($percentiles, $dto->percentiles);
         self::assertSame(1024.5, $dto->memoryUsed);
         self::assertSame(2048.0, $dto->memoryPeak);
+        self::assertSame(0.5, $dto->stdDev);
+        self::assertSame(27.78, $dto->cv);
+        self::assertSame(555.56, $dto->throughput);
     }
 
     public function testFromDomainPreservesPercentiles(): void
@@ -123,7 +141,6 @@ final class BenchmarkStatisticsDataTest extends TestCase
         // Arrange
         $percentiles = new PercentileMetrics(
             p50: 10.0,
-            p80: 20.0,
             p90: 30.0,
             p95: 40.0,
             p99: 50.0,
@@ -138,6 +155,11 @@ final class BenchmarkStatisticsDataTest extends TestCase
             percentiles: $percentiles,
             averageMemoryUsed: 512.0,
             peakMemoryUsed: 1024.0,
+            minExecutionTime: 5.0,
+            maxExecutionTime: 60.0,
+            standardDeviation: 10.5,
+            coefficientOfVariation: 42.0,
+            throughput: 40.0,
         );
 
         // Act
@@ -145,9 +167,13 @@ final class BenchmarkStatisticsDataTest extends TestCase
 
         // Assert - Verify percentiles are accessible via getter methods
         self::assertSame(10.0, $dto->getP50());
-        self::assertSame(20.0, $dto->getP80());
         self::assertSame(30.0, $dto->getP90());
         self::assertSame(40.0, $dto->getP95());
         self::assertSame(50.0, $dto->getP99());
+        self::assertSame(5.0, $dto->min);
+        self::assertSame(60.0, $dto->max);
+        self::assertSame(10.5, $dto->stdDev);
+        self::assertSame(42.0, $dto->cv);
+        self::assertSame(40.0, $dto->throughput);
     }
 }
