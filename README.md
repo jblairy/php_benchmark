@@ -221,13 +221,13 @@ src/
 
 ### 📚 Documentation
 
-| Document | Description |
-|----------|-------------|
-| [docs/architecture/01-overview.md](docs/architecture/01-overview.md) | Architecture deep dive |
-| [docs/architecture/02-layers.md](docs/architecture/02-layers.md) | Layer responsibilities |
+| Document                                                                         | Description |
+|----------------------------------------------------------------------------------|-------------|
+| [docs/architecture/01-overview.md](docs/architecture/01-overview.md)             | Architecture deep dive |
+| [docs/architecture/02-layers.md](docs/architecture/02-layers.md)                 | Layer responsibilities |
 | [docs/architecture/03-ports-adapters.md](docs/architecture/03-ports-adapters.md) | Hexagonal architecture details |
-| [CLAUDE.md](CLAUDE.md) | Developer reference guide |
-| [docs/README.md](docs/README.md) | Complete documentation index |
+| [AGENTS.md](AGENTS.md)                                                           | Developer reference guide |
+| [docs/README.md](docs/README.md)                                                 | Complete documentation index |
 
 ## 🤝 Contributing
 
@@ -295,7 +295,7 @@ make quality
 
 ### 📖 Developer Resources
 
-- **[CLAUDE.md](CLAUDE.md)** - Complete developer reference guide
+- **[AGENTS.md](AGENTS.md)** - Complete developer reference guide
 - **[docs/guides/creating-benchmarks.md](docs/guides/creating-benchmarks.md)** - How to add benchmarks
 - **[docs/guides/atomic-commits.md](docs/guides/atomic-commits.md)** - Commit best practices
 - **[docs/architecture/](docs/architecture/)** - Architecture documentation
