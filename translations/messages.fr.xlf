@@ -5,6 +5,54 @@
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
+      <trans-unit id="BJYDqDw" resname="config_menu.title">
+        <source>config_menu.title</source>
+        <target>Configuration</target>
+      </trans-unit>
+      <trans-unit id="FWhuT_k" resname="config_menu.php_versions">
+        <source>config_menu.php_versions</source>
+        <target>Versions PHP</target>
+      </trans-unit>
+      <trans-unit id="E7mZOn_" resname="config_menu.metrics">
+        <source>config_menu.metrics</source>
+        <target>Métriques affichées</target>
+      </trans-unit>
+      <trans-unit id="HouEvSw" resname="config_menu.time_unit">
+        <source>config_menu.time_unit</source>
+        <target>Unité de temps</target>
+      </trans-unit>
+      <trans-unit id="xMEvFba" resname="config_menu.select_all">
+        <source>config_menu.select_all</source>
+        <target>Tout sélectionner</target>
+      </trans-unit>
+      <trans-unit id="pO5dHIF" resname="config_menu.deselect_all">
+        <source>config_menu.deselect_all</source>
+        <target>Tout désélectionner</target>
+      </trans-unit>
+      <trans-unit id="nK1dLpE" resname="config_menu.unit_ms">
+        <source>config_menu.unit_ms</source>
+        <target>Millisecondes (ms)</target>
+      </trans-unit>
+      <trans-unit id="n8W7nNW" resname="config_menu.unit_us">
+        <source>config_menu.unit_us</source>
+        <target>Microsecondes (μs)</target>
+      </trans-unit>
+      <trans-unit id="NzLiNTb" resname="config_menu.unit_ns">
+        <source>config_menu.unit_ns</source>
+        <target>Nanosecondes (ns)</target>
+      </trans-unit>
+      <trans-unit id="pB1XMZM" resname="config_menu.unit_ms_desc">
+        <source>config_menu.unit_ms_desc</source>
+        <target>1 ms = 1/1000 seconde</target>
+      </trans-unit>
+      <trans-unit id="eibLZwb" resname="config_menu.unit_us_desc">
+        <source>config_menu.unit_us_desc</source>
+        <target>1 μs = 1/1000000 seconde</target>
+      </trans-unit>
+      <trans-unit id="h5WGUfE" resname="config_menu.unit_ns_desc">
+        <source>config_menu.unit_ns_desc</source>
+        <target>1 ns = 1/1000000000 seconde</target>
+      </trans-unit>
       <trans-unit id="0T7N_mY" resname="categories.performance">
         <source>categories.performance</source>
         <target>Performance</target>

@@ -1,3 +1,17 @@
+config_menu:
+  title: "Configuration"
+  php_versions: "Versions PHP"
+  metrics: "Métriques affichées"
+  time_unit: "Unité de temps"
+  select_all: "Tout sélectionner"
+  deselect_all: "Tout désélectionner"
+  unit_ms: "Millisecondes (ms)"
+  unit_us: "Microsecondes (μs)"
+  unit_ns: "Nanosecondes (ns)"
+  unit_ms_desc: "1 ms = 1/1000 seconde"
+  unit_us_desc: "1 μs = 1/1000000 seconde"
+  unit_ns_desc: "1 ns = 1/1000000000 seconde"
+
 categories:
   performance: "Performance"
   throughput: "Débit"
