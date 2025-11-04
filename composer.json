@@ -2,6 +2,7 @@
     "type": "project",
     "license": "proprietary",
     "name": "jblairy/php_benchmark",
+    "description": "A PHP benchmark tool",
     "authors": [
         {
             "name": "Julien Blairy"
@@ -19,7 +20,7 @@
         "doctrine/orm": "^3.5.3",
         "phpdocumentor/reflection-docblock": "^5.6.3",
         "phpstan/phpdoc-parser": "^2.3",
-        "spatie/async": ">=1.8",
+        "spatie/async": "^1.8.0",
         "symfony/asset": "7.3.*",
         "symfony/asset-mapper": "7.3.*",
         "symfony/console": "7.3.*",
