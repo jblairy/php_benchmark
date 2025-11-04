@@ -5,7 +5,7 @@
 [![PHP Version](https://img.shields.io/badge/PHP-8.4+-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net)
 [![PHPStan Level](https://img.shields.io/badge/PHPStan-level%20max-brightgreen?style=flat-square)](https://phpstan.org/)
 [![Code Style](https://img.shields.io/badge/code%20style-PSR--12-blue?style=flat-square)](https://www.php-fig.org/psr/psr-12/)
-[![Tests](https://img.shields.io/badge/tests-50%20passed-success?style=flat-square)](https://phpunit.de/)
+<a href="https://github.com/jblairy/php_benchmark/actions/workflows/quality.yml"><img src="https://github.com/jblairy/php_benchmark/actions/workflows/quality.yml/badge.svg"></a>
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 
 **A modern benchmarking framework for PHP testing performance across versions 5.6 to 8.5**
