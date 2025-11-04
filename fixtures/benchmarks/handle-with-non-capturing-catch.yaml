@@ -1,15 +1,13 @@
-slug: handle-with-try-catch
-name: 'Handle With Try Catch'
+slug: handle-with-non-capturing-catch
+name: 'Handle With Non-Capturing Catch (PHP 8.0+)'
 category: ErrorHandling
-description: ''
-tags: {  }
+description: 'Exception handling without capturing the exception variable (PHP 8.0+)'
+icon: 🎯
+tags:
+  - php80
+  - exception
+  - catch
 phpVersions:
-  - php56
-  - php70
-  - php71
-  - php72
-  - php73
-  - php74
   - php80
   - php81
   - php82
@@ -20,7 +18,7 @@ code: |
   for ($i = 0; 10000 > $i; ++$i) {
               try {
                   $result = 100 / (0 === $i % 10 ? 1 : $i);
-              } catch (Exception $e) {
+              } catch (Throwable) {
                   $result = 0;
               }
           }
