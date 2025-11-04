@@ -34,11 +34,6 @@ final class BenchmarkStatisticsDataTest extends TestCase
             percentiles: $percentiles,
             memoryUsed: 1024.5,
             memoryPeak: 2048.0,
-            p50: 1.5,
-            p80: 2.0,
-            p90: 2.5,
-            p95: 3.0,
-            p99: 4.0,
         );
 
         // Assert
@@ -50,14 +45,14 @@ final class BenchmarkStatisticsDataTest extends TestCase
         self::assertSame($percentiles, $dto->percentiles);
         self::assertSame(1024.5, $dto->memoryUsed);
         self::assertSame(2048.0, $dto->memoryPeak);
-        self::assertSame(1.5, $dto->p50);
-        self::assertSame(2.0, $dto->p80);
-        self::assertSame(2.5, $dto->p90);
-        self::assertSame(3.0, $dto->p95);
-        self::assertSame(4.0, $dto->p99);
+        self::assertSame(1.5, $dto->getP50());
+        self::assertSame(2.0, $dto->getP80());
+        self::assertSame(2.5, $dto->getP90());
+        self::assertSame(3.0, $dto->getP95());
+        self::assertSame(4.0, $dto->getP99());
     }
 
-    public function testPercentilesAreAccessibleDirectly(): void
+    public function testPercentilesAreAccessibleViaGetters(): void
     {
         // Arrange
         $percentiles = new PercentileMetrics(
@@ -77,19 +72,14 @@ final class BenchmarkStatisticsDataTest extends TestCase
             percentiles: $percentiles,
             memoryUsed: 1024.5,
             memoryPeak: 2048.0,
-            p50: 1.5,
-            p80: 2.0,
-            p90: 2.5,
-            p95: 3.0,
-            p99: 4.0,
         );
 
-        // Act & Assert - All percentiles accessible as public properties
-        self::assertSame(1.5, $dto->p50);
-        self::assertSame(2.0, $dto->p80);
-        self::assertSame(2.5, $dto->p90);
-        self::assertSame(3.0, $dto->p95);
-        self::assertSame(4.0, $dto->p99);
+        // Act & Assert - All percentiles accessible via getter methods
+        self::assertSame(1.5, $dto->getP50());
+        self::assertSame(2.0, $dto->getP80());
+        self::assertSame(2.5, $dto->getP90());
+        self::assertSame(3.0, $dto->getP95());
+        self::assertSame(4.0, $dto->getP99());
     }
 
     public function testFromDomainCreatesDTO(): void
@@ -153,11 +143,11 @@ final class BenchmarkStatisticsDataTest extends TestCase
         // Act
         $dto = BenchmarkStatisticsData::fromDomain($domainStats);
 
-        // Assert - Verify percentiles are exposed as direct properties
-        self::assertSame(10.0, $dto->p50);
-        self::assertSame(20.0, $dto->p80);
-        self::assertSame(30.0, $dto->p90);
-        self::assertSame(40.0, $dto->p95);
-        self::assertSame(50.0, $dto->p99);
+        // Assert - Verify percentiles are accessible via getter methods
+        self::assertSame(10.0, $dto->getP50());
+        self::assertSame(20.0, $dto->getP80());
+        self::assertSame(30.0, $dto->getP90());
+        self::assertSame(40.0, $dto->getP95());
+        self::assertSame(50.0, $dto->getP99());
     }
 }

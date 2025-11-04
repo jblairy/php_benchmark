@@ -84,16 +84,16 @@
                         <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="p50">p50 (ms)</td>
                         {% set best_p50 = 999999 %}
                         {% for stats in this.data.phpVersions %}
-                            {% if stats.p50 < best_p50 %}
-                                {% set best_p50 = stats.p50 %}
+                            {% if stats.getP50() < best_p50 %}
+                                {% set best_p50 = stats.getP50() %}
                             {% endif %}
                         {% endfor %}
 
                         {% for stats in this.data.phpVersions %}
-                            <td class="benchmark-card__table-cell {% if stats.p50 == best_p50 %}benchmark-card__table-cell--best-value{% endif %}"
+                            <td class="benchmark-card__table-cell {% if stats.getP50() == best_p50 %}benchmark-card__table-cell--best-value{% endif %}"
                                 data-unit-switch-target="cell"
-                                data-value="{{ stats.p50 }}">
-                                {{ stats.p50|number_format(5) }}
+                                data-value="{{ stats.getP50() }}">
+                                {{ stats.getP50()|number_format(5) }}
                             </td>
                         {% endfor %}
                     </tr>
@@ -101,16 +101,16 @@
                         <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="p80">p80 (ms)</td>
                         {% set best_p80 = 999999 %}
                         {% for stats in this.data.phpVersions %}
-                            {% if stats.p80 < best_p80 %}
-                                {% set best_p80 = stats.p80 %}
+                            {% if stats.getP80() < best_p80 %}
+                                {% set best_p80 = stats.getP80() %}
                             {% endif %}
                         {% endfor %}
 
                         {% for stats in this.data.phpVersions %}
-                            <td class="benchmark-card__table-cell {% if stats.p80 == best_p80 %}benchmark-card__table-cell--best-value{% endif %}"
+                            <td class="benchmark-card__table-cell {% if stats.getP80() == best_p80 %}benchmark-card__table-cell--best-value{% endif %}"
                                 data-unit-switch-target="cell"
-                                data-value="{{ stats.p80 }}">
-                                {{ stats.p80|number_format(5) }}
+                                data-value="{{ stats.getP80() }}">
+                                {{ stats.getP80()|number_format(5) }}
                             </td>
                         {% endfor %}
                     </tr>
@@ -118,16 +118,16 @@
                         <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="p90">p90 (ms)</td>
                         {% set best_p90 = 999999 %}
                         {% for stats in this.data.phpVersions %}
-                            {% if stats.p90 < best_p90 %}
-                                {% set best_p90 = stats.p90 %}
+                            {% if stats.getP90() < best_p90 %}
+                                {% set best_p90 = stats.getP90() %}
                             {% endif %}
                         {% endfor %}
 
                         {% for stats in this.data.phpVersions %}
-                            <td class="benchmark-card__table-cell {% if stats.p90 == best_p90 %}benchmark-card__table-cell--best-value{% endif %}"
+                            <td class="benchmark-card__table-cell {% if stats.getP90() == best_p90 %}benchmark-card__table-cell--best-value{% endif %}"
                                 data-unit-switch-target="cell"
-                                data-value="{{ stats.p90 }}">
-                                {{ stats.p90|number_format(5) }}
+                                data-value="{{ stats.getP90() }}">
+                                {{ stats.getP90()|number_format(5) }}
                             </td>
                         {% endfor %}
                     </tr>
@@ -135,16 +135,16 @@
                         <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="p95">p95 (ms)</td>
                         {% set best_p95 = 999999 %}
                         {% for stats in this.data.phpVersions %}
-                            {% if stats.p95 < best_p95 %}
-                                {% set best_p95 = stats.p95 %}
+                            {% if stats.getP95() < best_p95 %}
+                                {% set best_p95 = stats.getP95() %}
                             {% endif %}
                         {% endfor %}
 
                         {% for stats in this.data.phpVersions %}
-                            <td class="benchmark-card__table-cell {% if stats.p95 == best_p95 %}benchmark-card__table-cell--best-value{% endif %}"
+                            <td class="benchmark-card__table-cell {% if stats.getP95() == best_p95 %}benchmark-card__table-cell--best-value{% endif %}"
                                 data-unit-switch-target="cell"
-                                data-value="{{ stats.p95 }}">
-                                {{ stats.p95|number_format(5) }}
+                                data-value="{{ stats.getP95() }}">
+                                {{ stats.getP95()|number_format(5) }}
                             </td>
                         {% endfor %}
                     </tr>
@@ -152,16 +152,16 @@
                         <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="p99">p99 (ms)</td>
                         {% set best_p99 = 999999 %}
                         {% for stats in this.data.phpVersions %}
-                            {% if stats.p99 < best_p99 %}
-                                {% set best_p99 = stats.p99 %}
+                            {% if stats.getP99() < best_p99 %}
+                                {% set best_p99 = stats.getP99() %}
                             {% endif %}
                         {% endfor %}
 
                         {% for stats in this.data.phpVersions %}
-                            <td class="benchmark-card__table-cell {% if stats.p99 == best_p99 %}benchmark-card__table-cell--best-value{% endif %}"
+                            <td class="benchmark-card__table-cell {% if stats.getP99() == best_p99 %}benchmark-card__table-cell--best-value{% endif %}"
                                 data-unit-switch-target="cell"
-                                data-value="{{ stats.p99 }}">
-                                {{ stats.p99|number_format(5) }}
+                                data-value="{{ stats.getP99() }}">
+                                {{ stats.getP99()|number_format(5) }}
                             </td>
                         {% endfor %}
                     </tr>
