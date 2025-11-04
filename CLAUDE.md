@@ -100,9 +100,21 @@ make quality             # Run all quality checks and fixes
 
 ### Testing
 ```bash
-docker-compose run --rm main vendor/bin/phpunit
+# Unit tests
+make test                                                                         # Run all tests
 docker-compose run --rm main vendor/bin/phpunit tests/Path/To/SpecificTest.php  # Single test
+
+# Mutation testing (tests the quality of your tests)
+make infection-report    # Run Infection (no threshold, for exploration)
+make infection           # Run Infection with strict thresholds (MSI >= 80%)
+
+# Manual mutation testing
+docker-compose run --rm main phpdbg -qrr vendor/bin/infection --threads=4 --show-mutations
 ```
+
+**Note**: Infection requires a code coverage driver (phpdbg or PCOV). The `make` commands use phpdbg which is already available in the container.
+
+See [docs/guides/mutation-testing.md](docs/guides/mutation-testing.md) for complete Infection guide.
 
 ## Architecture
 
