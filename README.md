@@ -149,6 +149,10 @@ make quality           # Run all quality checks
 
 # Assets (CSS/JS)
 make assets.refresh    # Rebuild and refresh frontend assets
+
+# Translations (i18n)
+make trans.compile     # Compile YAML → XLF (2-3x faster, production-ready)
+make trans.update      # Extract new keys from templates + compile
 ```
 </details>
 

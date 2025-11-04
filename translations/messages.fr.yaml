@@ -1,0 +1,48 @@
+metrics:
+  count:
+    label: "Échantillons"
+    description: "Nombre d'exécutions du test. Plus le nombre est élevé, plus les statistiques sont fiables."
+  
+  p50:
+    label: "p50 (ms)"
+    description: "Médiane (50e percentile). 50% des exécutions sont plus rapides que cette valeur. Plus fiable que la moyenne car non affectée par les valeurs extrêmes."
+  
+  p90:
+    label: "p90 (ms)"
+    description: "90e percentile. 90% des exécutions sont plus rapides que cette valeur. Indique les performances dans des conditions normales."
+  
+  p95:
+    label: "p95 (ms)"
+    description: "95e percentile. 95% des exécutions sont plus rapides que cette valeur. Utile pour identifier les cas légèrement dégradés."
+  
+  p99:
+    label: "p99 (ms)"
+    description: "99e percentile. 99% des exécutions sont plus rapides que cette valeur. Identifie la tail latency (latence de queue) dans les pires cas."
+  
+  minmax:
+    label: "Min / Max (ms)"
+    description: "Temps d'exécution minimum et maximum observés. Indique la plage complète de variation des performances (best case / worst case)."
+  
+  std_dev:
+    label: "Écart-type (ms)"
+    description: "Mesure la dispersion des temps d'exécution. Un écart-type faible indique des performances stables et prévisibles."
+  
+  cv:
+    label: "Stabilité (CV%)"
+    description: "Coefficient de Variation en pourcentage. Mesure la variabilité relative des performances. CV < 5% = excellent, 5-15% = bon, > 15% = instable."
+  
+  avg:
+    label: "Moyenne (ms)"
+    description: "Temps d'exécution moyen. Attention : peut être biaisée par les valeurs extrêmes. Préférer la médiane (p50)."
+  
+  throughput:
+    label: "Débit (ops/sec)"
+    description: "Nombre d'opérations par seconde. Plus la valeur est élevée, meilleures sont les performances. Calculé par : 1000 / temps_moyen."
+  
+  memory_used:
+    label: "Mémoire utilisée (Mo)"
+    description: "Quantité moyenne de mémoire consommée pendant l'exécution du test. Mémoire allouée et utilisée par le code."
+  
+  memory_peak:
+    label: "Pic de mémoire (Mo)"
+    description: "Pic maximal de mémoire atteint pendant l'exécution. Indique la consommation mémoire dans le pire cas."

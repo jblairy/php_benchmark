@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="fr" target-language="fr" datatype="plaintext" original="file.ext">
+    <header>
+      <tool tool-id="symfony" tool-name="Symfony"/>
+    </header>
+    <body>
+      <trans-unit id="0r2N5sl" resname="metrics.count.label">
+        <source>metrics.count.label</source>
+        <target>Échantillons</target>
+      </trans-unit>
+      <trans-unit id="qbzj.Vl" resname="metrics.count.description">
+        <source>metrics.count.description</source>
+        <target>Nombre d'exécutions du test. Plus le nombre est élevé, plus les statistiques sont fiables.</target>
+      </trans-unit>
+      <trans-unit id="n8NFipG" resname="metrics.p50.label">
+        <source>metrics.p50.label</source>
+        <target>p50 (ms)</target>
+      </trans-unit>
+      <trans-unit id="5OQ6IPJ" resname="metrics.p50.description">
+        <source>metrics.p50.description</source>
+        <target>Médiane (50e percentile). 50% des exécutions sont plus rapides que cette valeur. Plus fiable que la moyenne car non affectée par les valeurs extrêmes.</target>
+      </trans-unit>
+      <trans-unit id="itxx6hA" resname="metrics.p90.label">
+        <source>metrics.p90.label</source>
+        <target>p90 (ms)</target>
+      </trans-unit>
+      <trans-unit id="4r8kcLf" resname="metrics.p90.description">
+        <source>metrics.p90.description</source>
+        <target>90e percentile. 90% des exécutions sont plus rapides que cette valeur. Indique les performances dans des conditions normales.</target>
+      </trans-unit>
+      <trans-unit id="mOYWEa9" resname="metrics.p95.label">
+        <source>metrics.p95.label</source>
+        <target>p95 (ms)</target>
+      </trans-unit>
+      <trans-unit id="b69DFLM" resname="metrics.p95.description">
+        <source>metrics.p95.description</source>
+        <target>95e percentile. 95% des exécutions sont plus rapides que cette valeur. Utile pour identifier les cas légèrement dégradés.</target>
+      </trans-unit>
+      <trans-unit id="8GGow7n" resname="metrics.p99.label">
+        <source>metrics.p99.label</source>
+        <target>p99 (ms)</target>
+      </trans-unit>
+      <trans-unit id="OO9lULV" resname="metrics.p99.description">
+        <source>metrics.p99.description</source>
+        <target>99e percentile. 99% des exécutions sont plus rapides que cette valeur. Identifie la tail latency (latence de queue) dans les pires cas.</target>
+      </trans-unit>
+      <trans-unit id="IbYQokV" resname="metrics.minmax.label">
+        <source>metrics.minmax.label</source>
+        <target>Min / Max (ms)</target>
+      </trans-unit>
+      <trans-unit id="Yr7QYhl" resname="metrics.minmax.description">
+        <source>metrics.minmax.description</source>
+        <target>Temps d'exécution minimum et maximum observés. Indique la plage complète de variation des performances (best case / worst case).</target>
+      </trans-unit>
+      <trans-unit id="OV2CT1." resname="metrics.std_dev.label">
+        <source>metrics.std_dev.label</source>
+        <target>Écart-type (ms)</target>
+      </trans-unit>
+      <trans-unit id="dVFV.MF" resname="metrics.std_dev.description">
+        <source>metrics.std_dev.description</source>
+        <target>Mesure la dispersion des temps d'exécution. Un écart-type faible indique des performances stables et prévisibles.</target>
+      </trans-unit>
+      <trans-unit id="Mf2vvBu" resname="metrics.cv.label">
+        <source>metrics.cv.label</source>
+        <target>Stabilité (CV%)</target>
+      </trans-unit>
+      <trans-unit id="q6sgTBW" resname="metrics.cv.description">
+        <source>metrics.cv.description</source>
+        <target><![CDATA[Coefficient de Variation en pourcentage. Mesure la variabilité relative des performances. CV < 5% = excellent, 5-15% = bon, > 15% = instable.]]></target>
+      </trans-unit>
+      <trans-unit id="FuwxCxG" resname="metrics.avg.label">
+        <source>metrics.avg.label</source>
+        <target>Moyenne (ms)</target>
+      </trans-unit>
+      <trans-unit id="RD8uqGv" resname="metrics.avg.description">
+        <source>metrics.avg.description</source>
+        <target>Temps d'exécution moyen. Attention : peut être biaisée par les valeurs extrêmes. Préférer la médiane (p50).</target>
+      </trans-unit>
+      <trans-unit id="x9RiPiJ" resname="metrics.throughput.label">
+        <source>metrics.throughput.label</source>
+        <target>Débit (ops/sec)</target>
+      </trans-unit>
+      <trans-unit id="nLV7y7f" resname="metrics.throughput.description">
+        <source>metrics.throughput.description</source>
+        <target>Nombre d'opérations par seconde. Plus la valeur est élevée, meilleures sont les performances. Calculé par : 1000 / temps_moyen.</target>
+      </trans-unit>
+      <trans-unit id="N3z2ZTO" resname="metrics.memory_used.label">
+        <source>metrics.memory_used.label</source>
+        <target>Mémoire utilisée (Mo)</target>
+      </trans-unit>
+      <trans-unit id="VsTRtyC" resname="metrics.memory_used.description">
+        <source>metrics.memory_used.description</source>
+        <target>Quantité moyenne de mémoire consommée pendant l'exécution du test. Mémoire allouée et utilisée par le code.</target>
+      </trans-unit>
+      <trans-unit id="SBD.ktC" resname="metrics.memory_peak.label">
+        <source>metrics.memory_peak.label</source>
+        <target>Pic de mémoire (Mo)</target>
+      </trans-unit>
+      <trans-unit id="IWTqtko" resname="metrics.memory_peak.description">
+        <source>metrics.memory_peak.description</source>
+        <target>Pic maximal de mémoire atteint pendant l'exécution. Indique la consommation mémoire dans le pire cas.</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
