@@ -98,6 +98,9 @@ export default class extends Controller {
                     }
                 });
             });
+
+            // Recalculate best values for visible columns only
+            this.recalculateBestValues(table, versionIndices);
         });
     }
 
@@ -142,6 +145,19 @@ export default class extends Controller {
                     row.style.display = isVisible ? '' : 'none';
                 }
             });
+
+            // Recalculate best values after metric filtering (affects visible rows)
+            const headers = table.querySelectorAll('thead th');
+            const versionIndices = [];
+            headers.forEach((header, index) => {
+                const text = header.textContent.trim();
+                const match = text.match(/PHP\s*(\d+\.\d+|\d+)/);
+                if (match) {
+                    const isVisible = header.style.display !== 'none';
+                    versionIndices.push({ index, visible: isVisible });
+                }
+            });
+            this.recalculateBestValues(table, versionIndices);
         });
     }
 
@@ -251,5 +267,83 @@ export default class extends Controller {
         
         const unit = localStorage.getItem('benchmark_unit') || 'ms';
         this.applyUnitConversion(unit);
+    }
+
+    /**
+     * Recalculate best values dynamically based on visible columns and rows
+     */
+    recalculateBestValues(table, versionIndices) {
+        // Get only visible data rows (not category headers)
+        const dataRows = Array.from(table.querySelectorAll('tbody tr:not(.benchmark-card__table-row--category)'))
+            .filter(row => row.style.display !== 'none');
+
+        // Process each visible metric row
+        dataRows.forEach(row => {
+            const metricCell = row.querySelector('[data-metric]');
+            if (!metricCell) return;
+
+            const metric = metricCell.dataset.metric;
+            const cells = Array.from(row.querySelectorAll('td')).slice(1); // Skip first cell (metric label)
+
+            // Remove all existing best-value classes
+            cells.forEach(cell => cell.classList.remove('benchmark-card__table-cell--best-value'));
+
+            // Get visible cells with their values
+            const visibleCells = versionIndices
+                .map(({ index, visible }, i) => {
+                    // index is the header index, we need to map to cell index (header index - 1)
+                    const cellIndex = index - 1;
+                    return { cell: cells[cellIndex], visible };
+                })
+                .filter(item => item && item.visible && item.cell);
+
+            if (visibleCells.length === 0) return;
+
+            // Determine best value based on metric type
+            let bestValue = null;
+            let bestCell = null;
+
+            visibleCells.forEach(({ cell }) => {
+                // Try to get value from data attribute first
+                let value = parseFloat(cell.dataset.value);
+                
+                // If no data attribute, parse from text content
+                if (isNaN(value)) {
+                    // Handle cells with nested spans (like stdDev)
+                    const valueSpan = cell.querySelector('[data-value]');
+                    if (valueSpan) {
+                        value = parseFloat(valueSpan.dataset.value);
+                    } else {
+                        // Parse text content, removing commas and spaces
+                        const text = cell.textContent.trim().replace(/[,\s]/g, '').replace(/%$/, '');
+                        value = parseFloat(text);
+                    }
+                }
+
+                if (isNaN(value)) return;
+
+                // Determine if lower or higher is better
+                const lowerIsBetter = !['throughput'].includes(metric);
+
+                if (bestValue === null) {
+                    bestValue = value;
+                    bestCell = cell;
+                } else {
+                    const isBetter = lowerIsBetter 
+                        ? value < bestValue 
+                        : value > bestValue;
+                    
+                    if (isBetter) {
+                        bestValue = value;
+                        bestCell = cell;
+                    }
+                }
+            });
+
+            // Apply best-value class to the winner
+            if (bestCell) {
+                bestCell.classList.add('benchmark-card__table-cell--best-value');
+            }
+        });
     }
 }
