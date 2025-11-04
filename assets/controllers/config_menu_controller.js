@@ -8,13 +8,26 @@ export default class extends Controller {
     };
 
     connect() {
+        console.log('Config menu controller connected!');
+        console.log('Has menu target:', this.hasMenuTarget);
+        console.log('Has backdrop target:', this.hasBackdropTarget);
+        
         // Load preferences from localStorage
         this.loadPreferences();
         this.applyFilters();
     }
 
-    toggleMenu() {
+    toggleMenu(event) {
+        console.log('Toggle menu clicked!');
+        
+        if (!this.hasMenuTarget) {
+            console.error('Menu target not found!');
+            return;
+        }
+        
         const isVisible = this.menuTarget.classList.toggle('config-menu--visible');
+        console.log('Menu is now visible:', isVisible);
+        
         if (this.hasBackdropTarget) {
             this.backdropTarget.classList.toggle('config-menu-backdrop--visible', isVisible);
         }

@@ -14,7 +14,7 @@
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </head>
-    <body class="body">
+    <body class="body" data-controller="config-menu">
         {% include 'components/_header.html.twig' %}
         {% include 'components/_config_menu.html.twig' %}
 
