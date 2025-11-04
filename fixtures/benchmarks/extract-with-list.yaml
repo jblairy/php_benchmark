@@ -20,5 +20,5 @@ code: |
   $data = [1, 2, 3];
 
           for ($i = 0; 100000 > $i; ++$i) {
-              [$a, $b, $c] = $data;
+              list($a, $b, $c) = $data;
           }

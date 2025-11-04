@@ -1,0 +1,26 @@
+slug: extract-with-short-array-syntax
+name: 'Extract With Short Array Syntax (PHP 7.1+)'
+category: ValueExtraction
+description: 'Array destructuring with short syntax [] instead of list()'
+icon: 📦
+tags:
+  - php71
+  - array
+  - destructuring
+phpVersions:
+  - php71
+  - php72
+  - php73
+  - php74
+  - php80
+  - php81
+  - php82
+  - php83
+  - php84
+  - php85
+code: |
+  $data = [1, 2, 3];
+
+          for ($i = 0; 100000 > $i; ++$i) {
+              [$a, $b, $c] = $data;
+          }
