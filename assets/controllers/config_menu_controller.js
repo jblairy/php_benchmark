@@ -289,61 +289,58 @@ export default class extends Controller {
             cells.forEach(cell => cell.classList.remove('benchmark-card__table-cell--best-value'));
 
             // Get visible cells with their values
-            const visibleCells = versionIndices
+            const visibleCellsWithValues = versionIndices
                 .map(({ index, visible }, i) => {
                     // index is the header index, we need to map to cell index (header index - 1)
                     const cellIndex = index - 1;
-                    return { cell: cells[cellIndex], visible };
-                })
-                .filter(item => item && item.visible && item.cell);
-
-            if (visibleCells.length === 0) return;
-
-            // Determine best value based on metric type
-            let bestValue = null;
-            let bestCell = null;
-
-            visibleCells.forEach(({ cell }) => {
-                // Try to get value from data attribute first
-                let value = parseFloat(cell.dataset.value);
-                
-                // If no data attribute, parse from text content
-                if (isNaN(value)) {
-                    // Handle cells with nested spans (like stdDev)
-                    const valueSpan = cell.querySelector('[data-value]');
-                    if (valueSpan) {
-                        value = parseFloat(valueSpan.dataset.value);
-                    } else {
-                        // Parse text content, removing commas and spaces
-                        const text = cell.textContent.trim().replace(/[,\s]/g, '').replace(/%$/, '');
-                        value = parseFloat(text);
-                    }
-                }
-
-                if (isNaN(value)) return;
-
-                // Determine if lower or higher is better
-                const lowerIsBetter = !['throughput'].includes(metric);
-
-                if (bestValue === null) {
-                    bestValue = value;
-                    bestCell = cell;
-                } else {
-                    const isBetter = lowerIsBetter 
-                        ? value < bestValue 
-                        : value > bestValue;
+                    const cell = cells[cellIndex];
                     
-                    if (isBetter) {
-                        bestValue = value;
-                        bestCell = cell;
+                    if (!visible || !cell) return null;
+
+                    // Try to get value from data attribute first
+                    let value = parseFloat(cell.dataset.value);
+                    
+                    // If no data attribute, parse from text content
+                    if (isNaN(value)) {
+                        // Handle cells with nested spans (like stdDev)
+                        const valueSpan = cell.querySelector('[data-value]');
+                        if (valueSpan) {
+                            value = parseFloat(valueSpan.dataset.value);
+                        } else {
+                            // Parse text content, removing commas and spaces
+                            const text = cell.textContent.trim().replace(/[,\s]/g, '').replace(/%$/, '');
+                            value = parseFloat(text);
+                        }
                     }
+
+                    if (isNaN(value)) return null;
+
+                    return { cell, value };
+                })
+                .filter(item => item !== null);
+
+            if (visibleCellsWithValues.length === 0) return;
+
+            // Determine if lower or higher is better
+            const lowerIsBetter = !['throughput'].includes(metric);
+
+            // Find the best value
+            const bestValue = visibleCellsWithValues.reduce((best, current) => {
+                if (best === null) return current.value;
+                
+                const isBetter = lowerIsBetter 
+                    ? current.value < best 
+                    : current.value > best;
+                
+                return isBetter ? current.value : best;
+            }, null);
+
+            // Apply best-value class to ALL cells that match the best value
+            visibleCellsWithValues.forEach(({ cell, value }) => {
+                if (value === bestValue) {
+                    cell.classList.add('benchmark-card__table-cell--best-value');
                 }
             });
-
-            // Apply best-value class to the winner
-            if (bestCell) {
-                bestCell.classList.add('benchmark-card__table-cell--best-value');
-            }
         });
     }
 }
