@@ -33,8 +33,9 @@ services:
         class: Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Repository\DoctrineBenchmarkRepository
 
     # Script Execution (Port -> Adapter)
+    # Using DockerPoolExecutor for better performance with connection pooling
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptExecutorPort:
-        class: Jblairy\PhpBenchmark\Infrastructure\Execution\Docker\DockerScriptExecutor
+        class: Jblairy\PhpBenchmark\Infrastructure\Execution\Docker\DockerPoolExecutor
 
     # Result Persistence (Port -> Adapter)
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\ResultPersisterPort:
