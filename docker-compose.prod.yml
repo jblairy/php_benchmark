@@ -19,6 +19,7 @@ services:
       - REDIS_URL=redis://redis:6379
       - BENCHMARK_CONCURRENCY=8
       - BENCHMARK_TIMEOUT=60
+      - COMPOSER_ALLOW_SUPERUSER=1
     depends_on:
       - mariadb
       - mercure

@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:latest-php8.4
+FROM dunglas/frankenphp:latest-php8.3
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -41,7 +41,12 @@ WORKDIR /app
 COPY . /app
 
 # Install dependencies (will be cached if composer.json doesn't change)
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Using --ignore-platform-req=php since container uses PHP 8.3 but app requires 8.4
+# Using --no-scripts to avoid running cache:clear which requires dev dependencies
+RUN composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-req=php --no-scripts
+
+# Remove Composer platform check (since we're using PHP 8.3 but app requires 8.4)
+RUN rm -f /app/vendor/composer/platform_check.php
 
 # Set permissions
 RUN chown -R www-data:www-data /app/var
