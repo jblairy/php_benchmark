@@ -1,0 +1,15 @@
+framework:
+    cache:
+        # Use Redis for application cache in production
+        app: cache.adapter.redis
+        default_redis_provider: '%env(REDIS_URL)%'
+        
+        # Configure cache pools
+        pools:
+            cache.benchmarks:
+                adapter: cache.adapter.redis
+                default_lifetime: 3600
+            
+            cache.results:
+                adapter: cache.adapter.redis
+                default_lifetime: 7200

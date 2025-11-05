@@ -1,0 +1,28 @@
+{
+    frankenphp {
+        # Enable worker mode for ultra-fast performance
+        # Workers keep the application in memory between requests
+        worker /app/public/index.php 4
+    }
+    
+    # Global options
+    auto_https off
+}
+
+:80 {
+    # Set the root directory
+    root * /app/public
+    
+    # Enable compression
+    encode gzip zstd
+    
+    # Log to stdout
+    log {
+        output stdout
+        format json
+        level INFO
+    }
+    
+    # PHP files are handled by FrankenPHP
+    php_server
+}
