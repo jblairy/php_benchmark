@@ -59,8 +59,8 @@ services:
     volumes:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
-    mem_limit: 512m
-    cpus: 1
+    mem_limit: 1g
+    cpus: 2
     command: tail -f /dev/null
 
   php70:
@@ -68,8 +68,8 @@ services:
     volumes:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
-    mem_limit: 512m
-    cpus: 1
+    mem_limit: 1g
+    cpus: 2
     command: tail -f /dev/null
 
   php71:
@@ -77,8 +77,8 @@ services:
     volumes:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
-    mem_limit: 512m
-    cpus: 1
+    mem_limit: 1g
+    cpus: 2
     command: tail -f /dev/null
 
   php72:
@@ -86,8 +86,8 @@ services:
     volumes:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
-    mem_limit: 512m
-    cpus: 1
+    mem_limit: 1g
+    cpus: 2
     command: tail -f /dev/null
 
   php73:
@@ -95,8 +95,8 @@ services:
     volumes:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
-    mem_limit: 512m
-    cpus: 1
+    mem_limit: 1g
+    cpus: 2
     command: tail -f /dev/null
 
   php74:
@@ -104,8 +104,8 @@ services:
     volumes:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
-    mem_limit: 512m
-    cpus: 1
+    mem_limit: 1g
+    cpus: 2
     command: tail -f /dev/null
 
   php80:
@@ -113,8 +113,8 @@ services:
     volumes:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
-    mem_limit: 512m
-    cpus: 1
+    mem_limit: 1g
+    cpus: 2
     command: tail -f /dev/null
 
   php81:
@@ -122,8 +122,8 @@ services:
     volumes:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
-    mem_limit: 512m
-    cpus: 1
+    mem_limit: 1g
+    cpus: 2
     command: tail -f /dev/null
 
   php82:
@@ -131,8 +131,8 @@ services:
     volumes:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
-    mem_limit: 512m
-    cpus: 1
+    mem_limit: 1g
+    cpus: 2
     command: tail -f /dev/null
 
   php83:
@@ -140,8 +140,8 @@ services:
     volumes:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
-    mem_limit: 512m
-    cpus: 1
+    mem_limit: 1g
+    cpus: 2
     command: tail -f /dev/null
 
   php84:
@@ -149,8 +149,8 @@ services:
     volumes:
       - ./:/srv/php_benchmark
     working_dir: /srv/php_benchmark
-    mem_limit: 512m
-    cpus: 1
+    mem_limit: 1g
+    cpus: 2
     command: tail -f /dev/null
 
   php85:
@@ -160,8 +160,8 @@ services:
       volumes:
           - ./:/srv/php_benchmark
       working_dir: /srv/php_benchmark
-      mem_limit: 512m
-      cpus: 1
+      mem_limit: 1g
+      cpus: 2
       command: tail -f /dev/null
 
 volumes:

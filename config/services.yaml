@@ -60,7 +60,7 @@ services:
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\AsyncExecutorPort:
         class: Jblairy\PhpBenchmark\Infrastructure\Async\SpatieAsyncExecutorAdapter
         arguments:
-            $concurrency: 100
+            $concurrency: '%env(int:BENCHMARK_CONCURRENCY)%'
 
     # Benchmark auto-tagging (moved from Domain to keep it framework-agnostic)
     _instanceof:

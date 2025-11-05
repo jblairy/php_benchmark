@@ -74,9 +74,13 @@ final class DockerScriptExecutor implements ScriptExecutorPort
 
     private function executeInDocker(string $phpVersion, string $scriptPath): string
     {
+        $timeout = (int) ($_ENV['BENCHMARK_TIMEOUT'] ?? 30);
+
         $command = sprintf(
-            'docker-compose exec -T %s php %s 2>&1',
+            'timeout %ds docker-compose exec -T %s php -d max_execution_time=%d %s 2>&1',
+            $timeout,
             escapeshellarg($phpVersion),
+            $timeout,
             escapeshellarg($scriptPath),
         );
 
@@ -84,6 +88,11 @@ final class DockerScriptExecutor implements ScriptExecutorPort
         $exitCode = 0;
 
         exec($command, $output, $exitCode);
+
+        // Exit code 124 = timeout command timed out
+        if (124 === $exitCode) {
+            throw new RuntimeException(sprintf('Script execution timed out after %d seconds', $timeout));
+        }
 
         if (0 !== $exitCode) {
             throw new RuntimeException(sprintf('Script execution failed with code %d: %s', $exitCode, implode("\n", $output)));
