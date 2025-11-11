@@ -70,6 +70,16 @@ services:
             tags: ['app.benchmark']
 
     # Domain Services (need explicit registration since Domain is excluded)
+    # Enhanced Statistics Calculator with outlier detection
+    Jblairy\PhpBenchmark\Domain\Dashboard\Service\OutlierDetector: ~
+    
+    Jblairy\PhpBenchmark\Domain\Dashboard\Service\EnhancedStatisticsCalculator:
+        arguments:
+            $outlierDetector: '@Jblairy\PhpBenchmark\Domain\Dashboard\Service\OutlierDetector'
+            $removeOutliers: true
+            $outlierThreshold: 1.5
+    
+    # Legacy calculator kept for backward compatibility
     Jblairy\PhpBenchmark\Domain\Dashboard\Service\StatisticsCalculator: ~
 
     # Fixtures configuration

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jblairy\PhpBenchmark\Application\Dashboard\DTO;
 
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\BenchmarkStatistics;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Model\EnhancedBenchmarkStatistics;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\PercentileMetrics;
 
 /**
@@ -12,6 +13,7 @@ use Jblairy\PhpBenchmark\Domain\Dashboard\Model\PercentileMetrics;
  *
  * Used to transfer data from Application layer to Infrastructure (Controller/Twig)
  * Percentiles are accessible via the percentiles property or convenience methods.
+ * Supports enhanced statistics with outlier detection.
  */
 final readonly class BenchmarkStatisticsData
 {
@@ -29,11 +31,42 @@ final readonly class BenchmarkStatisticsData
         public float $stdDev,
         public float $cv,
         public float $throughput,
+        // Enhanced statistics
+        public ?int $outlierCount = null,
+        public ?float $outlierPercentage = null,
+        public ?float $rawCV = null,
+        public ?float $stabilityScore = null,
+        public ?string $stabilityRating = null,
     ) {
     }
 
     public static function fromDomain(BenchmarkStatistics $benchmarkStatistics): self
     {
+        // Check if this is an enhanced statistics object
+        if ($benchmarkStatistics instanceof EnhancedBenchmarkStatistics) {
+            return new self(
+                benchmarkId: $benchmarkStatistics->benchmarkId,
+                benchmarkName: $benchmarkStatistics->benchmarkName,
+                phpVersion: $benchmarkStatistics->phpVersion,
+                count: $benchmarkStatistics->executionCount,
+                avg: $benchmarkStatistics->averageExecutionTime,
+                percentiles: $benchmarkStatistics->percentiles,
+                memoryUsed: $benchmarkStatistics->averageMemoryUsed,
+                memoryPeak: $benchmarkStatistics->peakMemoryUsed,
+                min: $benchmarkStatistics->minExecutionTime,
+                max: $benchmarkStatistics->maxExecutionTime,
+                stdDev: $benchmarkStatistics->standardDeviation,
+                cv: $benchmarkStatistics->coefficientOfVariation,
+                throughput: $benchmarkStatistics->throughput,
+                outlierCount: $benchmarkStatistics->outlierCount,
+                outlierPercentage: $benchmarkStatistics->outlierPercentage,
+                rawCV: $benchmarkStatistics->rawCV,
+                stabilityScore: $benchmarkStatistics->stabilityScore,
+                stabilityRating: $benchmarkStatistics->getStabilityRating(),
+            );
+        }
+        
+        // Fallback to basic statistics
         return new self(
             benchmarkId: $benchmarkStatistics->benchmarkId,
             benchmarkName: $benchmarkStatistics->benchmarkName,
@@ -69,5 +102,46 @@ final readonly class BenchmarkStatisticsData
     public function getP99(): float
     {
         return $this->percentiles->p99;
+    }
+
+    public function hasOutliers(): bool
+    {
+        return $this->outlierCount !== null && $this->outlierCount > 0;
+    }
+
+    public function getOutlierInfo(): string
+    {
+        if (!$this->hasOutliers()) {
+            return 'No outliers';
+        }
+
+        return sprintf(
+            '%d outliers (%.1f%%) removed',
+            $this->outlierCount,
+            $this->outlierPercentage ?? 0
+        );
+    }
+
+    public function getCVImprovement(): ?float
+    {
+        if ($this->rawCV === null || $this->rawCV === 0.0) {
+            return null;
+        }
+
+        return (($this->rawCV - $this->cv) / $this->rawCV) * 100;
+    }
+
+    public function getStabilityScoreColor(): string
+    {
+        if ($this->stabilityScore === null) {
+            return 'secondary';
+        }
+
+        return match (true) {
+            $this->stabilityScore >= 90 => 'success',
+            $this->stabilityScore >= 75 => 'info',
+            $this->stabilityScore >= 60 => 'warning',
+            default => 'danger',
+        };
     }
 }
