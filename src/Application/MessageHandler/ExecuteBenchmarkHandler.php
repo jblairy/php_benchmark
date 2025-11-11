@@ -8,6 +8,7 @@ use Jblairy\PhpBenchmark\Application\Message\ExecuteBenchmarkMessage;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Event\BenchmarkProgress;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkConfiguration;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkExecutorPort;
+use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkRepositoryPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\EventDispatcherPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ResultPersisterPort;
 use Jblairy\PhpBenchmark\Domain\PhpVersion\Enum\PhpVersion;
@@ -27,6 +28,7 @@ final readonly class ExecuteBenchmarkHandler
         private BenchmarkExecutorPort $benchmarkExecutor,
         private ResultPersisterPort $resultPersister,
         private EventDispatcherPort $eventDispatcher,
+        private BenchmarkRepositoryPort $benchmarkRepository,
         private LoggerInterface $logger,
     ) {
     }
@@ -43,13 +45,12 @@ final readonly class ExecuteBenchmarkHandler
         ]);
 
         try {
-            // Reconstruct benchmark from class name
-            $benchmarkClass = $message->benchmarkClass;
-            if (!class_exists($benchmarkClass)) {
-                throw new \RuntimeException(sprintf('Benchmark class %s not found', $benchmarkClass));
+            // Load benchmark from repository
+            $benchmark = $this->benchmarkRepository->findBenchmarkByName($message->benchmarkSlug);
+            if (!$benchmark) {
+                throw new \RuntimeException(sprintf('Benchmark %s not found in repository', $message->benchmarkSlug));
             }
 
-            $benchmark = new $benchmarkClass();
             $phpVersion = PhpVersion::from($message->phpVersion);
 
             $configuration = new BenchmarkConfiguration(
