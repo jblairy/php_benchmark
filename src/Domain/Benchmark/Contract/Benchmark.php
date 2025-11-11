@@ -15,4 +15,6 @@ use Jblairy\PhpBenchmark\Domain\PhpVersion\Enum\PhpVersion;
 interface Benchmark
 {
     public function getMethodBody(PhpVersion $phpVersion): string;
+
+    public function getSlug(): string;
 }

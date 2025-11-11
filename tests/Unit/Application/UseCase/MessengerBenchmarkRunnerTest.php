@@ -44,6 +44,10 @@ final class MessengerBenchmarkRunnerTest extends TestCase
             public function getMethodBody(PhpVersion $phpVersion): string {
                 return 'return 1;';
             }
+            
+            public function getSlug(): string {
+                return 'test-benchmark';
+            }
         };
         
         $configuration = new BenchmarkConfiguration(
