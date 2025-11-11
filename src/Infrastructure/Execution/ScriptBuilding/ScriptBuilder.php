@@ -15,7 +15,6 @@ final readonly class ScriptBuilder implements ScriptBuilderPort
     public function __construct(
         #[Autowire(env: 'BENCHMARK_WARMUP_ITERATIONS')]
         private int $warmupIterations = 10,
-
         #[Autowire(env: 'BENCHMARK_INNER_ITERATIONS')]
         private int $innerIterations = 1000,
     ) {

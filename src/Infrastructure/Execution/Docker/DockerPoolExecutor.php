@@ -27,13 +27,21 @@ final class DockerPoolExecutor implements ScriptExecutorPort
     private const string TEMP_DIR = '/app/var/tmp';
 
     /**
-     * @var array<string, array{process: resource|false, pipes: array<int, resource>}>
+     * @var array<string, array{process: false|resource, pipes: array<int, resource>}>
      */
     private array $containerPool = [];
 
     public function __construct(
         private readonly LoggerInterface $logger,
     ) {
+    }
+
+    public function __destruct()
+    {
+        // Clean up all container connections
+        foreach ($this->containerPool as $phpVersion => $poolData) {
+            $this->closeConnection($phpVersion);
+        }
     }
 
     public function executeScript(ExecutionContext $executionContext): BenchmarkResult
@@ -65,18 +73,10 @@ final class DockerPoolExecutor implements ScriptExecutorPort
                 'php_version' => $executionContext->phpVersion->value,
                 'script_file' => $tempFile,
                 'error' => $runtimeException->getMessage(),
-                'script_preview' => substr($executionContext->scriptContent, 0, 200),
+                'script_preview' => mb_substr($executionContext->scriptContent, 0, 200),
             ]);
 
             throw $this->enrichExceptionWithContext($runtimeException, $executionContext, $tempFile);
-        }
-    }
-
-    public function __destruct()
-    {
-        // Clean up all container connections
-        foreach ($this->containerPool as $phpVersion => $poolData) {
-            $this->closeConnection($phpVersion);
         }
     }
 
@@ -224,7 +224,7 @@ final class DockerPoolExecutor implements ScriptExecutorPort
                 $executionContext->benchmarkSlug,
                 $executionContext->benchmarkClassName,
                 $executionContext->phpVersion->value,
-                $tempFile
+                $tempFile,
             ),
             (int) $runtimeException->getCode(),
             $runtimeException,

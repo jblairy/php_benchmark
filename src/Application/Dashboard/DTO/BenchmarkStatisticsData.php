@@ -65,7 +65,7 @@ final readonly class BenchmarkStatisticsData
                 stabilityRating: $benchmarkStatistics->getStabilityRating(),
             );
         }
-        
+
         // Fallback to basic statistics
         return new self(
             benchmarkId: $benchmarkStatistics->benchmarkId,
@@ -106,7 +106,7 @@ final readonly class BenchmarkStatisticsData
 
     public function hasOutliers(): bool
     {
-        return $this->outlierCount !== null && $this->outlierCount > 0;
+        return null !== $this->outlierCount && 0 < $this->outlierCount;
     }
 
     public function getOutlierInfo(): string
@@ -118,13 +118,13 @@ final readonly class BenchmarkStatisticsData
         return sprintf(
             '%d outliers (%.1f%%) removed',
             $this->outlierCount,
-            $this->outlierPercentage ?? 0
+            $this->outlierPercentage ?? 0,
         );
     }
 
     public function getCVImprovement(): ?float
     {
-        if ($this->rawCV === null || $this->rawCV === 0.0) {
+        if (null === $this->rawCV || 0.0 === $this->rawCV) {
             return null;
         }
 
@@ -133,14 +133,14 @@ final readonly class BenchmarkStatisticsData
 
     public function getStabilityScoreColor(): string
     {
-        if ($this->stabilityScore === null) {
+        if (null === $this->stabilityScore) {
             return 'secondary';
         }
 
         return match (true) {
-            $this->stabilityScore >= 90 => 'success',
-            $this->stabilityScore >= 75 => 'info',
-            $this->stabilityScore >= 60 => 'warning',
+            90 <= $this->stabilityScore => 'success',
+            75 <= $this->stabilityScore => 'info',
+            60 <= $this->stabilityScore => 'warning',
             default => 'danger',
         };
     }

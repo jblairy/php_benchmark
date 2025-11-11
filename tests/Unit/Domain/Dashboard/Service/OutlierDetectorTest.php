@@ -137,7 +137,7 @@ final class OutlierDetectorTest extends TestCase
         self::assertCount(2, $result->outliers);
         self::assertContains(45.2, $result->outliers);
         self::assertContains(98.7, $result->outliers);
-        
+
         // Verify bounds make sense
         self::assertGreaterThan(10.0, $result->lowerBound);
         self::assertLessThan(15.0, $result->upperBound);
@@ -169,7 +169,7 @@ final class OutlierDetectorTest extends TestCase
         // Assert - All values should be within bounds
         self::assertCount(5, $result->cleanedData);
         self::assertCount(0, $result->outliers);
-        
+
         // For this dataset: Q1=1.5, Q3=4.5, IQR=3
         // Bounds: [-3, 9]
         self::assertEqualsWithDelta(-2.5, $result->lowerBound, 0.1);

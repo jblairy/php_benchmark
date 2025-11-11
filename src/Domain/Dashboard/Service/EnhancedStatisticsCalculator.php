@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Jblairy\PhpBenchmark\Domain\Dashboard\Service;
 
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\BenchmarkMetrics;
-use Jblairy\PhpBenchmark\Domain\Dashboard\Model\BenchmarkStatistics;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\PercentileMetrics;
 
 /**
  * Enhanced statistics calculator with outlier detection and removal.
- * 
+ *
  * This calculator improves upon the basic StatisticsCalculator by:
  * - Detecting and removing outliers before calculating statistics
  * - Providing both raw and cleaned statistics
@@ -42,10 +41,10 @@ final readonly class EnhancedStatisticsCalculator
 
         // Detect outliers in execution times
         $outlierResult = $this->outlierDetector->detectAndRemove($benchmarkMetrics->executionTimes);
-        
+
         // Use cleaned data if outlier removal is enabled
         $dataToAnalyze = $this->removeOutliers ? $outlierResult->cleanedData : $benchmarkMetrics->executionTimes;
-        
+
         // Calculate statistics on the appropriate dataset
         $sortedTimes = $dataToAnalyze;
         sort($sortedTimes);

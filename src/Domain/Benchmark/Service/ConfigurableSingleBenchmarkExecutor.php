@@ -37,7 +37,7 @@ final readonly class ConfigurableSingleBenchmarkExecutor implements BenchmarkExe
 
         // Try to get benchmark entity for custom iterations
         $benchmarkEntity = $this->benchmarkRepository->findBySlug(
-            $benchmarkConfiguration->benchmark->getSlug()
+            $benchmarkConfiguration->benchmark->getSlug(),
         );
 
         // Configure the script builder if it supports configuration
@@ -47,7 +47,7 @@ final readonly class ConfigurableSingleBenchmarkExecutor implements BenchmarkExe
                 $benchmarkEntity->getInnerIterations(),
                 $code,
             );
-            
+
             $this->scriptBuilderPort->setIterationConfiguration($iterationConfig);
         }
 

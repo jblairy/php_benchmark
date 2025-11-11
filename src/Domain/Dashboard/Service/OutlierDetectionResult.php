@@ -11,7 +11,7 @@ final readonly class OutlierDetectionResult
 {
     /**
      * @param array<int, float> $cleanedData Data with outliers removed
-     * @param array<int, float> $outliers Detected outlier values
+     * @param array<int, float> $outliers    Detected outlier values
      */
     public function __construct(
         public array $cleanedData,
@@ -34,7 +34,7 @@ final readonly class OutlierDetectionResult
 
     public function hasOutliers(): bool
     {
-        return $this->outlierCount > 0;
+        return 0 < $this->outlierCount;
     }
 
     public function getCleanedCount(): int

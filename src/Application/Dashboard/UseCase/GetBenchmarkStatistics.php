@@ -8,7 +8,6 @@ use Jblairy\PhpBenchmark\Application\Dashboard\DTO\BenchmarkData;
 use Jblairy\PhpBenchmark\Application\Dashboard\DTO\BenchmarkStatisticsData;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Port\PulseRepositoryPort;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Service\EnhancedStatisticsCalculator;
-use Jblairy\PhpBenchmark\Domain\Dashboard\Service\OutlierDetector;
 
 /**
  * Use Case: Get statistics for a single benchmark across all PHP versions.

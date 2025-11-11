@@ -220,4 +220,3 @@ return static function (Config $config): void {
 //   2. Corriger AbstractBenchmark namespace (PRIORITÉ 2 - Simple refactor)
 //   3. Corriger Benchmark interface (PRIORITÉ 3 - Retirer annotation Symfony)
 //   4. Refactorer ChartBuilder (PRIORITÉ 4 - Le déplacer ou créer Port)
-

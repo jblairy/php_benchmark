@@ -48,7 +48,7 @@ final class DockerScriptExecutor implements ScriptExecutorPort
                 'php_version' => $executionContext->phpVersion->value,
                 'script_file' => $tempFile,
                 'error' => $runtimeException->getMessage(),
-                'script_preview' => substr($executionContext->scriptContent, 0, 200),
+                'script_preview' => mb_substr($executionContext->scriptContent, 0, 200),
             ]);
 
             throw $this->enrichExceptionWithContext($runtimeException, $executionContext, $tempFile);
@@ -171,7 +171,7 @@ final class DockerScriptExecutor implements ScriptExecutorPort
                 $executionContext->benchmarkSlug,
                 $executionContext->benchmarkClassName,
                 $executionContext->phpVersion->value,
-                $tempFile
+                $tempFile,
             ),
             (int) $runtimeException->getCode(),
             $runtimeException,

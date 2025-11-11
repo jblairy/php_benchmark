@@ -15,7 +15,9 @@ use Jblairy\PhpBenchmark\Domain\Benchmark\Port\EventDispatcherPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ResultPersisterPort;
 use Jblairy\PhpBenchmark\Domain\PhpVersion\Enum\PhpVersion;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Throwable;
 
 /**
  * Handles asynchronous benchmark execution via Symfony Messenger.
@@ -50,13 +52,13 @@ final readonly class ExecuteBenchmarkHandler
             // Load benchmark from repository
             $benchmark = $this->benchmarkRepository->findBenchmarkByName($message->benchmarkSlug);
             if (!$benchmark) {
-                throw new \RuntimeException(sprintf('Benchmark %s not found in repository', $message->benchmarkSlug));
+                throw new RuntimeException(sprintf('Benchmark %s not found in repository', $message->benchmarkSlug));
             }
 
             $phpVersion = PhpVersion::from($message->phpVersion);
 
             // Dispatch start event for first iteration
-            if ($message->iterationNumber === 1) {
+            if (1 === $message->iterationNumber) {
                 $this->eventDispatcher->dispatch(
                     new BenchmarkStarted(
                         benchmarkId: $message->benchmarkSlug,
@@ -108,7 +110,7 @@ final readonly class ExecuteBenchmarkHandler
                 'execution_time_ms' => $result->executionTimeMs,
                 'memory_usage_bytes' => $result->memoryUsedBytes,
             ]);
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             $this->logger->error('Benchmark execution failed', [
                 'benchmark' => $message->benchmarkName,
                 'php_version' => $message->phpVersion,

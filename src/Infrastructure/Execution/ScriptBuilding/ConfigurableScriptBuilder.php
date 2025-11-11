@@ -19,7 +19,6 @@ final class ConfigurableScriptBuilder implements ScriptBuilderPort
     public function __construct(
         #[Autowire(env: 'BENCHMARK_WARMUP_ITERATIONS')]
         private readonly int $defaultWarmupIterations = 10,
-
         #[Autowire(env: 'BENCHMARK_INNER_ITERATIONS')]
         private readonly int $defaultInnerIterations = 100,
     ) {

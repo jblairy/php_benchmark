@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jblairy\PhpBenchmark\Infrastructure\Cli;
 
+use Exception;
 use Jblairy\PhpBenchmark\Application\Message\ExecuteBenchmarkMessage;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -28,9 +29,9 @@ final class TestMessengerCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        
+
         $io->title('Testing Messenger Configuration');
-        
+
         try {
             // Create a test message
             $testMessage = new ExecuteBenchmarkMessage(
@@ -42,7 +43,7 @@ final class TestMessengerCommand extends Command
                 executionId: 'test_' . uniqid(),
                 iterationNumber: 1,
             );
-            
+
             $io->section('Dispatching test message...');
             $io->writeln('Message details:');
             $io->listing([
@@ -50,10 +51,10 @@ final class TestMessengerCommand extends Command
                 'Name: ' . $testMessage->benchmarkName,
                 'Execution ID: ' . $testMessage->executionId,
             ]);
-            
+
             // Dispatch the message
             $envelope = $this->messageBus->dispatch($testMessage);
-            
+
             // Check which transport received the message
             $transportStamp = $envelope->last(TransportNamesStamp::class);
             if ($transportStamp instanceof TransportNamesStamp) {
@@ -62,21 +63,20 @@ final class TestMessengerCommand extends Command
             } else {
                 $io->warning('Message dispatched but transport information not available.');
             }
-            
+
             $io->section('Next steps:');
             $io->listing([
                 'Run "php bin/console messenger:consume async -vv" to process the message',
                 'Check worker logs in var/log/messenger-worker-*.log',
                 'Use "php bin/console messenger:failed:show" to see failed messages',
             ]);
-            
+
             return Command::SUCCESS;
-            
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $io->error(sprintf('Failed to dispatch message: %s', $e->getMessage()));
             $io->writeln('Stack trace:');
             $io->writeln($e->getTraceAsString());
-            
+
             return Command::FAILURE;
         }
     }

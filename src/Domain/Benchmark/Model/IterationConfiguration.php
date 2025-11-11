@@ -14,11 +14,11 @@ final readonly class IterationConfiguration
 {
     private const int DEFAULT_WARMUP_ITERATIONS = 10;
     private const int DEFAULT_INNER_ITERATIONS = 100;
-    
+
     // Minimum values for statistical validity
     private const int MIN_WARMUP_ITERATIONS = 1;
     private const int MIN_INNER_ITERATIONS = 10;
-    
+
     // Maximum reasonable values to prevent excessive runtime
     private const int MAX_WARMUP_ITERATIONS = 100;
     private const int MAX_INNER_ITERATIONS = 10000;
@@ -46,7 +46,7 @@ final readonly class IterationConfiguration
         // Otherwise, calculate smart defaults based on benchmark code
         if (null !== $benchmarkCode) {
             $complexity = self::analyzeBenchmarkComplexity($benchmarkCode);
-            
+
             return new self(
                 $warmupIterations ?? self::calculateWarmupIterations($complexity),
                 $innerIterations ?? self::calculateInnerIterations($complexity),
@@ -56,7 +56,7 @@ final readonly class IterationConfiguration
         // Fallback to environment defaults or hardcoded defaults
         $envWarmup = $_ENV['BENCHMARK_WARMUP_ITERATIONS'] ?? self::DEFAULT_WARMUP_ITERATIONS;
         $envInner = $_ENV['BENCHMARK_INNER_ITERATIONS'] ?? self::DEFAULT_INNER_ITERATIONS;
-        
+
         return new self(
             $warmupIterations ?? (is_numeric($envWarmup) ? (int) $envWarmup : self::DEFAULT_WARMUP_ITERATIONS),
             $innerIterations ?? (is_numeric($envInner) ? (int) $envInner : self::DEFAULT_INNER_ITERATIONS),
@@ -64,8 +64,29 @@ final readonly class IterationConfiguration
     }
 
     /**
+     * Get total measurement iterations (excluding warmup).
+     */
+    public function getTotalMeasurementIterations(): int
+    {
+        return $this->innerIterations;
+    }
+
+    /**
+     * Get a description of the configuration.
+     */
+    public function getDescription(): string
+    {
+        return sprintf(
+            'Warmup: %d, Inner: %d (Total: %d measurements)',
+            $this->warmupIterations,
+            $this->innerIterations,
+            $this->getTotalMeasurementIterations(),
+        );
+    }
+
+    /**
      * Analyze benchmark code complexity.
-     * 
+     *
      * @return array{level: string, score: float, estimatedOperations: int}
      */
     private static function analyzeBenchmarkComplexity(string $code): array
@@ -73,7 +94,7 @@ final readonly class IterationConfiguration
         // Count loop iterations
         $loopMatches = [];
         preg_match_all('/for\s*\([^;]+;\s*(\d+)\s*>/', $code, $loopMatches);
-        
+
         $totalIterations = 1;
         $matches = is_array($loopMatches[1] ?? null) ? $loopMatches[1] : [];
         foreach ($matches as $iterations) {
@@ -107,10 +128,10 @@ final readonly class IterationConfiguration
 
         return [
             'level' => match (true) {
-                $score >= 15 => 'extreme',
-                $score >= 10 => 'heavy',
-                $score >= 5 => 'moderate',
-                $score >= 2 => 'light',
+                15 <= $score => 'extreme',
+                10 <= $score => 'heavy',
+                5 <= $score => 'moderate',
+                2 <= $score => 'light',
                 default => 'minimal',
             },
             'score' => $score,
@@ -120,7 +141,7 @@ final readonly class IterationConfiguration
 
     /**
      * Calculate optimal warmup iterations based on complexity.
-     * 
+     *
      * @param array{level: string, score: float, estimatedOperations: int} $complexity
      */
     private static function calculateWarmupIterations(array $complexity): int
@@ -136,7 +157,7 @@ final readonly class IterationConfiguration
 
     /**
      * Calculate optimal inner iterations based on complexity.
-     * 
+     *
      * @param array{level: string, score: float, estimatedOperations: int} $complexity
      */
     private static function calculateInnerIterations(array $complexity): int
@@ -151,8 +172,9 @@ final readonly class IterationConfiguration
         };
 
         $estimatedOps = $complexity['estimatedOperations'];
-        if ($estimatedOps > 0) {
+        if (0 < $estimatedOps) {
             $suggested = (int) ($targetOperations / $estimatedOps);
+
             return max(self::MIN_INNER_ITERATIONS, min(1000, $suggested));
         }
 
@@ -161,49 +183,20 @@ final readonly class IterationConfiguration
 
     private function validate(): void
     {
-        if ($this->warmupIterations < self::MIN_WARMUP_ITERATIONS) {
-            throw new InvalidArgumentException(
-                sprintf('Warmup iterations must be at least %d', self::MIN_WARMUP_ITERATIONS)
-            );
+        if (self::MIN_WARMUP_ITERATIONS > $this->warmupIterations) {
+            throw new InvalidArgumentException(sprintf('Warmup iterations must be at least %d', self::MIN_WARMUP_ITERATIONS));
         }
 
-        if ($this->warmupIterations > self::MAX_WARMUP_ITERATIONS) {
-            throw new InvalidArgumentException(
-                sprintf('Warmup iterations must not exceed %d', self::MAX_WARMUP_ITERATIONS)
-            );
+        if (self::MAX_WARMUP_ITERATIONS < $this->warmupIterations) {
+            throw new InvalidArgumentException(sprintf('Warmup iterations must not exceed %d', self::MAX_WARMUP_ITERATIONS));
         }
 
-        if ($this->innerIterations < self::MIN_INNER_ITERATIONS) {
-            throw new InvalidArgumentException(
-                sprintf('Inner iterations must be at least %d', self::MIN_INNER_ITERATIONS)
-            );
+        if (self::MIN_INNER_ITERATIONS > $this->innerIterations) {
+            throw new InvalidArgumentException(sprintf('Inner iterations must be at least %d', self::MIN_INNER_ITERATIONS));
         }
 
-        if ($this->innerIterations > self::MAX_INNER_ITERATIONS) {
-            throw new InvalidArgumentException(
-                sprintf('Inner iterations must not exceed %d', self::MAX_INNER_ITERATIONS)
-            );
+        if (self::MAX_INNER_ITERATIONS < $this->innerIterations) {
+            throw new InvalidArgumentException(sprintf('Inner iterations must not exceed %d', self::MAX_INNER_ITERATIONS));
         }
-    }
-
-    /**
-     * Get total measurement iterations (excluding warmup).
-     */
-    public function getTotalMeasurementIterations(): int
-    {
-        return $this->innerIterations;
-    }
-
-    /**
-     * Get a description of the configuration.
-     */
-    public function getDescription(): string
-    {
-        return sprintf(
-            'Warmup: %d, Inner: %d (Total: %d measurements)',
-            $this->warmupIterations,
-            $this->innerIterations,
-            $this->getTotalMeasurementIterations(),
-        );
     }
 }

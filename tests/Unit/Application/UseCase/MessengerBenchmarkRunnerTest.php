@@ -28,32 +28,34 @@ final class MessengerBenchmarkRunnerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->messageBus = $this->createMock(MessageBusInterface::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherPort::class);
         $this->runner = new MessengerBenchmarkRunner(
             $this->messageBus,
-            $this->eventDispatcher
+            $this->eventDispatcher,
         );
     }
 
     public function testRunDispatchesMessagesForEachIteration(): void
     {
         // Given
-        $benchmark = new class implements Benchmark {
-            public function getMethodBody(PhpVersion $phpVersion): string {
+        $benchmark = new class () implements Benchmark {
+            public function getMethodBody(PhpVersion $phpVersion): string
+            {
                 return 'return 1;';
             }
-            
-            public function getSlug(): string {
+
+            public function getSlug(): string
+            {
                 return 'test-benchmark';
             }
         };
-        
+
         $configuration = new BenchmarkConfiguration(
             benchmark: $benchmark,
             phpVersion: PhpVersion::PHP_84,
-            iterations: 3
+            iterations: 3,
         );
 
         $messagesDispatched = [];
@@ -62,6 +64,7 @@ final class MessengerBenchmarkRunnerTest extends TestCase
             ->method('dispatch')
             ->willReturnCallback(function ($message) use (&$messagesDispatched) {
                 $messagesDispatched[] = $message;
+
                 return new Envelope($message);
             });
 
@@ -71,7 +74,7 @@ final class MessengerBenchmarkRunnerTest extends TestCase
             ->method('dispatch')
             ->with($this->logicalOr(
                 $this->isInstanceOf(BenchmarkStarted::class),
-                $this->isInstanceOf(BenchmarkCompleted::class)
+                $this->isInstanceOf(BenchmarkCompleted::class),
             ));
 
         // When
@@ -79,7 +82,7 @@ final class MessengerBenchmarkRunnerTest extends TestCase
 
         // Then
         $this->assertCount(3, $messagesDispatched);
-        
+
         foreach ($messagesDispatched as $index => $message) {
             $this->assertInstanceOf(ExecuteBenchmarkMessage::class, $message);
             $this->assertEquals($benchmark::class, $message->benchmarkClass);

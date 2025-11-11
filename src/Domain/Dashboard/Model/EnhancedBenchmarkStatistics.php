@@ -81,10 +81,10 @@ final readonly class EnhancedBenchmarkStatistics extends BenchmarkStatistics
     public function getStabilityRating(): string
     {
         return match (true) {
-            $this->stabilityScore >= 90 => 'Excellent',
-            $this->stabilityScore >= 75 => 'Good',
-            $this->stabilityScore >= 60 => 'Fair',
-            $this->stabilityScore >= 40 => 'Poor',
+            90 <= $this->stabilityScore => 'Excellent',
+            75 <= $this->stabilityScore => 'Good',
+            60 <= $this->stabilityScore => 'Fair',
+            40 <= $this->stabilityScore => 'Poor',
             default => 'Very Poor',
         };
     }
