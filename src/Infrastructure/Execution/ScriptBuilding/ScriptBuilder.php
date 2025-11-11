@@ -7,28 +7,32 @@ namespace Jblairy\PhpBenchmark\Infrastructure\Execution\ScriptBuilding;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptBuilderPort;
 
 /**
- * Script builder that adds stability improvements:
- * - Warmup phase to stabilize JIT/opcache
+ * Script builder with stability improvements for accurate benchmarking.
+ * 
+ * Features:
+ * - Warmup iterations to stabilize JIT/opcache
  * - Multiple inner iterations to reduce noise
- * - Better timing precision
+ * - High precision timing with hrtime()
+ * - Configurable via environment variables
  */
-final readonly class StableScriptBuilder implements ScriptBuilderPort
+final readonly class ScriptBuilder implements ScriptBuilderPort
 {
-    private const WARMUP_ITERATIONS = 5;
-    private const INNER_ITERATIONS = 100;
+    private int $warmupIterations;
+    private int $innerIterations;
+
+    public function __construct()
+    {
+        $this->warmupIterations = (int) ($_ENV['BENCHMARK_WARMUP_ITERATIONS'] ?? 10);
+        $this->innerIterations = (int) ($_ENV['BENCHMARK_INNER_ITERATIONS'] ?? 1000);
+    }
 
     public function build(string $methodBody): string
     {
-        return $this->wrapWithStabilityImprovements($methodBody);
-    }
-
-    private function wrapWithStabilityImprovements(string $methodBody): string
-    {
-        $warmupIterations = self::WARMUP_ITERATIONS;
-        $innerIterations = self::INNER_ITERATIONS;
+        $warmupIterations = $this->warmupIterations;
+        $innerIterations = $this->innerIterations;
         
         return <<<PHP
-                // Warmup phase: Run the code a few times to stabilize JIT/opcache
+                // Warmup phase: Run the code several times to stabilize JIT/opcache
                 for (\$warmup = 0; \$warmup < {$warmupIterations}; ++\$warmup) {
                     {$methodBody}
                 }
@@ -37,22 +41,23 @@ final readonly class StableScriptBuilder implements ScriptBuilderPort
                 \$mem_before = memory_get_usage(true);
                 \$mem_peak_before = memory_get_peak_usage(true);
                 
-                // Start timing with high precision
-                \$start_time = microtime(true);
+                // High precision timing with hrtime (nanoseconds)
+                \$start_time = hrtime(true);
                 
                 // Run the benchmark multiple times to reduce noise
                 for (\$inner = 0; \$inner < {$innerIterations}; ++\$inner) {
                     {$methodBody}
                 }
                 
-                \$end_time = microtime(true);
+                \$end_time = hrtime(true);
                 
                 // Memory measurement after all iterations
                 \$mem_after = memory_get_usage(true);
                 \$mem_peak_after = memory_get_peak_usage(true);
                 
                 // Calculate average time per iteration
-                \$total_time_ms = (\$end_time - \$start_time) * 1000;
+                \$elapsed_ns = \$end_time - \$start_time;
+                \$total_time_ms = \$elapsed_ns / 1_000_000; // nanoseconds to milliseconds
                 \$avg_time_ms = \$total_time_ms / {$innerIterations};
                 
                 echo json_encode([
@@ -60,6 +65,7 @@ final readonly class StableScriptBuilder implements ScriptBuilderPort
                     "memory_used_bytes" => (\$mem_after - \$mem_before) / {$innerIterations},
                     "memory_peak_bytes" => (\$mem_peak_after - \$mem_peak_before),
                     "inner_iterations" => {$innerIterations},
+                    "warmup_iterations" => {$warmupIterations},
                 ]);
             PHP;
     }
