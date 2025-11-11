@@ -63,6 +63,7 @@ services:
       - APP_DEBUG=1
       - DATABASE_URL=mysql://root:password@mariadb:3306/php_benchmark
       - MERCURE_URL=http://mercure/.well-known/mercure
+      - MERCURE_JWT_SECRET=!ChangeThisMercureHubJWTSecretKey!
       - MESSENGER_TRANSPORT_DSN=redis://redis:6379/messages
       - REDIS_URL=redis://redis:6379
       - BENCHMARK_CONCURRENCY=2
@@ -90,6 +91,7 @@ services:
       - APP_DEBUG=1
       - DATABASE_URL=mysql://root:password@mariadb:3306/php_benchmark
       - MERCURE_URL=http://mercure/.well-known/mercure
+      - MERCURE_JWT_SECRET=!ChangeThisMercureHubJWTSecretKey!
       - MESSENGER_TRANSPORT_DSN=redis://redis:6379/messages
       - REDIS_URL=redis://redis:6379
       - BENCHMARK_CONCURRENCY=2
