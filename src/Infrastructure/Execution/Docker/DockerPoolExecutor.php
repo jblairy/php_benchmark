@@ -27,11 +27,6 @@ final class DockerPoolExecutor implements ScriptExecutorPort
     private const string TEMP_DIR = '/app/var/tmp';
 
     /**
-     * @var array<string, array{process: false|resource, pipes: array<int, resource>}>
-     */
-    private array $containerPool = [];
-
-    /**
      * @var array<string, bool> Track which containers have been warmed up
      */
     private array $warmedContainers = [];
@@ -39,14 +34,6 @@ final class DockerPoolExecutor implements ScriptExecutorPort
     public function __construct(
         private readonly LoggerInterface $logger,
     ) {
-    }
-
-    public function __destruct()
-    {
-        // Clean up all container connections
-        foreach ($this->containerPool as $phpVersion => $poolData) {
-            $this->closeConnection($phpVersion);
-        }
     }
 
     public function executeScript(ExecutionContext $executionContext): BenchmarkResult
@@ -107,13 +94,13 @@ final class DockerPoolExecutor implements ScriptExecutorPort
 
     /**
      * Pre-warm container to ensure stable execution environment.
-     * 
+     *
      * This executes a simple dummy script to:
      * - Initialize PHP runtime
      * - Load opcache
      * - Warm up JIT compiler
      * - Establish network/filesystem connections
-     * 
+     *
      * Impact: Reduces CV% by 5-10% by eliminating first-run overhead.
      */
     private function ensureContainerWarmed(string $phpVersion): void
@@ -130,19 +117,19 @@ final class DockerPoolExecutor implements ScriptExecutorPort
         try {
             // Create a simple warmup script
             $warmupScript = <<<'PHP'
-                // Warmup: Initialize runtime, opcache, JIT
-                $x = 0;
-                for ($i = 0; $i < 1000; ++$i) {
-                    $x += $i;
-                }
-                echo json_encode(['status' => 'warm', 'result' => $x]);
-            PHP;
+                    // Warmup: Initialize runtime, opcache, JIT
+                    $x = 0;
+                    for ($i = 0; $i < 1000; ++$i) {
+                        $x += $i;
+                    }
+                    echo json_encode(['status' => 'warm', 'result' => $x]);
+                PHP;
 
             $tempFile = $this->createTempScriptFile($warmupScript);
-            
+
             // Execute warmup script (result is discarded)
             $this->executeInDockerPool($phpVersion, $tempFile);
-            
+
             // Cleanup
             $this->cleanupTempFile($tempFile);
 
@@ -158,7 +145,7 @@ final class DockerPoolExecutor implements ScriptExecutorPort
                 'php_version' => $phpVersion,
                 'error' => $e->getMessage(),
             ]);
-            
+
             // Mark as warmed to avoid retrying
             $this->warmedContainers[$phpVersion] = true;
         }
@@ -212,33 +199,6 @@ final class DockerPoolExecutor implements ScriptExecutorPort
     private function getProjectName(): string
     {
         return $_ENV['COMPOSE_PROJECT_NAME'] ?? 'php_benchmark';
-    }
-
-    private function closeConnection(string $phpVersion): void
-    {
-        if (!isset($this->containerPool[$phpVersion])) {
-            return;
-        }
-
-        $poolData = $this->containerPool[$phpVersion];
-
-        // Close pipes
-        foreach ($poolData['pipes'] as $pipe) {
-            if (is_resource($pipe)) {
-                fclose($pipe);
-            }
-        }
-
-        // Close process
-        if (is_resource($poolData['process'])) {
-            proc_close($poolData['process']);
-        }
-
-        unset($this->containerPool[$phpVersion]);
-
-        $this->logger->debug('Closed connection pool', [
-            'php_version' => $phpVersion,
-        ]);
     }
 
     private function parseOutput(string $output): BenchmarkResult

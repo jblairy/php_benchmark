@@ -9,6 +9,7 @@ parameters:
     # Benchmark execution parameters
     benchmark.warmup_iterations: '%env(int:BENCHMARK_WARMUP_ITERATIONS)%'
     benchmark.inner_iterations: '%env(int:BENCHMARK_INNER_ITERATIONS)%'
+    benchmark.samples: '%env(int:BENCHMARK_SAMPLES)%'
 
 services:
     # default configuration for services in *this* file
@@ -49,9 +50,15 @@ services:
         class: Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Repository\PulseRepository
 
     # Benchmark Execution (Port -> Adapter)
-    # ConfigurableSingleBenchmarkExecutor uses per-benchmark iteration settings
+    # Phase 3: Multi-sample execution wraps ConfigurableSingleBenchmarkExecutor
+    # Executes each benchmark N times and aggregates results for CV% < 2%
+    Jblairy\PhpBenchmark\Domain\Benchmark\Service\ConfigurableSingleBenchmarkExecutor: ~
+    
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkExecutorPort:
-        class: Jblairy\PhpBenchmark\Domain\Benchmark\Service\ConfigurableSingleBenchmarkExecutor
+        class: Jblairy\PhpBenchmark\Domain\Benchmark\Service\MultiSampleBenchmarkExecutor
+        arguments:
+            $decoratedExecutor: '@Jblairy\PhpBenchmark\Domain\Benchmark\Service\ConfigurableSingleBenchmarkExecutor'
+            $numberOfSamples: '%benchmark.samples%'
 
     # Script Builder (Port -> Adapter)
     # Uses #[Autowire] attributes for environment variable injection
