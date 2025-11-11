@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jblairy\PhpBenchmark\Domain\Dashboard\Service;
 
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\BenchmarkMetrics;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Model\EnhancedBenchmarkStatistics;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\PercentileMetrics;
 
 /**
