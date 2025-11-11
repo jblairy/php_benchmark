@@ -1,10 +1,14 @@
-.PHONY: up start run fixtures db.reset db.refresh phpcsfixer phpcsfixer-fix phpstan quality phpmd phparkitect infection assets.refresh trans.compile trans.update dev.up dev.build dev.down dev.restart dev.logs dev.status dev.run prod.up prod.build prod.down prod.restart prod.logs prod.status prod.run
+.PHONY: up start run fixtures db.reset db.refresh phpcsfixer phpcsfixer-fix phpstan quality phpmd phparkitect infection assets.refresh trans.compile trans.update dev.up dev.build dev.down dev.restart dev.logs dev.status dev.run prod.up prod.build prod.down prod.restart prod.logs prod.status prod.run ci.up ci.build ci.down ci.logs ci.test ci.quality
 
+# Default: Use dev environment
 up:
-	docker-compose up -d --remove-orphans
+	@echo "🚀 Starting development environment..."
+	@echo "💡 Use 'make dev.up' for development or 'make prod.up' for production"
+	docker-compose -f docker-compose.dev.yml up -d --remove-orphans
 
 start:
-	docker-compose build
+	@echo "🏗️  Building development environment..."
+	docker-compose -f docker-compose.dev.yml build
 
 # Development commands (FrankenPHP + Redis + Messenger)
 dev.build:
@@ -104,7 +108,38 @@ prod.run:
 		time docker-compose -f docker-compose.prod.yml exec frankenphp php bin/console benchmark:run --test=$(test) --iterations=$(or $(iterations),1) --php-version=$(version); \
 	fi
 
-# New refactored benchmark command
+# CI/CD commands (for GitHub Actions and similar)
+ci.build:
+	@echo "🏗️  Building CI infrastructure..."
+	docker-compose -f docker-compose.ci.yml build
+	@echo "✅ CI build complete"
+
+ci.up:
+	@echo "🚀 Starting CI infrastructure..."
+	docker-compose -f docker-compose.ci.yml up -d
+	@echo "⏳ Waiting for services to be healthy..."
+	@sleep 15
+	@echo "✅ CI infrastructure running"
+
+ci.down:
+	@echo "⏹️  Stopping CI infrastructure..."
+	docker-compose -f docker-compose.ci.yml down -v
+	@echo "✅ CI infrastructure stopped and cleaned"
+
+ci.logs:
+	docker-compose -f docker-compose.ci.yml logs -f frankenphp
+
+ci.test:
+	@echo "🧪 Running tests in CI environment..."
+	docker-compose -f docker-compose.ci.yml exec -T frankenphp vendor/bin/phpunit --testdox
+
+ci.quality:
+	@echo "🔍 Running quality checks in CI environment..."
+	@docker-compose -f docker-compose.ci.yml exec -T frankenphp vendor/bin/phpstan analyse --no-progress --error-format=github --memory-limit=512M
+	@docker-compose -f docker-compose.ci.yml exec -T frankenphp vendor/bin/php-cs-fixer fix --dry-run --diff
+	@docker-compose -f docker-compose.ci.yml exec -T frankenphp vendor/bin/phpmd src github rulesets.xml
+
+# Benchmark command (uses dev environment by default)
 # Usage examples:
 #   make run test=Loop iterations=3
 #   make run test=HashWithSha256 iterations=50 version=php84
@@ -112,28 +147,28 @@ prod.run:
 run:
 	@if [ -z "$(version)" ]; then \
 		if [ -z "$(test)" ]; then \
-			docker-compose run --rm main php bin/console benchmark:run --iterations=$(or $(iterations),1); \
+			docker-compose -f docker-compose.dev.yml exec frankenphp php bin/console benchmark:run --iterations=$(or $(iterations),1); \
 		else \
-			docker-compose run --rm main php bin/console benchmark:run --test=$(test) --iterations=$(or $(iterations),1); \
+			docker-compose -f docker-compose.dev.yml exec frankenphp php bin/console benchmark:run --test=$(test) --iterations=$(or $(iterations),1); \
 		fi \
 	else \
-		docker-compose run --rm main php bin/console benchmark:run --test=$(test) --iterations=$(or $(iterations),1) --php-version=$(version); \
+		docker-compose -f docker-compose.dev.yml exec frankenphp php bin/console benchmark:run --test=$(test) --iterations=$(or $(iterations),1) --php-version=$(version); \
 	fi
 
 # Load fixtures into database from YAML files
 fixtures:
 	@echo "🔄 Loading fixtures from fixtures/benchmarks/*.yaml..."
-	@docker-compose exec main php bin/console doctrine:fixtures:load --no-interaction
+	@docker-compose -f docker-compose.dev.yml exec frankenphp php bin/console doctrine:fixtures:load --no-interaction
 	@echo "✅ Fixtures loaded successfully"
 
 # Reset database (drop, create, migrate) - without fixtures
 db.reset:
 	@echo "🗑️  Dropping database..."
-	@docker-compose run --rm main php bin/console d:d:d --force --if-exists
+	@docker-compose -f docker-compose.dev.yml exec frankenphp php bin/console d:d:d --force --if-exists
 	@echo "📦 Creating database..."
-	@docker-compose run --rm main php bin/console d:d:c
+	@docker-compose -f docker-compose.dev.yml exec frankenphp php bin/console d:d:c
 	@echo "🔄 Running migrations..."
-	@docker-compose run --rm main php bin/console d:m:m --no-interaction
+	@docker-compose -f docker-compose.dev.yml exec frankenphp php bin/console d:m:m --no-interaction
 	@echo "✅ Database reset complete"
 
 # Reset database and load fixtures (full refresh)
@@ -141,44 +176,44 @@ db.refresh: db.reset fixtures
 	@echo "✅ Database refreshed with fixtures"
 
 phpcsfixer:
-	docker-compose run --rm main vendor/bin/php-cs-fixer fix --dry-run --diff
+	docker-compose -f docker-compose.dev.yml exec frankenphp vendor/bin/php-cs-fixer fix --dry-run --diff
 
 phpcsfixer-fix:
-	docker-compose run --rm main vendor/bin/php-cs-fixer fix
+	docker-compose -f docker-compose.dev.yml exec frankenphp vendor/bin/php-cs-fixer fix
 
 phpstan:
-	docker-compose run --rm main vendor/bin/phpstan analyse --memory-limit=512M
+	docker-compose -f docker-compose.dev.yml exec frankenphp vendor/bin/phpstan analyse --memory-limit=512M
 
 phpmd:
-	docker-compose run --rm main vendor/bin/phpmd ./src ansi rulesets.xml
+	docker-compose -f docker-compose.dev.yml exec frankenphp vendor/bin/phpmd ./src ansi rulesets.xml
 
 phparkitect:
-	docker-compose run --rm main vendor/bin/phparkitect check
+	docker-compose -f docker-compose.dev.yml exec frankenphp vendor/bin/phparkitect check
 
 rector:
-	docker-compose run --rm main vendor/bin/rector
+	docker-compose -f docker-compose.dev.yml exec frankenphp vendor/bin/rector
 
 test:
-	docker-compose run --rm main vendor/bin/phpunit
+	docker-compose -f docker-compose.dev.yml exec frankenphp vendor/bin/phpunit
 
 test-coverage:
 	@echo "📊 Generating code coverage..."
-	docker-compose run --rm main phpdbg -qrr vendor/bin/phpunit --coverage-xml=var/coverage/coverage-xml --log-junit=var/coverage/junit.xml
+	docker-compose -f docker-compose.dev.yml exec frankenphp phpdbg -qrr vendor/bin/phpunit --coverage-xml=var/coverage/coverage-xml --log-junit=var/coverage/junit.xml
 
 infection:
 	@echo "🧬 Running Infection mutation testing..."
 	@echo "⚠️  This may take several minutes..."
 	@echo "📊 Step 1/2: Generating code coverage with PHPUnit..."
-	@docker-compose run --rm main phpdbg -qrr vendor/bin/phpunit --coverage-xml=var/coverage/coverage-xml --log-junit=var/coverage/junit.xml
+	@docker-compose -f docker-compose.dev.yml exec frankenphp phpdbg -qrr vendor/bin/phpunit --coverage-xml=var/coverage/coverage-xml --log-junit=var/coverage/junit.xml
 	@echo "🧬 Step 2/2: Running mutations..."
-	docker-compose run --rm main vendor/bin/infection --coverage=var/coverage --threads=4 --show-mutations --min-msi=80 --min-covered-msi=85
+	docker-compose -f docker-compose.dev.yml exec frankenphp vendor/bin/infection --coverage=var/coverage --threads=4 --show-mutations --min-msi=80 --min-covered-msi=85
 
 infection-report:
 	@echo "🧬 Running Infection mutation testing (report only, no MSI threshold)..."
 	@echo "📊 Step 1/2: Generating code coverage with PHPUnit..."
-	@docker-compose run --rm main phpdbg -qrr vendor/bin/phpunit --coverage-xml=var/coverage/coverage-xml --log-junit=var/coverage/junit.xml
+	@docker-compose -f docker-compose.dev.yml exec frankenphp phpdbg -qrr vendor/bin/phpunit --coverage-xml=var/coverage/coverage-xml --log-junit=var/coverage/junit.xml
 	@echo "🧬 Step 2/2: Running mutations..."
-	docker-compose run --rm main vendor/bin/infection --coverage=var/coverage --threads=4 --show-mutations
+	docker-compose -f docker-compose.dev.yml exec frankenphp vendor/bin/infection --coverage=var/coverage --threads=4 --show-mutations
 
 quality: phpcsfixer-fix phpstan phpmd phparkitect
 
@@ -188,16 +223,16 @@ quality: phpcsfixer-fix phpstan phpmd phparkitect
 #   1. Compiles all assets (SCSS → CSS, etc.)
 #   2. Deletes compiled assets to force new hash generation
 #   3. Clears Symfony cache
-#   4. Restarts the main container for a clean state
+#   4. Restarts the frankenphp container for a clean state
 assets.refresh:
 	@echo "🎨 Compiling assets..."
-	@docker-compose exec main php bin/console asset-map:compile
+	@docker-compose -f docker-compose.dev.yml exec frankenphp php bin/console asset-map:compile
 	@echo "🗑️  Removing compiled assets to force hash regeneration..."
 	@rm -rf public/assets
 	@echo "🔄 Clearing Symfony cache..."
-	@docker-compose exec main php bin/console cache:clear
-	@echo "🔄 Restarting main container..."
-	@docker-compose restart main
+	@docker-compose -f docker-compose.dev.yml exec frankenphp php bin/console cache:clear
+	@echo "🔄 Restarting frankenphp container..."
+	@docker-compose -f docker-compose.dev.yml restart frankenphp
 	@echo "✅ Assets refreshed! New CSS/JS hashes generated."
 	@echo "💡 Hard refresh your browser (Ctrl+Shift+R or Cmd+Shift+R) to see changes."
 
@@ -206,7 +241,7 @@ assets.refresh:
 # Run this after modifying translations/messages.*.yaml files
 trans.compile:
 	@echo "🌍 Compiling translations (YAML → XLF)..."
-	@docker-compose run --rm main php bin/console translation:extract --force fr
+	@docker-compose -f docker-compose.dev.yml exec frankenphp php bin/console translation:extract --force fr
 	@echo "✅ Translations compiled successfully"
 	@echo "📊 Performance: XLF format provides 2-3x faster lookups than YAML"
 
