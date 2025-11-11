@@ -75,7 +75,7 @@ final readonly class DoctrineBenchmarkRepository implements BenchmarkRepositoryP
         return $this->extractCategoryNamesFromQueryResults($results);
     }
 
-    private function findBenchmarkBySlug(string $slug): ?Benchmark
+    public function findBenchmarkBySlug(string $slug): ?Benchmark
     {
         $entity = $this->entityManager
             ->getRepository(BenchmarkEntity::class)
