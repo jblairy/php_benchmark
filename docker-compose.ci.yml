@@ -1,0 +1,282 @@
+services:
+  # FrankenPHP optimized for CI/CD (similar to prod, lighter resources)
+  frankenphp:
+    build:
+      context: .
+      dockerfile: docker/frankenphp/Dockerfile
+    volumes:
+      - ./:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    working_dir: /app
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - APP_ENV=test
+      - DATABASE_URL=mysql://root:password@mariadb:3306/php_benchmark_test
+      - MERCURE_URL=http://mercure/.well-known/mercure
+      - MERCURE_PUBLIC_URL=http://localhost:3000/.well-known/mercure
+      - MERCURE_JWT_SECRET=!ChangeThisMercureHubJWTSecretKey!
+      - MESSENGER_TRANSPORT_DSN=redis://redis:6379/messages
+      - REDIS_URL=redis://redis:6379
+      - BENCHMARK_CONCURRENCY=4
+      - BENCHMARK_TIMEOUT=30
+      - COMPOSER_ALLOW_SUPERUSER=1
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:80"
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '1'
+          memory: 512M
+    networks:
+      - benchmark_network
+
+  # Redis for cache and queue (no persistence in CI)
+  redis:
+    image: redis:7-alpine
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    networks:
+      - benchmark_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+  mariadb:
+    image: mariadb:10.11
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: php_benchmark_test
+      MYSQL_USER: php_user
+      MYSQL_PASSWORD: php_password
+    ports:
+      - "3306:3306"
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    tmpfs:
+      - /var/lib/mysql:rw,noexec,nosuid,size=512m
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    networks:
+      - benchmark_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ppassword"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  mercure:
+    image: dunglas/mercure
+    environment:
+      SERVER_NAME: ':80'
+      MERCURE_PUBLISHER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
+      MERCURE_SUBSCRIBER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
+      MERCURE_EXTRA_DIRECTIVES: |
+        cors_origins http://localhost:8000 http://127.0.0.1:8000
+        anonymous
+        heartbeat 15s
+    command: /usr/bin/caddy run --config /etc/caddy/dev.Caddyfile
+    ports:
+      - "3000:80"
+    networks:
+      - benchmark_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/.well-known/mercure"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+  # PHP containers for benchmarks (lighter limits for CI)
+  php56:
+    image: php:5.6-cli
+    volumes:
+      - ./:/app
+    working_dir: /app
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+  php70:
+    image: php:7.0-cli
+    volumes:
+      - ./:/app
+    working_dir: /app
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+  php71:
+    image: php:7.1-cli
+    volumes:
+      - ./:/app
+    working_dir: /app
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+  php72:
+    image: php:7.2-cli
+    volumes:
+      - ./:/app
+    working_dir: /app
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+  php73:
+    image: php:7.3-cli
+    volumes:
+      - ./:/app
+    working_dir: /app
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+  php74:
+    image: php:7.4-cli
+    volumes:
+      - ./:/app
+    working_dir: /app
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+  php80:
+    image: php:8.0-cli
+    volumes:
+      - ./:/app
+    working_dir: /app
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+  php81:
+    image: php:8.1-cli
+    volumes:
+      - ./:/app
+    working_dir: /app
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+  php82:
+    image: php:8.2-cli
+    volumes:
+      - ./:/app
+    working_dir: /app
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+  php83:
+    image: php:8.3-cli
+    volumes:
+      - ./:/app
+    working_dir: /app
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+  php84:
+    image: php:8.4-cli
+    volumes:
+      - ./:/app
+    working_dir: /app
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+  php85:
+    build:
+      context: .
+      dockerfile: Dockerfile.php85
+    volumes:
+      - ./:/app
+    working_dir: /app
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+networks:
+  benchmark_network:
+    driver: bridge
