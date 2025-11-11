@@ -11,17 +11,16 @@ use Jblairy\PhpBenchmark\Domain\Benchmark\Event\BenchmarkCompleted;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Event\BenchmarkStarted;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkConfiguration;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\EventDispatcherPort;
+use Jblairy\PhpBenchmark\Domain\Benchmark\Port\MessageBusPort;
 use Jblairy\PhpBenchmark\Domain\PhpVersion\Enum\PhpVersion;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 #[CoversClass(MessengerBenchmarkRunner::class)]
 final class MessengerBenchmarkRunnerTest extends TestCase
 {
-    private MessageBusInterface&MockObject $messageBus;
+    private MessageBusPort&MockObject $messageBus;
 
     private EventDispatcherPort&MockObject $eventDispatcher;
 
@@ -31,7 +30,7 @@ final class MessengerBenchmarkRunnerTest extends TestCase
     {
         parent::setUp();
 
-        $this->messageBus = $this->createMock(MessageBusInterface::class);
+        $this->messageBus = $this->createMock(MessageBusPort::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherPort::class);
         $this->messengerBenchmarkRunner = new MessengerBenchmarkRunner(
             $this->messageBus,
@@ -51,6 +50,16 @@ final class MessengerBenchmarkRunnerTest extends TestCase
             {
                 return 'test-benchmark';
             }
+
+            public function getWarmupIterations(): ?int
+            {
+                return null;
+            }
+
+            public function getInnerIterations(): ?int
+            {
+                return null;
+            }
         };
 
         $benchmarkConfiguration = new BenchmarkConfiguration(
@@ -63,10 +72,8 @@ final class MessengerBenchmarkRunnerTest extends TestCase
         $this->messageBus
             ->expects($this->exactly(3))
             ->method('dispatch')
-            ->willReturnCallback(function (object $message) use (&$messagesDispatched): Envelope {
+            ->willReturnCallback(function (object $message) use (&$messagesDispatched): void {
                 $messagesDispatched[] = $message;
-
-                return new Envelope($message);
             });
 
         // Expect start and completed events

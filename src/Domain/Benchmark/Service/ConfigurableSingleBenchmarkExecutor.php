@@ -9,11 +9,9 @@ use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkResult;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\ExecutionContext;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\IterationConfiguration;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkExecutorPort;
-use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkRepositoryPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\CodeExtractorPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptBuilderPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptExecutorPort;
-use Jblairy\PhpBenchmark\Infrastructure\Execution\ScriptBuilding\ConfigurableScriptBuilder;
 
 /**
  * Enhanced benchmark executor that uses per-benchmark iteration configuration.
@@ -24,7 +22,6 @@ final readonly class ConfigurableSingleBenchmarkExecutor implements BenchmarkExe
         private CodeExtractorPort $codeExtractorPort,
         private ScriptBuilderPort $scriptBuilderPort,
         private ScriptExecutorPort $scriptExecutorPort,
-        private BenchmarkRepositoryPort $benchmarkRepositoryPort,
     ) {
     }
 
@@ -35,30 +32,11 @@ final readonly class ConfigurableSingleBenchmarkExecutor implements BenchmarkExe
             $benchmarkConfiguration->phpVersion,
         );
 
-        // Try to get benchmark entity for custom iterations
-        $benchmark = $this->benchmarkRepositoryPort->findBenchmarkBySlug(
-            $benchmarkConfiguration->benchmark->getSlug(),
-        );
+        $benchmark = $benchmarkConfiguration->benchmark;
+        $warmupIterations = $benchmark->getWarmupIterations();
+        $innerIterations = $benchmark->getInnerIterations();
 
-        // Configure the script builder if it supports configuration
-        if ($this->scriptBuilderPort instanceof ConfigurableScriptBuilder && null !== $benchmark) {
-            // Access the underlying entity through DatabaseBenchmark adapter
-            $benchmarkEntity = $benchmark instanceof \Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Adapter\DatabaseBenchmark
-                ? $benchmark->getEntity()
-                : null;
-
-            if ($benchmarkEntity instanceof \Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Entity\Benchmark) {
-                $iterationConfig = IterationConfiguration::createWithDefaults(
-                    $benchmarkEntity->getWarmupIterations(),
-                    $benchmarkEntity->getInnerIterations(),
-                    $code,
-                );
-
-                $this->scriptBuilderPort->setIterationConfiguration($iterationConfig);
-            }
-        }
-
-        $script = $this->scriptBuilderPort->build($code);
+        $script = $this->buildScriptWithIterations($code, $warmupIterations, $innerIterations);
 
         $slug = $benchmarkConfiguration->benchmark->getSlug();
 
@@ -70,5 +48,23 @@ final readonly class ConfigurableSingleBenchmarkExecutor implements BenchmarkExe
         );
 
         return $this->scriptExecutorPort->executeScript($executionContext);
+    }
+
+    private function buildScriptWithIterations(
+        string $code,
+        ?int $warmupIterations,
+        ?int $innerIterations,
+    ): string {
+        if (null !== $warmupIterations && null !== $innerIterations) {
+            $iterationConfig = IterationConfiguration::createWithDefaults(
+                $warmupIterations,
+                $innerIterations,
+                $code,
+            );
+
+            return $this->scriptBuilderPort->buildWithIterationConfig($code, $iterationConfig);
+        }
+
+        return $this->scriptBuilderPort->build($code);
     }
 }

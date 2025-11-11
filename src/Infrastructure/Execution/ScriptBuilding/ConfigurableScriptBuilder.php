@@ -44,6 +44,16 @@ final class ConfigurableScriptBuilder implements ScriptBuilderPort
         // Reset current config after use
         $this->iterationConfiguration = null;
 
+        return $this->buildScript($methodBody, $config);
+    }
+
+    public function buildWithIterationConfig(string $methodBody, IterationConfiguration $config): string
+    {
+        return $this->buildScript($methodBody, $config);
+    }
+
+    private function buildScript(string $methodBody, IterationConfiguration $config): string
+    {
         $warmupIterations = $config->warmupIterations;
         $innerIterations = $config->innerIterations;
 

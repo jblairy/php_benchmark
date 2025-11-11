@@ -23,48 +23,22 @@ final readonly class OutlierDetector
      */
     public function detectAndRemove(array $data): OutlierDetectionResult
     {
-        if (4 > count($data)) {
-            // Not enough data points for meaningful outlier detection
-            return new OutlierDetectionResult(
-                cleanedData: $data,
-                outliers: [],
-                lowerBound: 0.0,
-                upperBound: 0.0,
-                outlierCount: 0,
-                originalCount: count($data),
-            );
+        if ($this->hasInsufficientDataPoints($data)) {
+            return $this->createEmptyResult($data);
         }
 
         $sorted = $data;
         sort($sorted);
 
-        // Calculate quartiles
-        $q1 = $this->calculateQuartile($sorted, 0.25);
-        $q3 = $this->calculateQuartile($sorted, 0.75);
-        $iqr = $q3 - $q1;
-
-        // Calculate bounds
-        $lowerBound = $q1 - (self::IQR_MULTIPLIER * $iqr);
-        $upperBound = $q3 + (self::IQR_MULTIPLIER * $iqr);
-
-        // Separate outliers and clean data
-        $cleanedData = [];
-        $outliers = [];
-
-        foreach ($data as $value) {
-            if ($value < $lowerBound || $value > $upperBound) {
-                $outliers[] = $value;
-            } else {
-                $cleanedData[] = $value;
-            }
-        }
+        $bounds = $this->calculateOutlierBounds($sorted);
+        $classification = $this->classifyDataPoints($data, $bounds);
 
         return new OutlierDetectionResult(
-            cleanedData: $cleanedData,
-            outliers: $outliers,
-            lowerBound: $lowerBound,
-            upperBound: $upperBound,
-            outlierCount: count($outliers),
+            cleanedData: $classification['clean'],
+            outliers: $classification['outliers'],
+            lowerBound: $bounds['lower'],
+            upperBound: $bounds['upper'],
+            outlierCount: count($classification['outliers']),
             originalCount: count($data),
         );
     }
@@ -87,23 +61,13 @@ final readonly class OutlierDetector
         sort($sorted);
         $median = $this->calculateQuartile($sorted, 0.5);
 
-        // Calculate MAD (Median Absolute Deviation)
-        $deviations = array_map(fn ($x): float => abs($x - $median), $data);
-        sort($deviations);
-        $mad = $this->calculateQuartile($deviations, 0.5);
+        $medianAbsoluteDeviation = $this->calculateMedianAbsoluteDeviation($data, $median);
 
-        // Avoid division by zero
-        if (0.0 === $mad) {
+        if (0.0 === $medianAbsoluteDeviation) {
             return array_fill(0, count($data), 0.0);
         }
 
-        // Calculate modified z-scores
-        $modifiedZScores = [];
-        foreach ($data as $value) {
-            $modifiedZScores[] = 0.6745 * ($value - $median) / $mad;
-        }
-
-        return $modifiedZScores;
+        return $this->calculateZScoresFromMAD($data, $median, $medianAbsoluteDeviation);
     }
 
     /**
@@ -139,6 +103,76 @@ final readonly class OutlierDetector
     }
 
     /**
+     * @param array<int, float> $data
+     */
+    private function hasInsufficientDataPoints(array $data): bool
+    {
+        return 4 > count($data);
+    }
+
+    /**
+     * @param array<int, float> $data
+     */
+    private function createEmptyResult(array $data): OutlierDetectionResult
+    {
+        return new OutlierDetectionResult(
+            cleanedData: $data,
+            outliers: [],
+            lowerBound: 0.0,
+            upperBound: 0.0,
+            outlierCount: 0,
+            originalCount: count($data),
+        );
+    }
+
+    /**
+     * @param array<int, float> $sortedData
+     *
+     * @return array{lower: float, upper: float}
+     */
+    private function calculateOutlierBounds(array $sortedData): array
+    {
+        $firstQuartile = $this->calculateQuartile($sortedData, 0.25);
+        $thirdQuartile = $this->calculateQuartile($sortedData, 0.75);
+        $interquartileRange = $thirdQuartile - $firstQuartile;
+
+        return [
+            'lower' => $firstQuartile - (self::IQR_MULTIPLIER * $interquartileRange),
+            'upper' => $thirdQuartile + (self::IQR_MULTIPLIER * $interquartileRange),
+        ];
+    }
+
+    /**
+     * @param array<int, float>                 $data
+     * @param array{lower: float, upper: float} $bounds
+     *
+     * @return array{clean: array<int, float>, outliers: array<int, float>}
+     */
+    private function classifyDataPoints(array $data, array $bounds): array
+    {
+        $clean = [];
+        $outliers = [];
+
+        foreach ($data as $key => $value) {
+            if ($this->isOutlier($value, $bounds)) {
+                $outliers[$key] = $value;
+            } else {
+                $clean[$key] = $value;
+            }
+        }
+
+        return compact('clean', 'outliers');
+    }
+
+    /**
+     * @param array{lower: float, upper: float} $bounds
+     */
+    private function isOutlier(float $value, array $bounds): bool
+    {
+        return $value < $bounds['lower'] || $value > $bounds['upper'];
+    }
+
+    /**
      * Calculate a specific quartile using linear interpolation.
      *
      * @param array<int, float> $sortedData Must be sorted in ascending order
@@ -171,5 +205,31 @@ final readonly class OutlierDetector
         $upperValue = $sortedData[$upper] ?? 0.0;
 
         return $lowerValue * (1 - $weight) + $upperValue * $weight;
+    }
+
+    /**
+     * @param array<int, float> $data
+     */
+    private function calculateMedianAbsoluteDeviation(array $data, float $median): float
+    {
+        $deviations = array_map(fn (float $value): float => abs($value - $median), $data);
+        sort($deviations);
+
+        return $this->calculateQuartile($deviations, 0.5);
+    }
+
+    /**
+     * @param array<int, float> $data
+     *
+     * @return array<int, float>
+     */
+    private function calculateZScoresFromMAD(array $data, float $median, float $mad): array
+    {
+        $modifiedZScores = [];
+        foreach ($data as $value) {
+            $modifiedZScores[] = 0.6745 * ($value - $median) / $mad;
+        }
+
+        return $modifiedZScores;
     }
 }

@@ -74,4 +74,14 @@ final readonly class DatabaseBenchmark implements Benchmark
     {
         return $this->benchmarkEntity->getPhpVersionEnums();
     }
+
+    public function getWarmupIterations(): ?int
+    {
+        return $this->benchmarkEntity->getWarmupIterations();
+    }
+
+    public function getInnerIterations(): ?int
+    {
+        return $this->benchmarkEntity->getInnerIterations();
+    }
 }

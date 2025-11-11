@@ -7,7 +7,7 @@ namespace Jblairy\PhpBenchmark\Domain\Benchmark\Service;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkConfiguration;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkResult;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkExecutorPort;
-use Psr\Log\LoggerInterface;
+use Jblairy\PhpBenchmark\Domain\Benchmark\Port\LoggerPort;
 
 use function array_map;
 use function array_sum;
@@ -39,7 +39,7 @@ final readonly class MultiSampleBenchmarkExecutor implements BenchmarkExecutorPo
 
     public function __construct(
         private BenchmarkExecutorPort $benchmarkExecutorPort,
-        private LoggerInterface $logger,
+        private LoggerPort $logger,
         private int $numberOfSamples = self::DEFAULT_SAMPLES,
     ) {
     }
@@ -48,8 +48,7 @@ final readonly class MultiSampleBenchmarkExecutor implements BenchmarkExecutorPo
     {
         $samples = $this->numberOfSamples;
 
-        // Single sample: bypass multi-sample logic
-        if (1 >= $samples) {
+        if ($this->shouldBypassMultiSampleLogic($samples)) {
             return $this->benchmarkExecutorPort->execute($benchmarkConfiguration);
         }
 
@@ -67,6 +66,11 @@ final readonly class MultiSampleBenchmarkExecutor implements BenchmarkExecutorPo
         return $benchmarkResult;
     }
 
+    private function shouldBypassMultiSampleLogic(int $samples): bool
+    {
+        return 1 >= $samples;
+    }
+
     /**
      * Collect multiple independent samples with inter-sample stabilization.
      *
@@ -82,16 +86,28 @@ final readonly class MultiSampleBenchmarkExecutor implements BenchmarkExecutorPo
                 'total_samples' => $samples,
             ]);
 
-            // Execute with fresh process state
-            $results[] = $this->benchmarkExecutorPort->execute($benchmarkConfiguration);
-
-            // Inter-sample stabilization pause (except after last sample)
-            if ($i < $samples - 1) {
-                usleep(self::INTER_SAMPLE_PAUSE_MICROSECONDS);
-            }
+            $results[] = $this->executeWithFreshProcessState($benchmarkConfiguration);
+            $this->pauseForStabilization($i, $samples);
         }
 
         return $results;
+    }
+
+    private function executeWithFreshProcessState(BenchmarkConfiguration $benchmarkConfiguration): BenchmarkResult
+    {
+        return $this->benchmarkExecutorPort->execute($benchmarkConfiguration);
+    }
+
+    private function pauseForStabilization(int $currentSample, int $totalSamples): void
+    {
+        if ($this->isNotLastSample($currentSample, $totalSamples)) {
+            usleep(self::INTER_SAMPLE_PAUSE_MICROSECONDS);
+        }
+    }
+
+    private function isNotLastSample(int $currentSample, int $totalSamples): bool
+    {
+        return $currentSample < $totalSamples - 1;
     }
 
     /**
@@ -204,7 +220,7 @@ final readonly class MultiSampleBenchmarkExecutor implements BenchmarkExecutorPo
 
         $mean = $this->calculateMean($executionTimes);
         $stdDev = $this->calculateStdDev($executionTimes);
-        $cv = 0.0 !== $mean ? ($stdDev / $mean) * 100 : 0.0;
+        $coefficientOfVariation = 0.0 !== $mean ? ($stdDev / $mean) * 100 : 0.0;
 
         $this->logger->info('Multi-sample execution completed', [
             'benchmark' => $benchmarkConfiguration->benchmark->getSlug(),
@@ -213,7 +229,7 @@ final readonly class MultiSampleBenchmarkExecutor implements BenchmarkExecutorPo
             'median_time_ms' => $benchmarkResult->executionTimeMs,
             'mean_time_ms' => $mean,
             'std_dev_ms' => $stdDev,
-            'cv_percent' => round($cv, 2),
+            'cv_percent' => round($coefficientOfVariation, 2),
             'min_time_ms' => min($executionTimes),
             'max_time_ms' => max($executionTimes),
         ]);

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Jblairy\PhpBenchmark\Tests\Unit\Application\Dashboard\DTO;
 
+use Jblairy\PhpBenchmark\Application\Dashboard\DTO\BasicMetrics;
 use Jblairy\PhpBenchmark\Application\Dashboard\DTO\BenchmarkStatisticsData;
+use Jblairy\PhpBenchmark\Application\Dashboard\DTO\MemoryMetrics;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\BenchmarkStatistics;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\PercentileMetrics;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -24,20 +26,28 @@ final class BenchmarkStatisticsDataTest extends TestCase
         );
 
         // Act
+        $basicMetrics = new BasicMetrics(
+            avg: 1.8,
+            min: 1.0,
+            max: 5.0,
+            stdDev: 0.5,
+            coefficientOfVariation: 27.78,
+            throughput: 555.56,
+        );
+
+        $memoryMetrics = new MemoryMetrics(
+            memoryUsed: 1024.5,
+            memoryPeak: 2048.0,
+        );
+
         $benchmarkStatisticsData = new BenchmarkStatisticsData(
             benchmarkId: 'test-benchmark',
             benchmarkName: 'Test Benchmark',
             phpVersion: 'php84',
             count: 100,
-            avg: 1.8,
+            basicMetrics: $basicMetrics,
             percentiles: $percentileMetrics,
-            memoryUsed: 1024.5,
-            memoryPeak: 2048.0,
-            min: 1.0,
-            max: 5.0,
-            stdDev: 0.5,
-            cv: 27.78,
-            throughput: 555.56,
+            memoryMetrics: $memoryMetrics,
         );
 
         // Assert
@@ -70,20 +80,28 @@ final class BenchmarkStatisticsDataTest extends TestCase
             p99: 4.0,
         );
 
+        $basicMetrics = new BasicMetrics(
+            avg: 1.8,
+            min: 1.0,
+            max: 5.0,
+            stdDev: 0.5,
+            coefficientOfVariation: 27.78,
+            throughput: 555.56,
+        );
+
+        $memoryMetrics = new MemoryMetrics(
+            memoryUsed: 1024.5,
+            memoryPeak: 2048.0,
+        );
+
         $benchmarkStatisticsData = new BenchmarkStatisticsData(
             benchmarkId: 'test',
             benchmarkName: 'Test',
             phpVersion: 'php84',
             count: 100,
-            avg: 1.8,
+            basicMetrics: $basicMetrics,
             percentiles: $percentileMetrics,
-            memoryUsed: 1024.5,
-            memoryPeak: 2048.0,
-            min: 1.0,
-            max: 5.0,
-            stdDev: 0.5,
-            cv: 27.78,
-            throughput: 555.56,
+            memoryMetrics: $memoryMetrics,
         );
 
         // Act & Assert - All percentiles accessible via getter methods

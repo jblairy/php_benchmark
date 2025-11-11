@@ -57,7 +57,7 @@ services:
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkExecutorPort:
         class: Jblairy\PhpBenchmark\Domain\Benchmark\Service\MultiSampleBenchmarkExecutor
         arguments:
-            $decoratedExecutor: '@Jblairy\PhpBenchmark\Domain\Benchmark\Service\ConfigurableSingleBenchmarkExecutor'
+            $benchmarkExecutorPort: '@Jblairy\PhpBenchmark\Domain\Benchmark\Service\ConfigurableSingleBenchmarkExecutor'
             $numberOfSamples: '%benchmark.samples%'
 
     # Script Builder (Port -> Adapter)
@@ -70,6 +70,16 @@ services:
     # Event Dispatcher (Port -> Adapter)
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\EventDispatcherPort:
         class: Jblairy\PhpBenchmark\Infrastructure\Async\SymfonyEventDispatcherAdapter
+
+    # Logger (Port -> Adapter)
+    # Bridges Domain LoggerPort to PSR-3 LoggerInterface
+    Jblairy\PhpBenchmark\Domain\Benchmark\Port\LoggerPort:
+        class: Jblairy\PhpBenchmark\Infrastructure\Logging\PsrLoggerAdapter
+
+    # Message Bus (Port -> Adapter)
+    # Bridges Domain MessageBusPort to Symfony Messenger
+    Jblairy\PhpBenchmark\Domain\Benchmark\Port\MessageBusPort:
+        class: Jblairy\PhpBenchmark\Infrastructure\Async\SymfonyMessageBusAdapter
 
     # Benchmark auto-tagging (moved from Domain to keep it framework-agnostic)
     _instanceof:
@@ -98,3 +108,10 @@ services:
         arguments:
             $projectDir: '%kernel.project_dir%'
         tags: ['console.command']
+
+    # Message Handlers
+    # Configure handlers via services.yaml instead of attributes to keep Application layer
+    # independent of Symfony Messenger infrastructure
+    Jblairy\PhpBenchmark\Application\MessageHandler\ExecuteBenchmarkHandler:
+        tags:
+            - { name: 'messenger.message_handler' }

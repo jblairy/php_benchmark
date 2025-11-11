@@ -6,18 +6,18 @@ namespace Jblairy\PhpBenchmark\Application\UseCase;
 
 use Jblairy\PhpBenchmark\Application\Message\ExecuteBenchmarkMessage;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkConfiguration;
-use Symfony\Component\Messenger\MessageBusInterface;
+use Jblairy\PhpBenchmark\Domain\Benchmark\Port\MessageBusPort;
 
 /**
- * Runs benchmarks asynchronously using Symfony Messenger.
+ * Runs benchmarks asynchronously using a message bus.
  *
- * This replaces AsyncBenchmarkRunner and uses the Messenger component
- * to dispatch benchmark executions to async queues.
+ * This use case dispatches benchmark executions to async queues
+ * through the MessageBusPort abstraction.
  */
 final readonly class MessengerBenchmarkRunner
 {
     public function __construct(
-        private MessageBusInterface $messageBus,
+        private MessageBusPort $messageBus,
     ) {
     }
 

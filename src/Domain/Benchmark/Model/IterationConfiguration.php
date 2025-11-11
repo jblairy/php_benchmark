@@ -41,29 +41,18 @@ final readonly class IterationConfiguration
         ?int $innerIterations = null,
         ?string $benchmarkCode = null,
     ): self {
-        // If values are provided, use them (with validation)
-        if (null !== $warmupIterations && null !== $innerIterations) {
-            return new self($warmupIterations, $innerIterations);
-        }
-
-        // Otherwise, calculate smart defaults based on benchmark code
-        if (null !== $benchmarkCode) {
-            $complexity = self::analyzeBenchmarkComplexity($benchmarkCode);
-
+        if (self::hasExplicitValues($warmupIterations, $innerIterations)) {
             return new self(
-                $warmupIterations ?? self::calculateWarmupIterations($complexity),
-                $innerIterations ?? self::calculateInnerIterations($complexity),
+                $warmupIterations ?? self::DEFAULT_WARMUP_ITERATIONS,
+                $innerIterations ?? self::DEFAULT_INNER_ITERATIONS,
             );
         }
 
-        // Fallback to environment defaults or hardcoded defaults
-        $envWarmup = $_ENV['BENCHMARK_WARMUP_ITERATIONS'] ?? self::DEFAULT_WARMUP_ITERATIONS;
-        $envInner = $_ENV['BENCHMARK_INNER_ITERATIONS'] ?? self::DEFAULT_INNER_ITERATIONS;
+        if (self::canCalculateFromCode($benchmarkCode)) {
+            return self::createFromCodeComplexity($benchmarkCode, $warmupIterations, $innerIterations);
+        }
 
-        return new self(
-            $warmupIterations ?? (is_numeric($envWarmup) ? (int) $envWarmup : self::DEFAULT_WARMUP_ITERATIONS),
-            $innerIterations ?? (is_numeric($envInner) ? (int) $envInner : self::DEFAULT_INNER_ITERATIONS),
-        );
+        return self::createFromEnvironmentDefaults($warmupIterations, $innerIterations);
     }
 
     /**
@@ -85,6 +74,57 @@ final readonly class IterationConfiguration
             $this->innerIterations,
             $this->innerIterations,
         );
+    }
+
+    private static function hasExplicitValues(?int $warmupIterations, ?int $innerIterations): bool
+    {
+        return null !== $warmupIterations && null !== $innerIterations;
+    }
+
+    private static function canCalculateFromCode(?string $benchmarkCode): bool
+    {
+        return null !== $benchmarkCode;
+    }
+
+    private static function createFromCodeComplexity(
+        ?string $benchmarkCode,
+        ?int $warmupIterations,
+        ?int $innerIterations,
+    ): self {
+        if (null === $benchmarkCode) {
+            return self::createFromEnvironmentDefaults($warmupIterations, $innerIterations);
+        }
+
+        $complexity = self::analyzeBenchmarkComplexity($benchmarkCode);
+
+        return new self(
+            $warmupIterations ?? self::calculateWarmupIterations($complexity),
+            $innerIterations ?? self::calculateInnerIterations($complexity),
+        );
+    }
+
+    private static function createFromEnvironmentDefaults(
+        ?int $warmupIterations,
+        ?int $innerIterations,
+    ): self {
+        return new self(
+            $warmupIterations ?? self::getWarmupFromEnvironment(),
+            $innerIterations ?? self::getInnerFromEnvironment(),
+        );
+    }
+
+    private static function getWarmupFromEnvironment(): int
+    {
+        $envValue = $_ENV['BENCHMARK_WARMUP_ITERATIONS'] ?? self::DEFAULT_WARMUP_ITERATIONS;
+
+        return is_numeric($envValue) ? (int) $envValue : self::DEFAULT_WARMUP_ITERATIONS;
+    }
+
+    private static function getInnerFromEnvironment(): int
+    {
+        $envValue = $_ENV['BENCHMARK_INNER_ITERATIONS'] ?? self::DEFAULT_INNER_ITERATIONS;
+
+        return is_numeric($envValue) ? (int) $envValue : self::DEFAULT_INNER_ITERATIONS;
     }
 
     /**

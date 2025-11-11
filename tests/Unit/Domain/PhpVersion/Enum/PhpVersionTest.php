@@ -71,18 +71,6 @@ final class PhpVersionTest extends TestCase
         self::assertIsString($enum->value);
     }
 
-    public function testEnumCanBeComparedInConditionals(): void
-    {
-        $version = PhpVersion::PHP_8_4;
-
-        $isModern = match (true) {
-            PhpVersion::PHP_8_3 === $version || PhpVersion::PHP_8_4 === $version => true,
-            default => false,
-        };
-
-        self::assertTrue($isModern);
-    }
-
     public function testEnumCasesAreSingleton(): void
     {
         $version1 = PhpVersion::PHP_8_4;

@@ -12,20 +12,21 @@ use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkConfiguration;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkExecutorPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkRepositoryPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\EventDispatcherPort;
+use Jblairy\PhpBenchmark\Domain\Benchmark\Port\LoggerPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ResultPersisterPort;
 use Jblairy\PhpBenchmark\Domain\PhpVersion\Enum\PhpVersion;
-use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Throwable;
 
 /**
- * Handles asynchronous benchmark execution via Symfony Messenger.
+ * Handles asynchronous benchmark execution via message bus.
  *
  * This handler processes ExecuteBenchmarkMessage from the async queue,
  * executes the benchmark, persists results, and dispatches progress events.
+ *
+ * Configuration: Tagged as message handler in services.yaml to keep
+ * Application layer independent of Symfony Messenger infrastructure.
  */
-#[AsMessageHandler]
 final readonly class ExecuteBenchmarkHandler
 {
     public function __construct(
@@ -33,7 +34,7 @@ final readonly class ExecuteBenchmarkHandler
         private ResultPersisterPort $resultPersisterPort,
         private EventDispatcherPort $eventDispatcherPort,
         private BenchmarkRepositoryPort $benchmarkRepositoryPort,
-        private LoggerInterface $logger,
+        private LoggerPort $logger,
     ) {
     }
 

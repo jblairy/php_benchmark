@@ -17,4 +17,14 @@ interface Benchmark
     public function getMethodBody(PhpVersion $phpVersion): string;
 
     public function getSlug(): string;
+
+    /**
+     * Returns custom warmup iterations for this benchmark, or null for defaults.
+     */
+    public function getWarmupIterations(): ?int;
+
+    /**
+     * Returns custom inner iterations for this benchmark, or null for defaults.
+     */
+    public function getInnerIterations(): ?int;
 }

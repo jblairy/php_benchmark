@@ -17,7 +17,7 @@ final readonly class GetBenchmarkStatistics
 {
     public function __construct(
         private PulseRepositoryPort $pulseRepositoryPort,
-        private EnhancedStatisticsCalculator $enhancedStatisticsCalculator,
+        private EnhancedStatisticsCalculator $statsCalculator,
     ) {
     }
 
@@ -27,7 +27,7 @@ final readonly class GetBenchmarkStatistics
 
         $phpVersionStats = [];
         foreach ($metrics as $metric) {
-            $statistics = $this->enhancedStatisticsCalculator->calculate($metric);
+            $statistics = $this->statsCalculator->calculate($metric);
             $phpVersionStats[$metric->phpVersion] = BenchmarkStatisticsData::fromDomain($statistics);
         }
 

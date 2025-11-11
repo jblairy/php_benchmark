@@ -43,17 +43,48 @@ final readonly class EnhancedStatisticsCalculator
             return $this->createEmptyStatistics($benchmarkMetrics);
         }
 
-        // Detect outliers in execution times
-        $outlierDetectionResult = $this->outlierDetector->detectAndRemove($benchmarkMetrics->executionTimes);
+        $outlierDetectionResult = $this->detectOutliers($benchmarkMetrics);
+        $dataToAnalyze = $this->selectDataForAnalysis($outlierDetectionResult, $benchmarkMetrics);
 
-        // Use cleaned data if outlier removal is enabled
-        $dataToAnalyze = $this->removeOutliers ? $outlierDetectionResult->cleanedData : $benchmarkMetrics->executionTimes;
+        $cleanedStatistics = $this->calculateCleanedStatistics($dataToAnalyze);
+        $rawStatistics = $this->calculateRawStatistics($benchmarkMetrics);
 
-        // Calculate statistics on the appropriate dataset
+        return $this->buildEnhancedStatistics(
+            $benchmarkMetrics,
+            $cleanedStatistics,
+            $rawStatistics,
+            $outlierDetectionResult,
+        );
+    }
+
+    private function detectOutliers(BenchmarkMetrics $benchmarkMetrics): OutlierDetectionResult
+    {
+        return $this->outlierDetector->detectAndRemove($benchmarkMetrics->executionTimes);
+    }
+
+    /**
+     * @return array<int, float>
+     */
+    private function selectDataForAnalysis(
+        OutlierDetectionResult $outlierResult,
+        BenchmarkMetrics $benchmarkMetrics,
+    ): array {
+        return $this->removeOutliers
+            ? $outlierResult->cleanedData
+            : $benchmarkMetrics->executionTimes;
+    }
+
+    /**
+     * @param array<int, float> $dataToAnalyze
+     *
+     * @return array{percentiles: PercentileMetrics, average: float, stdDev: float, cv: float, throughput: float, min: float, max: float}
+     */
+    private function calculateCleanedStatistics(array $dataToAnalyze): array
+    {
         $sortedTimes = $dataToAnalyze;
         sort($sortedTimes);
 
-        $percentileMetrics = new PercentileMetrics(
+        $percentiles = new PercentileMetrics(
             p50: $this->calculatePercentile($sortedTimes, self::PERCENTILE_P50),
             p90: $this->calculatePercentile($sortedTimes, self::PERCENTILE_P90),
             p95: $this->calculatePercentile($sortedTimes, self::PERCENTILE_P95),
@@ -61,38 +92,69 @@ final readonly class EnhancedStatisticsCalculator
         );
 
         $average = $this->calculateAverage($dataToAnalyze);
-        $standardDeviation = $this->calculateStandardDeviation($dataToAnalyze, $average);
-        $coefficientOfVariation = $this->calculateCoefficientOfVariation($standardDeviation, $average);
+        $stdDev = $this->calculateStandardDeviation($dataToAnalyze, $average);
+        $coefficientOfVariation = $this->calculateCoefficientOfVariation($stdDev, $average);
         $throughput = $this->calculateThroughput($average);
 
-        // Also calculate raw statistics for comparison
+        return [
+            'percentiles' => $percentiles,
+            'average' => $average,
+            'stdDev' => $stdDev,
+            'cv' => $coefficientOfVariation,
+            'throughput' => $throughput,
+            'min' => $this->calculateMin($dataToAnalyze),
+            'max' => $this->calculateMax($dataToAnalyze),
+        ];
+    }
+
+    /**
+     * @return array{average: float, stdDev: float, cv: float}
+     */
+    private function calculateRawStatistics(BenchmarkMetrics $benchmarkMetrics): array
+    {
         $rawAverage = $this->calculateAverage($benchmarkMetrics->executionTimes);
         $rawStdDev = $this->calculateStandardDeviation($benchmarkMetrics->executionTimes, $rawAverage);
         $rawCV = $this->calculateCoefficientOfVariation($rawStdDev, $rawAverage);
 
+        return [
+            'average' => $rawAverage,
+            'stdDev' => $rawStdDev,
+            'cv' => $rawCV,
+        ];
+    }
+
+    /**
+     * @param array{percentiles: PercentileMetrics, average: float, stdDev: float, cv: float, throughput: float, min: float, max: float} $cleanedStats
+     * @param array{average: float, stdDev: float, cv: float}                                                                            $rawStats
+     */
+    private function buildEnhancedStatistics(
+        BenchmarkMetrics $benchmarkMetrics,
+        array $cleanedStats,
+        array $rawStats,
+        OutlierDetectionResult $outlierDetectionResult,
+    ): EnhancedBenchmarkStatistics {
         return new EnhancedBenchmarkStatistics(
             benchmarkId: $benchmarkMetrics->benchmarkId,
             benchmarkName: $benchmarkMetrics->benchmarkName,
             phpVersion: $benchmarkMetrics->phpVersion,
-            executionCount: count($dataToAnalyze),
-            averageExecutionTime: $average,
-            percentileMetrics: $percentileMetrics,
+            executionCount: count($this->selectDataForAnalysis($outlierDetectionResult, $benchmarkMetrics)),
+            averageExecutionTime: $cleanedStats['average'],
+            percentileMetrics: $cleanedStats['percentiles'],
             averageMemoryUsed: $this->calculateAverage($benchmarkMetrics->memoryUsages),
             peakMemoryUsed: $this->calculateMax($benchmarkMetrics->memoryPeaks),
-            minExecutionTime: $this->calculateMin($dataToAnalyze),
-            maxExecutionTime: $this->calculateMax($dataToAnalyze),
-            standardDeviation: $standardDeviation,
-            coefficientOfVariation: $coefficientOfVariation,
-            throughput: $throughput,
-            // Enhanced metrics
+            minExecutionTime: $cleanedStats['min'],
+            maxExecutionTime: $cleanedStats['max'],
+            standardDeviation: $cleanedStats['stdDev'],
+            coefficientOfVariation: $cleanedStats['cv'],
+            throughput: $cleanedStats['throughput'],
             outlierCount: $outlierDetectionResult->outlierCount,
             outlierPercentage: $outlierDetectionResult->getOutlierPercentage(),
             outliers: $outlierDetectionResult->outliers,
             rawExecutionCount: $benchmarkMetrics->getExecutionCount(),
-            rawAverage: $rawAverage,
-            rawStdDev: $rawStdDev,
-            rawCV: $rawCV,
-            stabilityScore: $this->calculateStabilityScore($coefficientOfVariation, $outlierDetectionResult),
+            rawAverage: $rawStats['average'],
+            rawStdDev: $rawStats['stdDev'],
+            rawCV: $rawStats['cv'],
+            stabilityScore: $this->calculateStabilityScore($cleanedStats['cv'], $outlierDetectionResult),
         );
     }
 
@@ -100,18 +162,29 @@ final readonly class EnhancedStatisticsCalculator
      * Calculate a stability score from 0 to 100.
      * Higher score = more stable benchmark.
      */
-    private function calculateStabilityScore(float $cv, OutlierDetectionResult $outlierDetectionResult): float
+    private function calculateStabilityScore(float $coefficientOfVariation, OutlierDetectionResult $outlierDetectionResult): float
     {
-        // Base score from CV% (lower CV = higher score)
-        $cvScore = max(0, 100 - ($cv * 5)); // CV of 20% = score of 0
+        $baseScore = $this->calculateBaseScoreFromCV($coefficientOfVariation);
+        $penalty = $this->calculateOutlierPenalty($outlierDetectionResult);
 
-        // Penalty for outliers
-        $outlierPenalty = min(30, $outlierDetectionResult->getOutlierPercentage() * 3); // Max 30 point penalty
-
-        // Final score
-        $score = max(0, $cvScore - $outlierPenalty);
+        $score = max(0, $baseScore - $penalty);
 
         return round($score, 2);
+    }
+
+    private function calculateBaseScoreFromCV(float $coefficientOfVariation): float
+    {
+        $cvImpact = $coefficientOfVariation * 5;
+
+        return max(0, 100 - $cvImpact);
+    }
+
+    private function calculateOutlierPenalty(OutlierDetectionResult $outlierDetectionResult): float
+    {
+        $maxPenalty = 30;
+        $penaltyFactor = 3;
+
+        return min($maxPenalty, $outlierDetectionResult->getOutlierPercentage() * $penaltyFactor);
     }
 
     /**

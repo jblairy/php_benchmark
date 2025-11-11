@@ -15,49 +15,91 @@ use Jblairy\PhpBenchmark\Domain\Dashboard\Model\PercentileMetrics;
  * Percentiles are accessible via the percentiles property or convenience methods.
  * Supports enhanced statistics with outlier detection.
  */
-final readonly class BenchmarkStatisticsData
+final class BenchmarkStatisticsData
 {
+    public float $avg {
+        get => $this->basicMetrics->avg;
+    }
+
+    public float $min {
+        get => $this->basicMetrics->min;
+    }
+
+    public float $max {
+        get => $this->basicMetrics->max;
+    }
+
+    public float $stdDev {
+        get => $this->basicMetrics->stdDev;
+    }
+
+    public float $cv {
+        get => $this->basicMetrics->coefficientOfVariation;
+    }
+
+    public float $throughput {
+        get => $this->basicMetrics->throughput;
+    }
+
+    public float $memoryUsed {
+        get => $this->memoryMetrics->memoryUsed;
+    }
+
+    public float $memoryPeak {
+        get => $this->memoryMetrics->memoryPeak;
+    }
+
+    public ?int $outlierCount {
+        get => $this->outlierMetrics?->outlierCount;
+    }
+
+    public ?float $outlierPercentage {
+        get => $this->outlierMetrics?->outlierPercentage;
+    }
+
+    public ?float $rawCV {
+        get => $this->outlierMetrics?->rawCV;
+    }
+
+    public ?float $stabilityScore {
+        get => $this->outlierMetrics?->stabilityScore;
+    }
+
+    public ?string $stabilityRating {
+        get => $this->outlierMetrics?->stabilityRating;
+    }
+
     public function __construct(
-        public string $benchmarkId,
-        public string $benchmarkName,
-        public string $phpVersion,
-        public int $count,
-        public float $avg,
-        public PercentileMetrics $percentiles,
-        public float $memoryUsed,
-        public float $memoryPeak,
-        public float $min,
-        public float $max,
-        public float $stdDev,
-        public float $cv,
-        public float $throughput,
-        // Enhanced statistics
-        public ?int $outlierCount = null,
-        public ?float $outlierPercentage = null,
-        public ?float $rawCV = null,
-        public ?float $stabilityScore = null,
-        public ?string $stabilityRating = null,
+        public readonly string $benchmarkId,
+        public readonly string $benchmarkName,
+        public readonly string $phpVersion,
+        public readonly int $count,
+        public readonly BasicMetrics $basicMetrics,
+        public readonly PercentileMetrics $percentiles,
+        public readonly MemoryMetrics $memoryMetrics,
+        public readonly ?OutlierMetrics $outlierMetrics = null,
     ) {
     }
 
     public static function fromDomain(BenchmarkStatistics $benchmarkStatistics): self
     {
-        // Check if this is an enhanced statistics object
+        $basicMetrics = new BasicMetrics(
+            avg: $benchmarkStatistics->averageExecutionTime,
+            min: $benchmarkStatistics->minExecutionTime,
+            max: $benchmarkStatistics->maxExecutionTime,
+            stdDev: $benchmarkStatistics->standardDeviation,
+            coefficientOfVariation: $benchmarkStatistics->coefficientOfVariation,
+            throughput: $benchmarkStatistics->throughput,
+        );
+
+        $memoryMetrics = new MemoryMetrics(
+            memoryUsed: $benchmarkStatistics->averageMemoryUsed,
+            memoryPeak: $benchmarkStatistics->peakMemoryUsed,
+        );
+
+        $outlierMetrics = null;
         if ($benchmarkStatistics instanceof EnhancedBenchmarkStatistics) {
-            return new self(
-                benchmarkId: $benchmarkStatistics->benchmarkId,
-                benchmarkName: $benchmarkStatistics->benchmarkName,
-                phpVersion: $benchmarkStatistics->phpVersion,
-                count: $benchmarkStatistics->executionCount,
-                avg: $benchmarkStatistics->averageExecutionTime,
-                percentiles: $benchmarkStatistics->percentiles,
-                memoryUsed: $benchmarkStatistics->averageMemoryUsed,
-                memoryPeak: $benchmarkStatistics->peakMemoryUsed,
-                min: $benchmarkStatistics->minExecutionTime,
-                max: $benchmarkStatistics->maxExecutionTime,
-                stdDev: $benchmarkStatistics->standardDeviation,
-                cv: $benchmarkStatistics->coefficientOfVariation,
-                throughput: $benchmarkStatistics->throughput,
+            $outlierMetrics = new OutlierMetrics(
                 outlierCount: $benchmarkStatistics->outlierCount,
                 outlierPercentage: $benchmarkStatistics->outlierPercentage,
                 rawCV: $benchmarkStatistics->rawCV,
@@ -66,21 +108,15 @@ final readonly class BenchmarkStatisticsData
             );
         }
 
-        // Fallback to basic statistics
         return new self(
             benchmarkId: $benchmarkStatistics->benchmarkId,
             benchmarkName: $benchmarkStatistics->benchmarkName,
             phpVersion: $benchmarkStatistics->phpVersion,
             count: $benchmarkStatistics->executionCount,
-            avg: $benchmarkStatistics->averageExecutionTime,
+            basicMetrics: $basicMetrics,
             percentiles: $benchmarkStatistics->percentiles,
-            memoryUsed: $benchmarkStatistics->averageMemoryUsed,
-            memoryPeak: $benchmarkStatistics->peakMemoryUsed,
-            min: $benchmarkStatistics->minExecutionTime,
-            max: $benchmarkStatistics->maxExecutionTime,
-            stdDev: $benchmarkStatistics->standardDeviation,
-            cv: $benchmarkStatistics->coefficientOfVariation,
-            throughput: $benchmarkStatistics->throughput,
+            memoryMetrics: $memoryMetrics,
+            outlierMetrics: $outlierMetrics,
         );
     }
 
@@ -106,42 +142,21 @@ final readonly class BenchmarkStatisticsData
 
     public function hasOutliers(): bool
     {
-        return null !== $this->outlierCount && 0 < $this->outlierCount;
+        return $this->outlierMetrics?->hasOutliers() ?? false;
     }
 
     public function getOutlierInfo(): string
     {
-        if (!$this->hasOutliers()) {
-            return 'No outliers';
-        }
-
-        return sprintf(
-            '%d outliers (%.1f%%) removed',
-            $this->outlierCount,
-            $this->outlierPercentage ?? 0,
-        );
+        return $this->outlierMetrics?->getOutlierInfo() ?? 'No outliers';
     }
 
     public function getCVImprovement(): ?float
     {
-        if (null === $this->rawCV || 0.0 === $this->rawCV) {
-            return null;
-        }
-
-        return (($this->rawCV - $this->cv) / $this->rawCV) * 100;
+        return $this->outlierMetrics?->getCVImprovement($this->cv);
     }
 
     public function getStabilityScoreColor(): string
     {
-        if (null === $this->stabilityScore) {
-            return 'secondary';
-        }
-
-        return match (true) {
-            90 <= $this->stabilityScore => 'success',
-            75 <= $this->stabilityScore => 'info',
-            60 <= $this->stabilityScore => 'warning',
-            default => 'danger',
-        };
+        return $this->outlierMetrics?->getStabilityScoreColor() ?? 'secondary';
     }
 }

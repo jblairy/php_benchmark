@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jblairy\PhpBenchmark\Infrastructure\Execution\ScriptBuilding;
 
+use Jblairy\PhpBenchmark\Domain\Benchmark\Model\IterationConfiguration;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptBuilderPort;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -25,6 +26,16 @@ final readonly class ScriptBuilder implements ScriptBuilderPort
         $warmupIterations = $this->warmupIterations;
         $innerIterations = $this->innerIterations;
 
+        return $this->buildScript($methodBody, $warmupIterations, $innerIterations);
+    }
+
+    public function buildWithIterationConfig(string $methodBody, IterationConfiguration $config): string
+    {
+        return $this->buildScript($methodBody, $config->warmupIterations, $config->innerIterations);
+    }
+
+    private function buildScript(string $methodBody, int $warmupIterations, int $innerIterations): string
+    {
         return <<<PHP
                 // ============================================================
                 // Phase 0: CPU Affinity (if available)
