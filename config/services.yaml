@@ -51,7 +51,7 @@ services:
 
     # Script Builder (Port -> Adapter)
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptBuilderPort:
-        class: Jblairy\PhpBenchmark\Infrastructure\Execution\ScriptBuilding\InstrumentedScriptBuilder
+        class: Jblairy\PhpBenchmark\Infrastructure\Execution\ScriptBuilding\ConfigurableStableScriptBuilder
 
     # Event Dispatcher (Port -> Adapter)
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\EventDispatcherPort:
