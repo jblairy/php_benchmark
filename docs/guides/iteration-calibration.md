@@ -64,40 +64,40 @@ php bin/console benchmark:calibrate --all --php-version=php84
 ### 1. Measure Baseline
 
 ```
-Execute with minimal iterations:
-- warmup: 1
-- inner: 10
-
+Execute code once (code already contains loops)
 Measure actual execution time
 ```
 
-### 2. Calculate Time Per Iteration
+**Note:** Benchmark fixtures already contain their own loops (e.g., `for ($i = 0; $i < 100000; $i++)`). The calibration measures this single execution, then calculates how many times to repeat it.
+
+### 2. Calculate Optimal Inner Iterations
 
 ```
-time_per_iteration = measured_time / 10
+optimal_inner = target_time / measured_time
 ```
 
-### 3. Extrapolate to Target
+**Example:**
+- Measured time: 50ms for one execution
+- Target: 1000ms
+- Result: `inner = 1000 / 50 = 20`
+
+### 3. Adjust Warmup Based on Execution Time
 
 ```
-optimal_inner = target_time / time_per_iteration
+if measured_time > 100ms: warmup = 1  # Heavy benchmark
+if measured_time > 50ms:  warmup = 3
+if measured_time > 10ms:  warmup = 5
+if measured_time > 1ms:   warmup = 10
+else:                     warmup = 15  # Light benchmark
 ```
 
-### 4. Adjust Warmup
+**Rationale:** Heavy operations need fewer warmup iterations, while light operations benefit from more warmup for CPU cache stability.
 
-```
-if inner <= 20:  warmup = 1
-if inner <= 50:  warmup = 3
-if inner <= 100: warmup = 5
-if inner <= 200: warmup = 10
-else:            warmup = 15
-```
-
-### 5. Clamp Values
+### 4. Clamp Values
 
 ```
 inner: 10 to 1000
-warmup: 1 to 20
+warmup: determined by complexity (see step 3)
 ```
 
 ## Calibration Strategy

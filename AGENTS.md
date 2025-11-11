@@ -25,6 +25,11 @@ make assets.refresh    # Force refresh assets: compile, regenerate hashes, clear
 make run test=Loop iterations=10              # Run specific benchmark
 docker-compose run --rm main php bin/console benchmark:run --test=Loop --php-version=php84
 
+# Benchmark Calibration
+docker-compose run --rm main php bin/console benchmark:calibrate --all --dry-run  # Preview optimal iterations
+docker-compose run --rm main php bin/console benchmark:calibrate --all            # Apply calibration
+docker-compose run --rm main php bin/console benchmark:calibrate --benchmark=access-instance-property  # Single benchmark
+
 # Mercure (Real-Time)
 ./scripts/mercure-verify.sh              # Verify Mercure setup
 ./scripts/mercure-listen.sh              # Watch real-time events

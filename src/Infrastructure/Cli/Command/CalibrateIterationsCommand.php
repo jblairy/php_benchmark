@@ -26,8 +26,6 @@ use Symfony\Component\Yaml\Yaml;
 final class CalibrateIterationsCommand extends Command
 {
     private const float DEFAULT_TARGET_TIME_MS = 1000.0; // 1 second
-    private const int MIN_WARMUP = 1;
-    private const int MAX_WARMUP = 20;
     private const int MIN_INNER = 10;
     private const int MAX_INNER = 1000;
 
@@ -52,8 +50,12 @@ final class CalibrateIterationsCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $targetTimeMs = (float) $input->getOption('target-time');
-        $phpVersion = (string) $input->getOption('php-version');
+        $targetTimeMsOption = $input->getOption('target-time');
+        $targetTimeMs = is_numeric($targetTimeMsOption) ? (float) $targetTimeMsOption : self::DEFAULT_TARGET_TIME_MS;
+        
+        $phpVersionOption = $input->getOption('php-version');
+        $phpVersion = is_string($phpVersionOption) ? $phpVersionOption : 'php56';
+        
         $dryRun = (bool) $input->getOption('dry-run');
         $force = (bool) $input->getOption('force');
 
@@ -75,22 +77,31 @@ final class CalibrateIterationsCommand extends Command
         }
 
         // Get benchmarks to calibrate
+        /** @var list<string> $benchmarkFiles */
         $benchmarkFiles = [];
-        if ($input->getOption('all')) {
-            $benchmarkFiles = glob($fixturesPath . '/*.yaml');
+        if (true === $input->getOption('all')) {
+            $globResult = glob($fixturesPath . '/*.yaml');
+            if (false === $globResult) {
+                $io->error('Failed to read fixtures directory');
+
+                return Command::FAILURE;
+            }
+            $benchmarkFiles = $globResult;
             $io->info(sprintf('Calibrating %d benchmarks...', count($benchmarkFiles)));
-        } elseif ($benchmarkSlug = $input->getOption('benchmark')) {
-            $file = $fixturesPath . '/' . $benchmarkSlug . '.yaml';
+        } else {
+            $benchmarkSlugOption = $input->getOption('benchmark');
+            if (!is_string($benchmarkSlugOption)) {
+                $io->error('Please specify --benchmark=<slug> or --all');
+
+                return Command::FAILURE;
+            }
+            $file = $fixturesPath . '/' . $benchmarkSlugOption . '.yaml';
             if (!file_exists($file)) {
-                $io->error(sprintf('Benchmark not found: %s', $benchmarkSlug));
+                $io->error(sprintf('Benchmark not found: %s', $benchmarkSlugOption));
 
                 return Command::FAILURE;
             }
             $benchmarkFiles = [$file];
-        } else {
-            $io->error('Please specify --benchmark=<slug> or --all');
-
-            return Command::FAILURE;
         }
 
         $io->progressStart(count($benchmarkFiles));
@@ -104,7 +115,13 @@ final class CalibrateIterationsCommand extends Command
 
             try {
                 $data = Yaml::parseFile($file);
-                $slug = $data['slug'] ?? basename($file, '.yaml');
+                if (!is_array($data)) {
+                    ++$skipped;
+
+                    continue;
+                }
+
+                $slug = is_string($data['slug'] ?? null) ? $data['slug'] : basename($file, '.yaml');
 
                 // Skip if already configured and not forced
                 if (!$force && (isset($data['warmupIterations']) || isset($data['innerIterations']))) {
@@ -114,7 +131,7 @@ final class CalibrateIterationsCommand extends Command
                 }
 
                 // Skip loop/iteration benchmarks
-                $category = $data['category'] ?? '';
+                $category = is_string($data['category'] ?? null) ? $data['category'] : '';
                 if (in_array($category, ['Iteration', 'Loop'], true)) {
                     ++$skipped;
 
@@ -184,16 +201,16 @@ final class CalibrateIterationsCommand extends Command
     }
 
     /**
-     * @param array<string, mixed> $benchmarkData
+     * @param array<mixed> $benchmarkData
      *
      * @return array{benchmark: string, measured_time: float, suggested_warmup: int, suggested_inner: int, efficiency: float}|null
      */
     private function calibrateBenchmark(array $benchmarkData, float $targetTimeMs): ?array
     {
-        $code = $benchmarkData['code'] ?? '';
-        $slug = $benchmarkData['slug'] ?? 'unknown';
+        $code = is_string($benchmarkData['code'] ?? null) ? $benchmarkData['code'] : '';
+        $slug = is_string($benchmarkData['slug'] ?? null) ? $benchmarkData['slug'] : 'unknown';
 
-        if (empty($code)) {
+        if ('' === $code) {
             return null;
         }
 
@@ -254,14 +271,20 @@ final class CalibrateIterationsCommand extends Command
             $output = shell_exec("timeout 5s php {$tempFile} 2>&1");
             @unlink($tempFile);
 
-            if (null === $output || '' === mb_trim($output)) {
+            if (null === $output) {
+                return null;
+            }
+            
+            $trimmedOutput = mb_trim($output);
+            if ('' === $trimmedOutput) {
                 return null;
             }
 
             // Extract JSON from output (ignore PHP notices/warnings)
-            $lines = explode("\n", mb_trim($output));
+            $lines = explode("\n", $trimmedOutput);
             $jsonLine = null;
             foreach (array_reverse($lines) as $line) {
+                assert(is_string($line));
                 $trimmed = mb_trim($line);
                 if ('' !== $trimmed && str_starts_with($trimmed, '{')) {
                     $jsonLine = $trimmed;
@@ -279,7 +302,12 @@ final class CalibrateIterationsCommand extends Command
                 return null;
             }
 
-            return (float) $result['execution_time_ms'];
+            $executionTime = $result['execution_time_ms'];
+            if (!is_numeric($executionTime)) {
+                return null;
+            }
+
+            return (float) $executionTime;
         } catch (Exception $e) {
             return null;
         }
@@ -291,6 +319,10 @@ final class CalibrateIterationsCommand extends Command
     private function updateFixture(string $filename, array $calibration): void
     {
         $data = Yaml::parseFile($filename);
+        if (!is_array($data)) {
+            return;
+        }
+        
         $data['warmupIterations'] = $calibration['suggested_warmup'];
         $data['innerIterations'] = $calibration['suggested_inner'];
 
