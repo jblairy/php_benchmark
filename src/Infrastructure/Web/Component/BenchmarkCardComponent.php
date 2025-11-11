@@ -26,29 +26,31 @@ final class BenchmarkCardComponent
     #[LiveProp]
     public string $benchmarkName = '';
 
-    private ?BenchmarkData $data = null;
+    private ?BenchmarkData $benchmarkData = null;
+
     private ?Chart $chart = null;
-    private ?DatabaseBenchmark $benchmark = null;
+
+    private ?DatabaseBenchmark $databaseBenchmark = null;
 
     public function __construct(
         private readonly GetBenchmarkStatistics $getBenchmarkStatistics,
         private readonly ChartBuilder $chartBuilder,
-        private readonly BenchmarkRepositoryPort $benchmarkRepository,
+        private readonly BenchmarkRepositoryPort $benchmarkRepositoryPort,
     ) {
     }
 
     public function getData(): ?BenchmarkData
     {
-        if (null === $this->data && '' !== $this->benchmarkId && '' !== $this->benchmarkName) {
-            $this->data = $this->getBenchmarkStatistics->execute($this->benchmarkId, $this->benchmarkName);
+        if (null === $this->benchmarkData && '' !== $this->benchmarkId && '' !== $this->benchmarkName) {
+            $this->benchmarkData = $this->getBenchmarkStatistics->execute($this->benchmarkId, $this->benchmarkName);
         }
 
-        return $this->data;
+        return $this->benchmarkData;
     }
 
     public function getChart(): ?Chart
     {
-        if (null === $this->chart && null !== $this->getData()) {
+        if (!$this->chart instanceof Chart && $this->getData() instanceof BenchmarkData) {
             $this->chart = $this->chartBuilder->createBenchmarkChart(
                 $this->getData(),
                 $this->getAllPhpVersions(),
@@ -96,18 +98,18 @@ final class BenchmarkCardComponent
      */
     private function getAllPhpVersions(): array
     {
-        return array_map(fn (PhpVersion $version): string => $version->value, PhpVersion::cases());
+        return array_map(fn (PhpVersion $phpVersion): string => $phpVersion->value, PhpVersion::cases());
     }
 
     private function getBenchmark(): ?DatabaseBenchmark
     {
-        if (null === $this->benchmark && '' !== $this->benchmarkId) {
-            $found = $this->benchmarkRepository->findBenchmarkByName($this->benchmarkId);
+        if (null === $this->databaseBenchmark && '' !== $this->benchmarkId) {
+            $found = $this->benchmarkRepositoryPort->findBenchmarkByName($this->benchmarkId);
             if ($found instanceof DatabaseBenchmark) {
-                $this->benchmark = $found;
+                $this->databaseBenchmark = $found;
             }
         }
 
-        return $this->benchmark;
+        return $this->databaseBenchmark;
     }
 }

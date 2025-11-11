@@ -11,15 +11,15 @@ final class BenchmarkResultTest extends TestCase
 {
     public function testConstructorCreatesImmutableValueObject(): void
     {
-        $result = new BenchmarkResult(
+        $benchmarkResult = new BenchmarkResult(
             executionTimeMs: 12.5,
             memoryUsedBytes: 1024.0,
             memoryPeakBytes: 2048.0,
         );
 
-        self::assertSame(12.5, $result->executionTimeMs);
-        self::assertSame(1024.0, $result->memoryUsedBytes);
-        self::assertSame(2048.0, $result->memoryPeakBytes);
+        self::assertEqualsWithDelta(12.5, $benchmarkResult->executionTimeMs, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(1024.0, $benchmarkResult->memoryUsedBytes, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(2048.0, $benchmarkResult->memoryPeakBytes, PHP_FLOAT_EPSILON);
     }
 
     public function testFromArrayWithValidData(): void
@@ -30,11 +30,11 @@ final class BenchmarkResultTest extends TestCase
             'memory_peak_bytes' => 4096.25,
         ];
 
-        $result = BenchmarkResult::fromArray($data);
+        $benchmarkResult = BenchmarkResult::fromArray($data);
 
-        self::assertSame(15.75, $result->executionTimeMs);
-        self::assertSame(2048.5, $result->memoryUsedBytes);
-        self::assertSame(4096.25, $result->memoryPeakBytes);
+        self::assertEqualsWithDelta(15.75, $benchmarkResult->executionTimeMs, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(2048.5, $benchmarkResult->memoryUsedBytes, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(4096.25, $benchmarkResult->memoryPeakBytes, PHP_FLOAT_EPSILON);
     }
 
     public function testFromArrayWithIntegerValues(): void
@@ -45,11 +45,11 @@ final class BenchmarkResultTest extends TestCase
             'memory_peak_bytes' => 2048,
         ];
 
-        $result = BenchmarkResult::fromArray($data);
+        $benchmarkResult = BenchmarkResult::fromArray($data);
 
-        self::assertSame(10.0, $result->executionTimeMs);
-        self::assertSame(1024.0, $result->memoryUsedBytes);
-        self::assertSame(2048.0, $result->memoryPeakBytes);
+        self::assertEqualsWithDelta(10.0, $benchmarkResult->executionTimeMs, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(1024.0, $benchmarkResult->memoryUsedBytes, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(2048.0, $benchmarkResult->memoryPeakBytes, PHP_FLOAT_EPSILON);
     }
 
     public function testFromArrayWithStringNumericValues(): void
@@ -60,22 +60,22 @@ final class BenchmarkResultTest extends TestCase
             'memory_peak_bytes' => '2048.5',
         ];
 
-        $result = BenchmarkResult::fromArray($data);
+        $benchmarkResult = BenchmarkResult::fromArray($data);
 
-        self::assertSame(12.5, $result->executionTimeMs);
-        self::assertSame(1024.0, $result->memoryUsedBytes);
-        self::assertSame(2048.5, $result->memoryPeakBytes);
+        self::assertEqualsWithDelta(12.5, $benchmarkResult->executionTimeMs, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(1024.0, $benchmarkResult->memoryUsedBytes, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(2048.5, $benchmarkResult->memoryPeakBytes, PHP_FLOAT_EPSILON);
     }
 
     public function testFromArrayWithMissingKeysDefaultsToZero(): void
     {
         $data = [];
 
-        $result = BenchmarkResult::fromArray($data);
+        $benchmarkResult = BenchmarkResult::fromArray($data);
 
-        self::assertSame(0.0, $result->executionTimeMs);
-        self::assertSame(0.0, $result->memoryUsedBytes);
-        self::assertSame(0.0, $result->memoryPeakBytes);
+        self::assertEqualsWithDelta(0.0, $benchmarkResult->executionTimeMs, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $benchmarkResult->memoryUsedBytes, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $benchmarkResult->memoryPeakBytes, PHP_FLOAT_EPSILON);
     }
 
     public function testFromArrayWithPartialDataDefaultsMissingToZero(): void
@@ -84,11 +84,11 @@ final class BenchmarkResultTest extends TestCase
             'execution_time_ms' => 25.5,
         ];
 
-        $result = BenchmarkResult::fromArray($data);
+        $benchmarkResult = BenchmarkResult::fromArray($data);
 
-        self::assertSame(25.5, $result->executionTimeMs);
-        self::assertSame(0.0, $result->memoryUsedBytes);
-        self::assertSame(0.0, $result->memoryPeakBytes);
+        self::assertEqualsWithDelta(25.5, $benchmarkResult->executionTimeMs, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $benchmarkResult->memoryUsedBytes, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $benchmarkResult->memoryPeakBytes, PHP_FLOAT_EPSILON);
     }
 
     public function testFromArrayWithInvalidNonNumericValuesDefaultsToZero(): void
@@ -99,11 +99,11 @@ final class BenchmarkResultTest extends TestCase
             'memory_peak_bytes' => null,
         ];
 
-        $result = BenchmarkResult::fromArray($data);
+        $benchmarkResult = BenchmarkResult::fromArray($data);
 
-        self::assertSame(0.0, $result->executionTimeMs);
-        self::assertSame(0.0, $result->memoryUsedBytes);
-        self::assertSame(0.0, $result->memoryPeakBytes);
+        self::assertEqualsWithDelta(0.0, $benchmarkResult->executionTimeMs, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $benchmarkResult->memoryUsedBytes, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $benchmarkResult->memoryPeakBytes, PHP_FLOAT_EPSILON);
     }
 
     public function testFromArrayWithBooleanValuesDefaultsToZero(): void
@@ -114,11 +114,11 @@ final class BenchmarkResultTest extends TestCase
             'memory_peak_bytes' => true,
         ];
 
-        $result = BenchmarkResult::fromArray($data);
+        $benchmarkResult = BenchmarkResult::fromArray($data);
 
-        self::assertSame(0.0, $result->executionTimeMs);
-        self::assertSame(0.0, $result->memoryUsedBytes);
-        self::assertSame(0.0, $result->memoryPeakBytes);
+        self::assertEqualsWithDelta(0.0, $benchmarkResult->executionTimeMs, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $benchmarkResult->memoryUsedBytes, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $benchmarkResult->memoryPeakBytes, PHP_FLOAT_EPSILON);
     }
 
     public function testFromArrayWithArrayValuesDefaultsToZero(): void
@@ -129,11 +129,11 @@ final class BenchmarkResultTest extends TestCase
             'memory_peak_bytes' => [],
         ];
 
-        $result = BenchmarkResult::fromArray($data);
+        $benchmarkResult = BenchmarkResult::fromArray($data);
 
-        self::assertSame(0.0, $result->executionTimeMs);
-        self::assertSame(0.0, $result->memoryUsedBytes);
-        self::assertSame(0.0, $result->memoryPeakBytes);
+        self::assertEqualsWithDelta(0.0, $benchmarkResult->executionTimeMs, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $benchmarkResult->memoryUsedBytes, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $benchmarkResult->memoryPeakBytes, PHP_FLOAT_EPSILON);
     }
 
     public function testFromArrayWithNegativeValues(): void
@@ -144,12 +144,12 @@ final class BenchmarkResultTest extends TestCase
             'memory_peak_bytes' => -2048.0,
         ];
 
-        $result = BenchmarkResult::fromArray($data);
+        $benchmarkResult = BenchmarkResult::fromArray($data);
 
         // Negative values are allowed (edge case)
-        self::assertSame(-10.5, $result->executionTimeMs);
-        self::assertSame(-1024.0, $result->memoryUsedBytes);
-        self::assertSame(-2048.0, $result->memoryPeakBytes);
+        self::assertSame(-10.5, $benchmarkResult->executionTimeMs);
+        self::assertSame(-1024.0, $benchmarkResult->memoryUsedBytes);
+        self::assertSame(-2048.0, $benchmarkResult->memoryPeakBytes);
     }
 
     public function testFromArrayWithZeroValues(): void
@@ -160,11 +160,11 @@ final class BenchmarkResultTest extends TestCase
             'memory_peak_bytes' => 0,
         ];
 
-        $result = BenchmarkResult::fromArray($data);
+        $benchmarkResult = BenchmarkResult::fromArray($data);
 
-        self::assertSame(0.0, $result->executionTimeMs);
-        self::assertSame(0.0, $result->memoryUsedBytes);
-        self::assertSame(0.0, $result->memoryPeakBytes);
+        self::assertEqualsWithDelta(0.0, $benchmarkResult->executionTimeMs, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $benchmarkResult->memoryUsedBytes, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $benchmarkResult->memoryPeakBytes, PHP_FLOAT_EPSILON);
     }
 
     public function testFromArrayWithVeryLargeNumbers(): void
@@ -175,11 +175,11 @@ final class BenchmarkResultTest extends TestCase
             'memory_peak_bytes' => 2147483648.0, // 2GB
         ];
 
-        $result = BenchmarkResult::fromArray($data);
+        $benchmarkResult = BenchmarkResult::fromArray($data);
 
-        self::assertSame(999999.99, $result->executionTimeMs);
-        self::assertSame(1073741824.0, $result->memoryUsedBytes);
-        self::assertSame(2147483648.0, $result->memoryPeakBytes);
+        self::assertEqualsWithDelta(999999.99, $benchmarkResult->executionTimeMs, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(1073741824.0, $benchmarkResult->memoryUsedBytes, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(2147483648.0, $benchmarkResult->memoryPeakBytes, PHP_FLOAT_EPSILON);
     }
 
     public function testFromArrayWithExtraKeysIgnoresThem(): void
@@ -192,10 +192,10 @@ final class BenchmarkResultTest extends TestCase
             'another_field' => 123,
         ];
 
-        $result = BenchmarkResult::fromArray($data);
+        $benchmarkResult = BenchmarkResult::fromArray($data);
 
-        self::assertSame(10.0, $result->executionTimeMs);
-        self::assertSame(1024.0, $result->memoryUsedBytes);
-        self::assertSame(2048.0, $result->memoryPeakBytes);
+        self::assertEqualsWithDelta(10.0, $benchmarkResult->executionTimeMs, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(1024.0, $benchmarkResult->memoryUsedBytes, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(2048.0, $benchmarkResult->memoryPeakBytes, PHP_FLOAT_EPSILON);
     }
 }

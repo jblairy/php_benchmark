@@ -12,11 +12,11 @@ use PHPUnit\Framework\TestCase;
  */
 final class OutlierDetectorTest extends TestCase
 {
-    private OutlierDetector $detector;
+    private OutlierDetector $outlierDetector;
 
     protected function setUp(): void
     {
-        $this->detector = new OutlierDetector();
+        $this->outlierDetector = new OutlierDetector();
     }
 
     public function testDetectAndRemoveWithNoOutliers(): void
@@ -25,13 +25,13 @@ final class OutlierDetectorTest extends TestCase
         $data = [10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.8, 10.9, 11.0];
 
         // Act
-        $result = $this->detector->detectAndRemove($data);
+        $result = $this->outlierDetector->detectAndRemove($data);
 
         // Assert
         self::assertCount(10, $result->cleanedData);
         self::assertCount(0, $result->outliers);
         self::assertFalse($result->hasOutliers());
-        self::assertSame(0.0, $result->getOutlierPercentage());
+        self::assertEqualsWithDelta(0.0, $result->getOutlierPercentage(), PHP_FLOAT_EPSILON);
     }
 
     public function testDetectAndRemoveWithClearOutliers(): void
@@ -45,7 +45,7 @@ final class OutlierDetectorTest extends TestCase
         ];
 
         // Act
-        $result = $this->detector->detectAndRemove($data);
+        $result = $this->outlierDetector->detectAndRemove($data);
 
         // Assert
         self::assertCount(9, $result->cleanedData);
@@ -62,7 +62,7 @@ final class OutlierDetectorTest extends TestCase
         $data = [10.0, 20.0, 30.0];
 
         // Act
-        $result = $this->detector->detectAndRemove($data);
+        $result = $this->outlierDetector->detectAndRemove($data);
 
         // Assert - Should return original data
         self::assertCount(3, $result->cleanedData);
@@ -76,7 +76,7 @@ final class OutlierDetectorTest extends TestCase
         $data = [];
 
         // Act
-        $result = $this->detector->detectAndRemove($data);
+        $result = $this->outlierDetector->detectAndRemove($data);
 
         // Assert
         self::assertCount(0, $result->cleanedData);
@@ -90,7 +90,7 @@ final class OutlierDetectorTest extends TestCase
         $data = range(1, 100); // 1 to 100
 
         // Act
-        $result = $this->detector->detectAndRemove($data);
+        $result = $this->outlierDetector->detectAndRemove($data);
 
         // Assert - With IQR=50, bounds should be [-50, 150]
         // So all values 1-100 should be included
@@ -108,7 +108,7 @@ final class OutlierDetectorTest extends TestCase
         ];
 
         // Act
-        $result = $this->detector->detectWithModifiedZScore($data, 3.5);
+        $result = $this->outlierDetector->detectWithModifiedZScore($data, 3.5);
 
         // Assert
         self::assertCount(11, $result->cleanedData);
@@ -130,7 +130,7 @@ final class OutlierDetectorTest extends TestCase
         ];
 
         // Act
-        $result = $this->detector->detectAndRemove($data);
+        $result = $this->outlierDetector->detectAndRemove($data);
 
         // Assert
         self::assertCount(19, $result->cleanedData); // Should remove 2 outliers
@@ -149,7 +149,7 @@ final class OutlierDetectorTest extends TestCase
         $data = [10, 11, 12, 13, 14, 15, 100, 200]; // 2 outliers
 
         // Act
-        $result = $this->detector->detectAndRemove($data);
+        $result = $this->outlierDetector->detectAndRemove($data);
 
         // Assert
         $summary = $result->getSummary();
@@ -164,7 +164,7 @@ final class OutlierDetectorTest extends TestCase
         $data = [1.0, 2.0, 3.0, 4.0, 5.0];
 
         // Act
-        $result = $this->detector->detectAndRemove($data);
+        $result = $this->outlierDetector->detectAndRemove($data);
 
         // Assert - All values should be within bounds
         self::assertCount(5, $result->cleanedData);

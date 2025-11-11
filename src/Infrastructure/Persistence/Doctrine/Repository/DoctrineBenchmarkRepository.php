@@ -33,7 +33,7 @@ final readonly class DoctrineBenchmarkRepository implements BenchmarkRepositoryP
             ->findAll();
 
         return array_map(
-            fn (BenchmarkEntity $entity): Benchmark => new DatabaseBenchmark($entity),
+            fn (BenchmarkEntity $benchmarkEntity): Benchmark => new DatabaseBenchmark($benchmarkEntity),
             $entities,
         );
     }
@@ -126,9 +126,9 @@ final readonly class DoctrineBenchmarkRepository implements BenchmarkRepositoryP
         }
 
         $categories = [];
-        foreach ($results as $row) {
-            if (is_array($row) && isset($row['category']) && is_string($row['category'])) {
-                $categories[] = $row['category'];
+        foreach ($results as $result) {
+            if (is_array($result) && isset($result['category']) && is_string($result['category'])) {
+                $categories[] = $result['category'];
             }
         }
 

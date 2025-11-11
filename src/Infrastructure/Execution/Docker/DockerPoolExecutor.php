@@ -139,11 +139,11 @@ final class DockerPoolExecutor implements ScriptExecutorPort
             $this->logger->info('Container pre-warmed successfully', [
                 'php_version' => $phpVersion,
             ]);
-        } catch (RuntimeException $e) {
+        } catch (RuntimeException $runtimeException) {
             // Log warning but don't fail - warmup is optional optimization
             $this->logger->warning('Container pre-warming failed, continuing anyway', [
                 'php_version' => $phpVersion,
-                'error' => $e->getMessage(),
+                'error' => $runtimeException->getMessage(),
             ]);
 
             // Mark as warmed to avoid retrying
@@ -153,7 +153,8 @@ final class DockerPoolExecutor implements ScriptExecutorPort
 
     private function executeInDockerPool(string $phpVersion, string $scriptPath): string
     {
-        $timeout = (int) ($_ENV['BENCHMARK_TIMEOUT'] ?? 30);
+        $timeoutEnv = $_ENV['BENCHMARK_TIMEOUT'] ?? 30;
+        $timeout = is_numeric($timeoutEnv) ? (int) $timeoutEnv : 30;
         $composeFile = $this->getComposeFile();
         $projectName = $this->getProjectName();
 
@@ -198,7 +199,9 @@ final class DockerPoolExecutor implements ScriptExecutorPort
 
     private function getProjectName(): string
     {
-        return $_ENV['COMPOSE_PROJECT_NAME'] ?? 'php_benchmark';
+        $projectName = $_ENV['COMPOSE_PROJECT_NAME'] ?? 'php_benchmark';
+
+        return is_string($projectName) ? $projectName : 'php_benchmark';
     }
 
     private function parseOutput(string $output): BenchmarkResult
@@ -228,7 +231,7 @@ final class DockerPoolExecutor implements ScriptExecutorPort
         /* @var array<string, mixed> */
         return array_filter(
             $data,
-            fn ($key): bool => is_string($key),
+            is_string(...),
             ARRAY_FILTER_USE_KEY,
         );
     }

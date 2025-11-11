@@ -14,14 +14,14 @@ use Jblairy\PhpBenchmark\Domain\PhpVersion\Enum\PhpVersion;
 final readonly class BenchmarkOrchestrator
 {
     public function __construct(
-        private MessengerBenchmarkRunner $benchmarkRunner,
+        private MessengerBenchmarkRunner $messengerBenchmarkRunner,
         private CodeExtractorPort $codeExtractorPort,
     ) {
     }
 
     public function executeSingle(BenchmarkConfiguration $benchmarkConfiguration): void
     {
-        $this->benchmarkRunner->run($benchmarkConfiguration);
+        $this->messengerBenchmarkRunner->run($benchmarkConfiguration);
     }
 
     /**
@@ -42,7 +42,7 @@ final readonly class BenchmarkOrchestrator
                     iterations: $iterations,
                 );
 
-                $this->benchmarkRunner->run($configuration);
+                $this->messengerBenchmarkRunner->run($configuration);
             }
         }
     }

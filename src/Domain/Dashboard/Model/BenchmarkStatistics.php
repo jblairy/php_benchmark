@@ -6,7 +6,7 @@ namespace Jblairy\PhpBenchmark\Domain\Dashboard\Model;
 
 /**
  * Value Object representing benchmark statistics for a specific PHP version.
- * 
+ *
  * Note: Not final to allow EnhancedBenchmarkStatistics to extend with outlier detection metrics.
  */
 readonly class BenchmarkStatistics

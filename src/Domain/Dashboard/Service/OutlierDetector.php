@@ -88,7 +88,7 @@ final readonly class OutlierDetector
         $median = $this->calculateQuartile($sorted, 0.5);
 
         // Calculate MAD (Median Absolute Deviation)
-        $deviations = array_map(fn ($x) => abs($x - $median), $data);
+        $deviations = array_map(fn ($x): float => abs($x - $median), $data);
         sort($deviations);
         $mad = $this->calculateQuartile($deviations, 0.5);
 
@@ -120,7 +120,8 @@ final readonly class OutlierDetector
         $outliers = [];
 
         foreach ($data as $index => $value) {
-            if (abs($zScores[$index]) > $threshold) {
+            $zScore = $zScores[$index] ?? 0.0;
+            if (abs($zScore) > $threshold) {
                 $outliers[] = $value;
             } else {
                 $cleanedData[] = $value;
@@ -151,7 +152,7 @@ final readonly class OutlierDetector
         }
 
         if (1 === $count) {
-            return $sortedData[0];
+            return $sortedData[0] ?? 0.0;
         }
 
         // Calculate the position
@@ -161,12 +162,14 @@ final readonly class OutlierDetector
 
         // If position is an integer, return that value
         if ($lower === $upper) {
-            return $sortedData[$lower];
+            return $sortedData[$lower] ?? 0.0;
         }
 
         // Linear interpolation between lower and upper
         $weight = $position - $lower;
+        $lowerValue = $sortedData[$lower] ?? 0.0;
+        $upperValue = $sortedData[$upper] ?? 0.0;
 
-        return $sortedData[$lower] * (1 - $weight) + $sortedData[$upper] * $weight;
+        return $lowerValue * (1 - $weight) + $upperValue * $weight;
     }
 }

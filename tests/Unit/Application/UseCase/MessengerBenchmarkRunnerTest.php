@@ -22,8 +22,10 @@ use Symfony\Component\Messenger\MessageBusInterface;
 final class MessengerBenchmarkRunnerTest extends TestCase
 {
     private MessageBusInterface&MockObject $messageBus;
+
     private EventDispatcherPort&MockObject $eventDispatcher;
-    private MessengerBenchmarkRunner $runner;
+
+    private MessengerBenchmarkRunner $messengerBenchmarkRunner;
 
     protected function setUp(): void
     {
@@ -31,9 +33,8 @@ final class MessengerBenchmarkRunnerTest extends TestCase
 
         $this->messageBus = $this->createMock(MessageBusInterface::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherPort::class);
-        $this->runner = new MessengerBenchmarkRunner(
+        $this->messengerBenchmarkRunner = new MessengerBenchmarkRunner(
             $this->messageBus,
-            $this->eventDispatcher,
         );
     }
 
@@ -52,9 +53,9 @@ final class MessengerBenchmarkRunnerTest extends TestCase
             }
         };
 
-        $configuration = new BenchmarkConfiguration(
+        $benchmarkConfiguration = new BenchmarkConfiguration(
             benchmark: $benchmark,
-            phpVersion: PhpVersion::PHP_84,
+            phpVersion: PhpVersion::PHP_8_4,
             iterations: 3,
         );
 
@@ -62,7 +63,7 @@ final class MessengerBenchmarkRunnerTest extends TestCase
         $this->messageBus
             ->expects($this->exactly(3))
             ->method('dispatch')
-            ->willReturnCallback(function ($message) use (&$messagesDispatched) {
+            ->willReturnCallback(function (object $message) use (&$messagesDispatched): Envelope {
                 $messagesDispatched[] = $message;
 
                 return new Envelope($message);
@@ -72,25 +73,25 @@ final class MessengerBenchmarkRunnerTest extends TestCase
         $this->eventDispatcher
             ->expects($this->exactly(2))
             ->method('dispatch')
-            ->with($this->logicalOr(
-                $this->isInstanceOf(BenchmarkStarted::class),
-                $this->isInstanceOf(BenchmarkCompleted::class),
+            ->with(self::logicalOr(
+                self::isInstanceOf(BenchmarkStarted::class),
+                self::isInstanceOf(BenchmarkCompleted::class),
             ));
 
         // When
-        $this->runner->run($configuration);
+        $this->messengerBenchmarkRunner->run($benchmarkConfiguration);
 
         // Then
-        $this->assertCount(3, $messagesDispatched);
+        self::assertCount(3, $messagesDispatched);
 
         foreach ($messagesDispatched as $index => $message) {
-            $this->assertInstanceOf(ExecuteBenchmarkMessage::class, $message);
-            $this->assertEquals($benchmark::class, $message->benchmarkClass);
-            $this->assertEquals('test-benchmark', $message->benchmarkSlug);
-            $this->assertEquals('TestBenchmark', $message->benchmarkName);
-            $this->assertEquals('php84', $message->phpVersion);
-            $this->assertEquals(3, $message->iterations);
-            $this->assertEquals($index + 1, $message->iterationNumber);
+            self::assertInstanceOf(ExecuteBenchmarkMessage::class, $message);
+            self::assertSame($benchmark::class, $message->benchmarkClass);
+            self::assertSame('test-benchmark', $message->benchmarkSlug);
+            self::assertSame('TestBenchmark', $message->benchmarkName);
+            self::assertSame('php84', $message->phpVersion);
+            self::assertSame(3, $message->iterations);
+            self::assertSame($index + 1, $message->iterationNumber);
         }
     }
 }

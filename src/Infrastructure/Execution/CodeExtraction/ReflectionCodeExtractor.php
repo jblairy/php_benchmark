@@ -27,9 +27,9 @@ final class ReflectionCodeExtractor implements CodeExtractorPort
     {
         $reflectionClass = new ReflectionClass($benchmark);
 
-        foreach ($reflectionClass->getMethods() as $method) {
-            if ($this->methodMatchesVersion($method, $phpVersion)) {
-                return $method;
+        foreach ($reflectionClass->getMethods() as $reflectionMethod) {
+            if ($this->methodMatchesVersion($reflectionMethod, $phpVersion)) {
+                return $reflectionMethod;
             }
         }
 

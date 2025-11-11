@@ -84,7 +84,6 @@ services:
         arguments:
             $outlierDetector: '@Jblairy\PhpBenchmark\Domain\Dashboard\Service\OutlierDetector'
             $removeOutliers: true
-            $outlierThreshold: 1.5
     
     # Legacy calculator kept for backward compatibility
     Jblairy\PhpBenchmark\Domain\Dashboard\Service\StatisticsCalculator: ~

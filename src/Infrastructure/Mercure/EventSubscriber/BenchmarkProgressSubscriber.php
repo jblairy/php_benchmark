@@ -33,20 +33,20 @@ final readonly class BenchmarkProgressSubscriber implements EventSubscriberInter
         ];
     }
 
-    public function onBenchmarkStarted(BenchmarkStarted $event): void
+    public function onBenchmarkStarted(BenchmarkStarted $benchmarkStarted): void
     {
-        $this->publishUpdate('benchmark/progress', $event->toArray());
+        $this->publishUpdate('benchmark/progress', $benchmarkStarted->toArray());
     }
 
-    public function onBenchmarkProgress(BenchmarkProgress $event): void
+    public function onBenchmarkProgress(BenchmarkProgress $benchmarkProgress): void
     {
-        $this->publishUpdate('benchmark/progress', $event->toArray());
+        $this->publishUpdate('benchmark/progress', $benchmarkProgress->toArray());
     }
 
-    public function onBenchmarkCompleted(BenchmarkCompleted $event): void
+    public function onBenchmarkCompleted(BenchmarkCompleted $benchmarkCompleted): void
     {
-        $this->publishUpdate('benchmark/progress', $event->toArray());
-        $this->publishUpdate('benchmark/results', $event->toArray());
+        $this->publishUpdate('benchmark/progress', $benchmarkCompleted->toArray());
+        $this->publishUpdate('benchmark/results', $benchmarkCompleted->toArray());
     }
 
     /**

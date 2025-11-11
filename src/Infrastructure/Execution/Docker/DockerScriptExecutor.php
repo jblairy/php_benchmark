@@ -10,12 +10,12 @@ use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptExecutorPort;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
-final class DockerScriptExecutor implements ScriptExecutorPort
+final readonly class DockerScriptExecutor implements ScriptExecutorPort
 {
     private const string TEMP_DIR = '/app/var/tmp';
 
     public function __construct(
-        private readonly LoggerInterface $logger,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -74,7 +74,8 @@ final class DockerScriptExecutor implements ScriptExecutorPort
 
     private function executeInDocker(string $phpVersion, string $scriptPath): string
     {
-        $timeout = (int) ($_ENV['BENCHMARK_TIMEOUT'] ?? 30);
+        $timeoutEnv = $_ENV['BENCHMARK_TIMEOUT'] ?? 30;
+        $timeout = is_numeric($timeoutEnv) ? (int) $timeoutEnv : 30;
         $composeFile = $this->getComposeFile();
         $projectName = $this->getProjectName();
 
@@ -118,7 +119,9 @@ final class DockerScriptExecutor implements ScriptExecutorPort
 
     private function getProjectName(): string
     {
-        return $_ENV['COMPOSE_PROJECT_NAME'] ?? 'php_benchmark';
+        $projectName = $_ENV['COMPOSE_PROJECT_NAME'] ?? 'php_benchmark';
+
+        return is_string($projectName) ? $projectName : 'php_benchmark';
     }
 
     private function parseOutput(string $output): BenchmarkResult
@@ -148,7 +151,7 @@ final class DockerScriptExecutor implements ScriptExecutorPort
         /* @var array<string, mixed> */
         return array_filter(
             $data,
-            fn ($key): bool => is_string($key),
+            is_string(...),
             ARRAY_FILTER_USE_KEY,
         );
     }

@@ -58,24 +58,24 @@ final readonly class BenchmarkCommand
     }
 
     private function executeAppropriateStrategy(
-        SymfonyStyle $io,
+        SymfonyStyle $symfonyStyle,
         ?string $testName,
         ?string $phpVersionName,
         int $iterations,
     ): void {
         if (null !== $testName && null !== $phpVersionName) {
-            $this->executeSingleBenchmark($io, $testName, $phpVersionName, $iterations);
+            $this->executeSingleBenchmark($symfonyStyle, $testName, $phpVersionName, $iterations);
 
             return;
         }
 
         if (null !== $testName) {
-            $this->executeBenchmarkAllVersions($io, $testName, $iterations);
+            $this->executeBenchmarkAllVersions($symfonyStyle, $testName, $iterations);
 
             return;
         }
 
-        $this->executeAllBenchmarks($io, $iterations);
+        $this->executeAllBenchmarks($symfonyStyle, $iterations);
     }
 
     private function executeSingleBenchmark(

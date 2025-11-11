@@ -6,7 +6,6 @@ namespace Jblairy\PhpBenchmark\Application\UseCase;
 
 use Jblairy\PhpBenchmark\Application\Message\ExecuteBenchmarkMessage;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkConfiguration;
-use Jblairy\PhpBenchmark\Domain\Benchmark\Port\EventDispatcherPort;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
@@ -19,7 +18,6 @@ final readonly class MessengerBenchmarkRunner
 {
     public function __construct(
         private MessageBusInterface $messageBus,
-        private EventDispatcherPort $eventDispatcher,
     ) {
     }
 

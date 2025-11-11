@@ -14,9 +14,13 @@ use Jblairy\PhpBenchmark\Domain\Dashboard\Model\PercentileMetrics;
 final readonly class StatisticsCalculator
 {
     private const int PERCENTILE_BASE = 100;
+
     private const int PERCENTILE_P50 = 50;
+
     private const int PERCENTILE_P90 = 90;
+
     private const int PERCENTILE_P95 = 95;
+
     private const int PERCENTILE_P99 = 99;
 
     public function calculate(BenchmarkMetrics $benchmarkMetrics): BenchmarkStatistics

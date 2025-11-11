@@ -19,15 +19,18 @@ use Jblairy\PhpBenchmark\Domain\Dashboard\Model\PercentileMetrics;
 final readonly class EnhancedStatisticsCalculator
 {
     private const int PERCENTILE_BASE = 100;
+
     private const int PERCENTILE_P50 = 50;
+
     private const int PERCENTILE_P90 = 90;
+
     private const int PERCENTILE_P95 = 95;
+
     private const int PERCENTILE_P99 = 99;
 
     public function __construct(
         private OutlierDetector $outlierDetector,
         private bool $removeOutliers = true,
-        private float $outlierThreshold = 1.5, // IQR multiplier
     ) {
     }
 
@@ -41,10 +44,10 @@ final readonly class EnhancedStatisticsCalculator
         }
 
         // Detect outliers in execution times
-        $outlierResult = $this->outlierDetector->detectAndRemove($benchmarkMetrics->executionTimes);
+        $outlierDetectionResult = $this->outlierDetector->detectAndRemove($benchmarkMetrics->executionTimes);
 
         // Use cleaned data if outlier removal is enabled
-        $dataToAnalyze = $this->removeOutliers ? $outlierResult->cleanedData : $benchmarkMetrics->executionTimes;
+        $dataToAnalyze = $this->removeOutliers ? $outlierDetectionResult->cleanedData : $benchmarkMetrics->executionTimes;
 
         // Calculate statistics on the appropriate dataset
         $sortedTimes = $dataToAnalyze;
@@ -73,7 +76,7 @@ final readonly class EnhancedStatisticsCalculator
             phpVersion: $benchmarkMetrics->phpVersion,
             executionCount: count($dataToAnalyze),
             averageExecutionTime: $average,
-            percentiles: $percentileMetrics,
+            percentileMetrics: $percentileMetrics,
             averageMemoryUsed: $this->calculateAverage($benchmarkMetrics->memoryUsages),
             peakMemoryUsed: $this->calculateMax($benchmarkMetrics->memoryPeaks),
             minExecutionTime: $this->calculateMin($dataToAnalyze),
@@ -82,14 +85,14 @@ final readonly class EnhancedStatisticsCalculator
             coefficientOfVariation: $coefficientOfVariation,
             throughput: $throughput,
             // Enhanced metrics
-            outlierCount: $outlierResult->outlierCount,
-            outlierPercentage: $outlierResult->getOutlierPercentage(),
-            outliers: $outlierResult->outliers,
+            outlierCount: $outlierDetectionResult->outlierCount,
+            outlierPercentage: $outlierDetectionResult->getOutlierPercentage(),
+            outliers: $outlierDetectionResult->outliers,
             rawExecutionCount: $benchmarkMetrics->getExecutionCount(),
             rawAverage: $rawAverage,
             rawStdDev: $rawStdDev,
             rawCV: $rawCV,
-            stabilityScore: $this->calculateStabilityScore($coefficientOfVariation, $outlierResult),
+            stabilityScore: $this->calculateStabilityScore($coefficientOfVariation, $outlierDetectionResult),
         );
     }
 
@@ -97,13 +100,13 @@ final readonly class EnhancedStatisticsCalculator
      * Calculate a stability score from 0 to 100.
      * Higher score = more stable benchmark.
      */
-    private function calculateStabilityScore(float $cv, OutlierDetectionResult $outlierResult): float
+    private function calculateStabilityScore(float $cv, OutlierDetectionResult $outlierDetectionResult): float
     {
         // Base score from CV% (lower CV = higher score)
         $cvScore = max(0, 100 - ($cv * 5)); // CV of 20% = score of 0
 
         // Penalty for outliers
-        $outlierPenalty = min(30, $outlierResult->getOutlierPercentage() * 3); // Max 30 point penalty
+        $outlierPenalty = min(30, $outlierDetectionResult->getOutlierPercentage() * 3); // Max 30 point penalty
 
         // Final score
         $score = max(0, $cvScore - $outlierPenalty);
@@ -212,7 +215,7 @@ final readonly class EnhancedStatisticsCalculator
             phpVersion: $benchmarkMetrics->phpVersion,
             executionCount: 0,
             averageExecutionTime: 0.0,
-            percentiles: new PercentileMetrics(0.0, 0.0, 0.0, 0.0),
+            percentileMetrics: new PercentileMetrics(0.0, 0.0, 0.0, 0.0),
             averageMemoryUsed: 0.0,
             peakMemoryUsed: 0.0,
             minExecutionTime: 0.0,

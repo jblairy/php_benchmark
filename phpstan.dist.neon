@@ -23,7 +23,7 @@ parameters:
     checkImplicitMixed: true
     checkBenevolentUnionTypes: true
 
-    reportUnmatchedIgnoredErrors: true
+    reportUnmatchedIgnoredErrors: false
     reportStaticMethodSignatures: true
     reportMaybes: true
     reportMagicMethods: true
@@ -47,18 +47,6 @@ parameters:
         jobSize: 20
         maximumNumberOfProcesses: 32
         minimumNumberOfJobsPerProcess: 2
-
-    ignoreErrors:
-        # Test assertions that PHPStan considers redundant are intentional for documentation
-        -
-            message: '#Call to static method PHPUnit\\Framework\\Assert::assertSame\(\) .* will always evaluate to true#'
-            path: tests/
-        -
-            message: '#Result of .* is always (true|false)#'
-            path: tests/
-        -
-            message: '#Strict comparison using === .* will always evaluate to (true|false)#'
-            path: tests/
 
 includes:
     - vendor/phpstan/phpstan-symfony/extension.neon

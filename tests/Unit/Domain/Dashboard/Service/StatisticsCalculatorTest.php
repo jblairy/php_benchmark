@@ -10,16 +10,16 @@ use PHPUnit\Framework\TestCase;
 
 final class StatisticsCalculatorTest extends TestCase
 {
-    private StatisticsCalculator $calculator;
+    private StatisticsCalculator $statisticsCalculator;
 
     protected function setUp(): void
     {
-        $this->calculator = new StatisticsCalculator();
+        $this->statisticsCalculator = new StatisticsCalculator();
     }
 
     public function testCalculateWithEmptyMetricsReturnsZeroStatistics(): void
     {
-        $metrics = new BenchmarkMetrics(
+        $benchmarkMetrics = new BenchmarkMetrics(
             benchmarkId: 'test-bench',
             benchmarkName: 'Test Benchmark',
             phpVersion: 'php84',
@@ -28,28 +28,28 @@ final class StatisticsCalculatorTest extends TestCase
             memoryPeaks: [],
         );
 
-        $statistics = $this->calculator->calculate($metrics);
+        $statistics = $this->statisticsCalculator->calculate($benchmarkMetrics);
 
         self::assertSame('test-bench', $statistics->benchmarkId);
         self::assertSame('Test Benchmark', $statistics->benchmarkName);
         self::assertSame('php84', $statistics->phpVersion);
         self::assertSame(0, $statistics->executionCount);
-        self::assertSame(0.0, $statistics->averageExecutionTime);
-        self::assertSame(0.0, $statistics->averageMemoryUsed);
-        self::assertSame(0.0, $statistics->peakMemoryUsed);
-        self::assertSame(0.0, $statistics->minExecutionTime);
-        self::assertSame(0.0, $statistics->maxExecutionTime);
-        self::assertSame(0.0, $statistics->standardDeviation);
-        self::assertSame(0.0, $statistics->coefficientOfVariation);
-        self::assertSame(0.0, $statistics->throughput);
-        self::assertSame(0.0, $statistics->percentiles->p50);
-        self::assertSame(0.0, $statistics->percentiles->p90);
-        self::assertSame(0.0, $statistics->percentiles->p99);
+        self::assertEqualsWithDelta(0.0, $statistics->averageExecutionTime, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $statistics->averageMemoryUsed, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $statistics->peakMemoryUsed, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $statistics->minExecutionTime, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $statistics->maxExecutionTime, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $statistics->standardDeviation, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $statistics->coefficientOfVariation, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $statistics->throughput, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $statistics->percentiles->p50, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $statistics->percentiles->p90, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $statistics->percentiles->p99, PHP_FLOAT_EPSILON);
     }
 
     public function testCalculateWithSingleValueReturnsCorrectStatistics(): void
     {
-        $metrics = new BenchmarkMetrics(
+        $benchmarkMetrics = new BenchmarkMetrics(
             benchmarkId: 'test-bench',
             benchmarkName: 'Test Benchmark',
             phpVersion: 'php84',
@@ -58,26 +58,26 @@ final class StatisticsCalculatorTest extends TestCase
             memoryPeaks: [2048.0],
         );
 
-        $statistics = $this->calculator->calculate($metrics);
+        $statistics = $this->statisticsCalculator->calculate($benchmarkMetrics);
 
         self::assertSame(1, $statistics->executionCount);
-        self::assertSame(10.5, $statistics->averageExecutionTime);
-        self::assertSame(1024.0, $statistics->averageMemoryUsed);
-        self::assertSame(2048.0, $statistics->peakMemoryUsed);
-        self::assertSame(10.5, $statistics->minExecutionTime);
-        self::assertSame(10.5, $statistics->maxExecutionTime);
-        self::assertSame(0.0, $statistics->standardDeviation); // Only 1 value, stdDev = 0
-        self::assertSame(0.0, $statistics->coefficientOfVariation); // stdDev = 0, so CV = 0
+        self::assertEqualsWithDelta(10.5, $statistics->averageExecutionTime, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(1024.0, $statistics->averageMemoryUsed, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(2048.0, $statistics->peakMemoryUsed, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(10.5, $statistics->minExecutionTime, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(10.5, $statistics->maxExecutionTime, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $statistics->standardDeviation, PHP_FLOAT_EPSILON); // Only 1 value, stdDev = 0
+        self::assertEqualsWithDelta(0.0, $statistics->coefficientOfVariation, PHP_FLOAT_EPSILON); // stdDev = 0, so CV = 0
         // Throughput = 1000 / 10.5 ≈ 95.238 ops/sec
         self::assertEqualsWithDelta(95.238, $statistics->throughput, 0.001);
-        self::assertSame(10.5, $statistics->percentiles->p50);
-        self::assertSame(10.5, $statistics->percentiles->p90);
-        self::assertSame(10.5, $statistics->percentiles->p99);
+        self::assertEqualsWithDelta(10.5, $statistics->percentiles->p50, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(10.5, $statistics->percentiles->p90, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(10.5, $statistics->percentiles->p99, PHP_FLOAT_EPSILON);
     }
 
     public function testCalculateWithMultipleValuesReturnsCorrectAverage(): void
     {
-        $metrics = new BenchmarkMetrics(
+        $benchmarkMetrics = new BenchmarkMetrics(
             benchmarkId: 'test-bench',
             benchmarkName: 'Test Benchmark',
             phpVersion: 'php84',
@@ -86,26 +86,26 @@ final class StatisticsCalculatorTest extends TestCase
             memoryPeaks: [150.0, 250.0, 350.0],
         );
 
-        $statistics = $this->calculator->calculate($metrics);
+        $statistics = $this->statisticsCalculator->calculate($benchmarkMetrics);
 
         self::assertSame(3, $statistics->executionCount);
-        self::assertSame(20.0, $statistics->averageExecutionTime);
-        self::assertSame(200.0, $statistics->averageMemoryUsed);
-        self::assertSame(350.0, $statistics->peakMemoryUsed);
-        self::assertSame(10.0, $statistics->minExecutionTime);
-        self::assertSame(30.0, $statistics->maxExecutionTime);
+        self::assertEqualsWithDelta(20.0, $statistics->averageExecutionTime, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(200.0, $statistics->averageMemoryUsed, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(350.0, $statistics->peakMemoryUsed, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(10.0, $statistics->minExecutionTime, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(30.0, $statistics->maxExecutionTime, PHP_FLOAT_EPSILON);
         // Standard deviation: sqrt(((10-20)^2 + (20-20)^2 + (30-20)^2) / 2) = sqrt(200/2) = 10.0
-        self::assertSame(10.0, $statistics->standardDeviation);
+        self::assertEqualsWithDelta(10.0, $statistics->standardDeviation, PHP_FLOAT_EPSILON);
         // CV = (10.0 / 20.0) * 100 = 50%
-        self::assertSame(50.0, $statistics->coefficientOfVariation);
+        self::assertEqualsWithDelta(50.0, $statistics->coefficientOfVariation, PHP_FLOAT_EPSILON);
         // Throughput = 1000 / 20.0 = 50.0 ops/sec
-        self::assertSame(50.0, $statistics->throughput);
+        self::assertEqualsWithDelta(50.0, $statistics->throughput, PHP_FLOAT_EPSILON);
     }
 
     public function testCalculatePercentilesWithSortedData(): void
     {
         // Dataset: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 (10 values)
-        $metrics = new BenchmarkMetrics(
+        $benchmarkMetrics = new BenchmarkMetrics(
             benchmarkId: 'test-bench',
             benchmarkName: 'Test Benchmark',
             phpVersion: 'php84',
@@ -114,29 +114,29 @@ final class StatisticsCalculatorTest extends TestCase
             memoryPeaks: [100.0],
         );
 
-        $statistics = $this->calculator->calculate($metrics);
+        $statistics = $this->statisticsCalculator->calculate($benchmarkMetrics);
 
         // P50 (50th percentile / median) = 5th value
-        self::assertSame(5.0, $statistics->percentiles->p50);
+        self::assertEqualsWithDelta(5.0, $statistics->percentiles->p50, PHP_FLOAT_EPSILON);
 
         // P90 (90th percentile) = 9th value
-        self::assertSame(9.0, $statistics->percentiles->p90);
+        self::assertEqualsWithDelta(9.0, $statistics->percentiles->p90, PHP_FLOAT_EPSILON);
 
         // P95 (95th percentile) = 10th value
-        self::assertSame(10.0, $statistics->percentiles->p95);
+        self::assertEqualsWithDelta(10.0, $statistics->percentiles->p95, PHP_FLOAT_EPSILON);
 
         // P99 (99th percentile) = 10th value (last)
-        self::assertSame(10.0, $statistics->percentiles->p99);
+        self::assertEqualsWithDelta(10.0, $statistics->percentiles->p99, PHP_FLOAT_EPSILON);
 
         // Min/Max
-        self::assertSame(1.0, $statistics->minExecutionTime);
-        self::assertSame(10.0, $statistics->maxExecutionTime);
+        self::assertEqualsWithDelta(1.0, $statistics->minExecutionTime, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(10.0, $statistics->maxExecutionTime, PHP_FLOAT_EPSILON);
     }
 
     public function testCalculatePercentilesWithUnsortedData(): void
     {
         // Unsorted dataset: should be sorted internally
-        $metrics = new BenchmarkMetrics(
+        $benchmarkMetrics = new BenchmarkMetrics(
             benchmarkId: 'test-bench',
             benchmarkName: 'Test Benchmark',
             phpVersion: 'php84',
@@ -145,20 +145,20 @@ final class StatisticsCalculatorTest extends TestCase
             memoryPeaks: [100.0],
         );
 
-        $statistics = $this->calculator->calculate($metrics);
+        $statistics = $this->statisticsCalculator->calculate($benchmarkMetrics);
 
         // After sorting: [10, 20, 30, 40, 50]
         // P50 (median) = 30 (3rd value)
-        self::assertSame(30.0, $statistics->percentiles->p50);
+        self::assertEqualsWithDelta(30.0, $statistics->percentiles->p50, PHP_FLOAT_EPSILON);
 
         // P90 = 50 (5th value, 90% of 5 = 4.5 -> ceil = 5)
-        self::assertSame(50.0, $statistics->percentiles->p90);
+        self::assertEqualsWithDelta(50.0, $statistics->percentiles->p90, PHP_FLOAT_EPSILON);
     }
 
     public function testCalculateWithRealWorldBenchmarkData(): void
     {
         // Realistic benchmark execution times in milliseconds
-        $metrics = new BenchmarkMetrics(
+        $benchmarkMetrics = new BenchmarkMetrics(
             benchmarkId: 'array-loop',
             benchmarkName: 'Array Loop Performance',
             phpVersion: 'php84',
@@ -179,7 +179,7 @@ final class StatisticsCalculatorTest extends TestCase
             ],
         );
 
-        $statistics = $this->calculator->calculate($metrics);
+        $statistics = $this->statisticsCalculator->calculate($benchmarkMetrics);
 
         self::assertSame(11, $statistics->executionCount);
 
@@ -192,13 +192,13 @@ final class StatisticsCalculatorTest extends TestCase
         self::assertLessThanOrEqual(13.2, $statistics->percentiles->p50);
 
         // P99 should be the outlier
-        self::assertSame(50.0, $statistics->percentiles->p99);
+        self::assertEqualsWithDelta(50.0, $statistics->percentiles->p99, PHP_FLOAT_EPSILON);
     }
 
     public function testCalculateDoesNotModifyOriginalData(): void
     {
         $originalTimes = [30.0, 10.0, 20.0];
-        $metrics = new BenchmarkMetrics(
+        $benchmarkMetrics = new BenchmarkMetrics(
             benchmarkId: 'test-bench',
             benchmarkName: 'Test Benchmark',
             phpVersion: 'php84',
@@ -207,12 +207,12 @@ final class StatisticsCalculatorTest extends TestCase
             memoryPeaks: [100.0],
         );
 
-        $this->calculator->calculate($metrics);
+        $this->statisticsCalculator->calculate($benchmarkMetrics);
 
         // Original array should remain unchanged (immutability check)
         self::assertCount(3, $originalTimes);
-        self::assertSame(30.0, $originalTimes[0]);
-        self::assertSame(10.0, $originalTimes[1]);
-        self::assertSame(20.0, $originalTimes[2]);
+        self::assertEqualsWithDelta(30.0, $originalTimes[0], PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(10.0, $originalTimes[1], PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(20.0, $originalTimes[2], PHP_FLOAT_EPSILON);
     }
 }

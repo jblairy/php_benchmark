@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 final class DashboardController extends AbstractController
 {
     public function __construct(
-        private readonly BenchmarkRepositoryPort $benchmarkRepository,
+        private readonly BenchmarkRepositoryPort $benchmarkRepositoryPort,
         #[Autowire(env: 'MERCURE_PUBLIC_URL')]
         private readonly string $mercurePublicUrl,
     ) {
@@ -24,8 +24,8 @@ final class DashboardController extends AbstractController
     {
         return $this->render('dashboard/index.html.twig', [
             'mercure_public_url' => $this->mercurePublicUrl,
-            'stats' => $this->benchmarkRepository->getDashboardStats(),
-            'top_categories' => $this->benchmarkRepository->getTopCategories(3),
+            'stats' => $this->benchmarkRepositoryPort->getDashboardStats(),
+            'top_categories' => $this->benchmarkRepositoryPort->getTopCategories(3),
         ]);
     }
 }

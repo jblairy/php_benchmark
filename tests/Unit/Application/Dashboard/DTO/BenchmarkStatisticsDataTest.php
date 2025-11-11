@@ -16,7 +16,7 @@ final class BenchmarkStatisticsDataTest extends TestCase
     public function testConstructorCreatesImmutableDTO(): void
     {
         // Arrange
-        $percentiles = new PercentileMetrics(
+        $percentileMetrics = new PercentileMetrics(
             p50: 1.5,
             p90: 2.5,
             p95: 3.0,
@@ -24,13 +24,13 @@ final class BenchmarkStatisticsDataTest extends TestCase
         );
 
         // Act
-        $dto = new BenchmarkStatisticsData(
+        $benchmarkStatisticsData = new BenchmarkStatisticsData(
             benchmarkId: 'test-benchmark',
             benchmarkName: 'Test Benchmark',
             phpVersion: 'php84',
             count: 100,
             avg: 1.8,
-            percentiles: $percentiles,
+            percentiles: $percentileMetrics,
             memoryUsed: 1024.5,
             memoryPeak: 2048.0,
             min: 1.0,
@@ -41,42 +41,42 @@ final class BenchmarkStatisticsDataTest extends TestCase
         );
 
         // Assert
-        self::assertSame('test-benchmark', $dto->benchmarkId);
-        self::assertSame('Test Benchmark', $dto->benchmarkName);
-        self::assertSame('php84', $dto->phpVersion);
-        self::assertSame(100, $dto->count);
-        self::assertSame(1.8, $dto->avg);
-        self::assertSame($percentiles, $dto->percentiles);
-        self::assertSame(1024.5, $dto->memoryUsed);
-        self::assertSame(2048.0, $dto->memoryPeak);
-        self::assertSame(1.0, $dto->min);
-        self::assertSame(5.0, $dto->max);
-        self::assertSame(0.5, $dto->stdDev);
-        self::assertSame(27.78, $dto->cv);
-        self::assertSame(555.56, $dto->throughput);
-        self::assertSame(1.5, $dto->getP50());
-        self::assertSame(2.5, $dto->getP90());
-        self::assertSame(3.0, $dto->getP95());
-        self::assertSame(4.0, $dto->getP99());
+        self::assertSame('test-benchmark', $benchmarkStatisticsData->benchmarkId);
+        self::assertSame('Test Benchmark', $benchmarkStatisticsData->benchmarkName);
+        self::assertSame('php84', $benchmarkStatisticsData->phpVersion);
+        self::assertSame(100, $benchmarkStatisticsData->count);
+        self::assertEqualsWithDelta(1.8, $benchmarkStatisticsData->avg, PHP_FLOAT_EPSILON);
+        self::assertSame($percentileMetrics, $benchmarkStatisticsData->percentiles);
+        self::assertEqualsWithDelta(1024.5, $benchmarkStatisticsData->memoryUsed, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(2048.0, $benchmarkStatisticsData->memoryPeak, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(1.0, $benchmarkStatisticsData->min, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(5.0, $benchmarkStatisticsData->max, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.5, $benchmarkStatisticsData->stdDev, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(27.78, $benchmarkStatisticsData->cv, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(555.56, $benchmarkStatisticsData->throughput, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(1.5, $benchmarkStatisticsData->getP50(), PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(2.5, $benchmarkStatisticsData->getP90(), PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(3.0, $benchmarkStatisticsData->getP95(), PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(4.0, $benchmarkStatisticsData->getP99(), PHP_FLOAT_EPSILON);
     }
 
     public function testPercentilesAreAccessibleViaGetters(): void
     {
         // Arrange
-        $percentiles = new PercentileMetrics(
+        $percentileMetrics = new PercentileMetrics(
             p50: 1.5,
             p90: 2.5,
             p95: 3.0,
             p99: 4.0,
         );
 
-        $dto = new BenchmarkStatisticsData(
+        $benchmarkStatisticsData = new BenchmarkStatisticsData(
             benchmarkId: 'test',
             benchmarkName: 'Test',
             phpVersion: 'php84',
             count: 100,
             avg: 1.8,
-            percentiles: $percentiles,
+            percentiles: $percentileMetrics,
             memoryUsed: 1024.5,
             memoryPeak: 2048.0,
             min: 1.0,
@@ -87,29 +87,29 @@ final class BenchmarkStatisticsDataTest extends TestCase
         );
 
         // Act & Assert - All percentiles accessible via getter methods
-        self::assertSame(1.5, $dto->getP50());
-        self::assertSame(2.5, $dto->getP90());
-        self::assertSame(3.0, $dto->getP95());
-        self::assertSame(4.0, $dto->getP99());
+        self::assertEqualsWithDelta(1.5, $benchmarkStatisticsData->getP50(), PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(2.5, $benchmarkStatisticsData->getP90(), PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(3.0, $benchmarkStatisticsData->getP95(), PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(4.0, $benchmarkStatisticsData->getP99(), PHP_FLOAT_EPSILON);
     }
 
     public function testFromDomainCreatesDTO(): void
     {
         // Arrange
-        $percentiles = new PercentileMetrics(
+        $percentileMetrics = new PercentileMetrics(
             p50: 1.5,
             p90: 2.5,
             p95: 3.0,
             p99: 4.0,
         );
 
-        $domainStats = new BenchmarkStatistics(
+        $benchmarkStatistics = new BenchmarkStatistics(
             benchmarkId: 'test-benchmark',
             benchmarkName: 'Test Benchmark',
             phpVersion: 'php84',
             executionCount: 100,
             averageExecutionTime: 1.8,
-            percentiles: $percentiles,
+            percentiles: $percentileMetrics,
             averageMemoryUsed: 1024.5,
             peakMemoryUsed: 2048.0,
             minExecutionTime: 1.0,
@@ -120,39 +120,39 @@ final class BenchmarkStatisticsDataTest extends TestCase
         );
 
         // Act
-        $dto = BenchmarkStatisticsData::fromDomain($domainStats);
+        $benchmarkStatisticsData = BenchmarkStatisticsData::fromDomain($benchmarkStatistics);
 
         // Assert
-        self::assertSame('test-benchmark', $dto->benchmarkId);
-        self::assertSame('Test Benchmark', $dto->benchmarkName);
-        self::assertSame('php84', $dto->phpVersion);
-        self::assertSame(100, $dto->count);
-        self::assertSame(1.8, $dto->avg);
-        self::assertSame($percentiles, $dto->percentiles);
-        self::assertSame(1024.5, $dto->memoryUsed);
-        self::assertSame(2048.0, $dto->memoryPeak);
-        self::assertSame(0.5, $dto->stdDev);
-        self::assertSame(27.78, $dto->cv);
-        self::assertSame(555.56, $dto->throughput);
+        self::assertSame('test-benchmark', $benchmarkStatisticsData->benchmarkId);
+        self::assertSame('Test Benchmark', $benchmarkStatisticsData->benchmarkName);
+        self::assertSame('php84', $benchmarkStatisticsData->phpVersion);
+        self::assertSame(100, $benchmarkStatisticsData->count);
+        self::assertEqualsWithDelta(1.8, $benchmarkStatisticsData->avg, PHP_FLOAT_EPSILON);
+        self::assertSame($percentileMetrics, $benchmarkStatisticsData->percentiles);
+        self::assertEqualsWithDelta(1024.5, $benchmarkStatisticsData->memoryUsed, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(2048.0, $benchmarkStatisticsData->memoryPeak, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.5, $benchmarkStatisticsData->stdDev, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(27.78, $benchmarkStatisticsData->cv, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(555.56, $benchmarkStatisticsData->throughput, PHP_FLOAT_EPSILON);
     }
 
     public function testFromDomainPreservesPercentiles(): void
     {
         // Arrange
-        $percentiles = new PercentileMetrics(
+        $percentileMetrics = new PercentileMetrics(
             p50: 10.0,
             p90: 30.0,
             p95: 40.0,
             p99: 50.0,
         );
 
-        $domainStats = new BenchmarkStatistics(
+        $benchmarkStatistics = new BenchmarkStatistics(
             benchmarkId: 'test',
             benchmarkName: 'Test',
             phpVersion: 'php85',
             executionCount: 50,
             averageExecutionTime: 25.0,
-            percentiles: $percentiles,
+            percentiles: $percentileMetrics,
             averageMemoryUsed: 512.0,
             peakMemoryUsed: 1024.0,
             minExecutionTime: 5.0,
@@ -163,17 +163,17 @@ final class BenchmarkStatisticsDataTest extends TestCase
         );
 
         // Act
-        $dto = BenchmarkStatisticsData::fromDomain($domainStats);
+        $benchmarkStatisticsData = BenchmarkStatisticsData::fromDomain($benchmarkStatistics);
 
         // Assert - Verify percentiles are accessible via getter methods
-        self::assertSame(10.0, $dto->getP50());
-        self::assertSame(30.0, $dto->getP90());
-        self::assertSame(40.0, $dto->getP95());
-        self::assertSame(50.0, $dto->getP99());
-        self::assertSame(5.0, $dto->min);
-        self::assertSame(60.0, $dto->max);
-        self::assertSame(10.5, $dto->stdDev);
-        self::assertSame(42.0, $dto->cv);
-        self::assertSame(40.0, $dto->throughput);
+        self::assertEqualsWithDelta(10.0, $benchmarkStatisticsData->getP50(), PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(30.0, $benchmarkStatisticsData->getP90(), PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(40.0, $benchmarkStatisticsData->getP95(), PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(50.0, $benchmarkStatisticsData->getP99(), PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(5.0, $benchmarkStatisticsData->min, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(60.0, $benchmarkStatisticsData->max, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(10.5, $benchmarkStatisticsData->stdDev, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(42.0, $benchmarkStatisticsData->cv, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(40.0, $benchmarkStatisticsData->throughput, PHP_FLOAT_EPSILON);
     }
 }

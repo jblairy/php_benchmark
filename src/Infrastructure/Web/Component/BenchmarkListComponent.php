@@ -22,7 +22,7 @@ final class BenchmarkListComponent
     private ?array $benchmarks = null;
 
     public function __construct(
-        private readonly PulseRepositoryPort $pulseRepository,
+        private readonly PulseRepositoryPort $pulseRepositoryPort,
     ) {
     }
 
@@ -32,7 +32,7 @@ final class BenchmarkListComponent
     public function getBenchmarks(): array
     {
         if (null === $this->benchmarks) {
-            $this->benchmarks = $this->pulseRepository->findUniqueBenchmarks();
+            $this->benchmarks = $this->pulseRepositoryPort->findUniqueBenchmarks();
         }
 
         return $this->benchmarks;

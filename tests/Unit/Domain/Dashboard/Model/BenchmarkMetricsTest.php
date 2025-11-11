@@ -12,7 +12,7 @@ final class BenchmarkMetricsTest extends TestCase
 {
     public function testConstructorCreatesImmutableValueObject(): void
     {
-        $metrics = new BenchmarkMetrics(
+        $benchmarkMetrics = new BenchmarkMetrics(
             benchmarkId: 'test-id',
             benchmarkName: 'Test Benchmark',
             phpVersion: 'php84',
@@ -21,17 +21,17 @@ final class BenchmarkMetricsTest extends TestCase
             memoryPeaks: [150.0, 250.0, 350.0],
         );
 
-        self::assertSame('test-id', $metrics->benchmarkId);
-        self::assertSame('Test Benchmark', $metrics->benchmarkName);
-        self::assertSame('php84', $metrics->phpVersion);
-        self::assertSame([10.0, 20.0, 30.0], $metrics->executionTimes);
-        self::assertSame([100.0, 200.0, 300.0], $metrics->memoryUsages);
-        self::assertSame([150.0, 250.0, 350.0], $metrics->memoryPeaks);
+        self::assertSame('test-id', $benchmarkMetrics->benchmarkId);
+        self::assertSame('Test Benchmark', $benchmarkMetrics->benchmarkName);
+        self::assertSame('php84', $benchmarkMetrics->phpVersion);
+        self::assertSame([10.0, 20.0, 30.0], $benchmarkMetrics->executionTimes);
+        self::assertSame([100.0, 200.0, 300.0], $benchmarkMetrics->memoryUsages);
+        self::assertSame([150.0, 250.0, 350.0], $benchmarkMetrics->memoryPeaks);
     }
 
     public function testGetExecutionCountReturnsCorrectCount(): void
     {
-        $metrics = new BenchmarkMetrics(
+        $benchmarkMetrics = new BenchmarkMetrics(
             benchmarkId: 'test-id',
             benchmarkName: 'Test',
             phpVersion: 'php84',
@@ -40,12 +40,12 @@ final class BenchmarkMetricsTest extends TestCase
             memoryPeaks: [100.0],
         );
 
-        self::assertSame(3, $metrics->getExecutionCount());
+        self::assertSame(3, $benchmarkMetrics->getExecutionCount());
     }
 
     public function testGetExecutionCountReturnsZeroForEmptyArray(): void
     {
-        $metrics = new BenchmarkMetrics(
+        $benchmarkMetrics = new BenchmarkMetrics(
             benchmarkId: 'test-id',
             benchmarkName: 'Test',
             phpVersion: 'php84',
@@ -54,12 +54,12 @@ final class BenchmarkMetricsTest extends TestCase
             memoryPeaks: [],
         );
 
-        self::assertSame(0, $metrics->getExecutionCount());
+        self::assertSame(0, $benchmarkMetrics->getExecutionCount());
     }
 
     public function testIsEmptyReturnsTrueForNoExecutions(): void
     {
-        $metrics = new BenchmarkMetrics(
+        $benchmarkMetrics = new BenchmarkMetrics(
             benchmarkId: 'test-id',
             benchmarkName: 'Test',
             phpVersion: 'php84',
@@ -68,12 +68,12 @@ final class BenchmarkMetricsTest extends TestCase
             memoryPeaks: [],
         );
 
-        self::assertTrue($metrics->isEmpty());
+        self::assertTrue($benchmarkMetrics->isEmpty());
     }
 
     public function testIsEmptyReturnsFalseForExecutions(): void
     {
-        $metrics = new BenchmarkMetrics(
+        $benchmarkMetrics = new BenchmarkMetrics(
             benchmarkId: 'test-id',
             benchmarkName: 'Test',
             phpVersion: 'php84',
@@ -82,12 +82,12 @@ final class BenchmarkMetricsTest extends TestCase
             memoryPeaks: [100.0],
         );
 
-        self::assertFalse($metrics->isEmpty());
+        self::assertFalse($benchmarkMetrics->isEmpty());
     }
 
     public function testValueObjectIsReadonly(): void
     {
-        $metrics = new BenchmarkMetrics(
+        $benchmarkMetrics = new BenchmarkMetrics(
             benchmarkId: 'test-id',
             benchmarkName: 'Test',
             phpVersion: 'php84',
@@ -96,7 +96,7 @@ final class BenchmarkMetricsTest extends TestCase
             memoryPeaks: [100.0],
         );
 
-        $reflection = new ReflectionClass($metrics);
-        self::assertTrue($reflection->isReadOnly());
+        $reflectionClass = new ReflectionClass($benchmarkMetrics);
+        self::assertTrue($reflectionClass->isReadOnly());
     }
 }

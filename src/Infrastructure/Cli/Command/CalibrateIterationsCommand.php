@@ -7,9 +7,7 @@ namespace Jblairy\PhpBenchmark\Infrastructure\Cli\Command;
 use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Yaml\Yaml;
 
@@ -23,105 +21,99 @@ use Symfony\Component\Yaml\Yaml;
     name: 'benchmark:calibrate',
     description: 'Calibrate benchmark iterations based on target execution time',
 )]
-final class CalibrateIterationsCommand extends Command
+final class CalibrateIterationsCommand
 {
-    private const float DEFAULT_TARGET_TIME_MS = 1000.0; // 1 second
+    private const float DEFAULT_TARGET_TIME_MS = 1000.0;
+    // 1 second
     private const int MIN_INNER = 10;
+
     private const int MAX_INNER = 1000;
 
-    public function __construct(
-        private readonly string $projectDir,
-    ) {
-        parent::__construct();
+    public function __construct(private readonly string $projectDir)
+    {
     }
 
-    protected function configure(): void
-    {
-        $this
-            ->addOption('benchmark', 'b', InputOption::VALUE_REQUIRED, 'Benchmark slug to calibrate')
-            ->addOption('all', 'a', InputOption::VALUE_NONE, 'Calibrate all benchmarks')
-            ->addOption('target-time', 't', InputOption::VALUE_REQUIRED, 'Target execution time in milliseconds', self::DEFAULT_TARGET_TIME_MS)
-            ->addOption('php-version', 'p', InputOption::VALUE_REQUIRED, 'PHP version to use for calibration', 'php56')
-            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Show suggestions without updating fixtures')
-            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Update fixtures even if already configured');
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $io = new SymfonyStyle($input, $output);
-
-        $targetTimeMsOption = $input->getOption('target-time');
-        $targetTimeMs = is_numeric($targetTimeMsOption) ? (float) $targetTimeMsOption : self::DEFAULT_TARGET_TIME_MS;
-
-        $phpVersionOption = $input->getOption('php-version');
-        $phpVersion = is_string($phpVersionOption) ? $phpVersionOption : 'php56';
-
-        $dryRun = (bool) $input->getOption('dry-run');
-        $force = (bool) $input->getOption('force');
-
-        $io->title('Benchmark Iteration Calibration');
-        $io->info(sprintf('Target execution time: %.0f ms', $targetTimeMs));
-        $io->info(sprintf('Calibration PHP version: %s', $phpVersion));
-
-        if ($dryRun) {
-            $io->warning('DRY RUN MODE - No files will be modified');
-        }
-
-        // Get fixtures path
-        $fixturesPath = $this->projectDir . '/fixtures/benchmarks';
-
-        if (!is_dir($fixturesPath)) {
-            $io->error('Fixtures directory not found: ' . $fixturesPath);
-
+    public function __invoke(
+        #[\Symfony\Component\Console\Attribute\Option(name: 'benchmark', shortcut: 'b', description: 'Benchmark slug to calibrate')]
+        ?string $benchmark = null,
+        #[\Symfony\Component\Console\Attribute\Option(name: 'all', shortcut: 'a', description: 'Calibrate all benchmarks')]
+        bool $all = false,
+        #[\Symfony\Component\Console\Attribute\Option(name: 'target-time', shortcut: 't', description: 'Target execution time in milliseconds')]
+        float $targetTime = self::DEFAULT_TARGET_TIME_MS,
+        #[\Symfony\Component\Console\Attribute\Option(name: 'php-version', shortcut: 'p', description: 'PHP version to use for calibration')]
+        string $phpVersion = 'php56',
+        #[\Symfony\Component\Console\Attribute\Option(name: 'dry-run', description: 'Show suggestions without updating fixtures')]
+        bool $dryRun = false,
+        #[\Symfony\Component\Console\Attribute\Option(name: 'force', shortcut: 'f', description: 'Update fixtures even if already configured')]
+        bool $force = false,
+        ?SymfonyStyle $symfonyStyle = null,
+    ): int {
+        // Guard against null $symfonyStyle - should not happen in normal execution
+        if (null === $symfonyStyle) {
             return Command::FAILURE;
         }
 
+        // Variables are already correctly typed from function parameters
+        // No need for additional assignments
+        $symfonyStyle->title('Benchmark Iteration Calibration');
+        $symfonyStyle->info(sprintf('Target execution time: %.0f ms', $targetTime));
+        $symfonyStyle->info(sprintf('Calibration PHP version: %s', $phpVersion));
+        if ($dryRun) {
+            $symfonyStyle->warning('DRY RUN MODE - No files will be modified');
+        }
+        // Get fixtures path
+        $fixturesPath = $this->projectDir . '/fixtures/benchmarks';
+        if (!is_dir($fixturesPath)) {
+            $symfonyStyle->error('Fixtures directory not found: ' . $fixturesPath);
+
+            return Command::FAILURE;
+        }
         // Get benchmarks to calibrate
         /** @var list<string> $benchmarkFiles */
         $benchmarkFiles = [];
-        if (true === $input->getOption('all')) {
+        if ($all) {
             $globResult = glob($fixturesPath . '/*.yaml');
             if (false === $globResult) {
-                $io->error('Failed to read fixtures directory');
+                $symfonyStyle->error('Failed to read fixtures directory');
 
                 return Command::FAILURE;
             }
+
             $benchmarkFiles = $globResult;
-            $io->info(sprintf('Calibrating %d benchmarks...', count($benchmarkFiles)));
+            $symfonyStyle->info(sprintf('Calibrating %d benchmarks...', count($benchmarkFiles)));
         } else {
-            $benchmarkSlugOption = $input->getOption('benchmark');
+            $benchmarkSlugOption = $benchmark;
             if (!is_string($benchmarkSlugOption)) {
-                $io->error('Please specify --benchmark=<slug> or --all');
+                $symfonyStyle->error('Please specify --benchmark=<slug> or --all');
 
                 return Command::FAILURE;
             }
+
             $file = $fixturesPath . '/' . $benchmarkSlugOption . '.yaml';
             if (!file_exists($file)) {
-                $io->error(sprintf('Benchmark not found: %s', $benchmarkSlugOption));
+                $symfonyStyle->error(sprintf('Benchmark not found: %s', $benchmarkSlugOption));
 
                 return Command::FAILURE;
             }
+
             $benchmarkFiles = [$file];
         }
-
-        $io->progressStart(count($benchmarkFiles));
-
+        $symfonyStyle->progressStart(count($benchmarkFiles));
         $results = [];
         $errors = [];
         $skipped = 0;
-
-        foreach ($benchmarkFiles as $file) {
-            $io->progressAdvance();
+        foreach ($benchmarkFiles as $benchmarkFile) {
+            $symfonyStyle->progressAdvance();
 
             try {
-                $data = Yaml::parseFile($file);
+                $data = Yaml::parseFile($benchmarkFile);
                 if (!is_array($data)) {
                     ++$skipped;
 
                     continue;
                 }
 
-                $slug = is_string($data['slug'] ?? null) ? $data['slug'] : basename($file, '.yaml');
+                $slug = is_string($data['slug'] ?? null) ? $data['slug'] : basename($benchmarkFile, '.yaml');
 
                 // Skip if already configured and not forced
                 if (!$force && (isset($data['warmupIterations']) || isset($data['innerIterations']))) {
@@ -138,29 +130,27 @@ final class CalibrateIterationsCommand extends Command
                     continue;
                 }
 
-                $calibration = $this->calibrateBenchmark($data, $targetTimeMs);
+                $calibration = $this->calibrateBenchmark($data, $targetTime);
 
                 if (null !== $calibration) {
                     $results[] = $calibration;
 
                     if (!$dryRun) {
-                        $this->updateFixture($file, $calibration);
+                        $this->updateFixture($benchmarkFile, $calibration);
                     }
                 }
             } catch (Exception $e) {
                 $errors[] = [
-                    'benchmark' => basename($file),
+                    'benchmark' => basename($benchmarkFile),
                     'error' => $e->getMessage(),
                 ];
             }
         }
-
-        $io->progressFinish();
-        $io->newLine();
-
+        $symfonyStyle->progressFinish();
+        $symfonyStyle->newLine();
         // Display results
-        if (0 < count($results)) {
-            $io->section('Calibration Results');
+        if ([] !== $results) {
+            $symfonyStyle->section('Calibration Results');
 
             $table = [];
             foreach ($results as $result) {
@@ -173,28 +163,25 @@ final class CalibrateIterationsCommand extends Command
                 ];
             }
 
-            $io->table(
+            $symfonyStyle->table(
                 ['Benchmark', 'Measured Time', 'Warmup', 'Inner', 'Efficiency'],
                 $table,
             );
 
-            $io->success(sprintf('Calibrated %d benchmarks', count($results)));
+            $symfonyStyle->success(sprintf('Calibrated %d benchmarks', count($results)));
         }
-
         if (0 < $skipped) {
-            $io->info(sprintf('Skipped %d benchmarks (already configured or loop tests)', $skipped));
+            $symfonyStyle->info(sprintf('Skipped %d benchmarks (already configured or loop tests)', $skipped));
         }
-
         // Display errors
-        if (0 < count($errors)) {
-            $io->section('Errors');
+        if ([] !== $errors) {
+            $symfonyStyle->section('Errors');
             foreach ($errors as $error) {
-                $io->error(sprintf('%s: %s', $error['benchmark'], $error['error']));
+                $symfonyStyle->error(sprintf('%s: %s', $error['benchmark'], $error['error']));
             }
         }
-
-        if ($dryRun && 0 < count($results)) {
-            $io->note('This was a DRY RUN. Run without --dry-run to apply changes.');
+        if ($dryRun && [] !== $results) {
+            $symfonyStyle->note('This was a DRY RUN. Run without --dry-run to apply changes.');
         }
 
         return Command::SUCCESS;
@@ -215,7 +202,7 @@ final class CalibrateIterationsCommand extends Command
         }
 
         // Measure single execution (code already contains loops)
-        $measuredTime = $this->measureExecutionTime($code, 0, 0);
+        $measuredTime = $this->measureExecutionTime($code);
 
         if (null === $measuredTime || 0 >= $measuredTime) {
             return null;
@@ -250,7 +237,7 @@ final class CalibrateIterationsCommand extends Command
         ];
     }
 
-    private function measureExecutionTime(string $code, int $warmup, int $inner): ?float
+    private function measureExecutionTime(string $code): ?float
     {
         try {
             // Simple approach: execute the code once and measure
@@ -268,10 +255,10 @@ final class CalibrateIterationsCommand extends Command
             file_put_contents($tempFile, $script);
 
             // Execute with PHP CLI with timeout
-            $output = shell_exec("timeout 5s php {$tempFile} 2>&1");
+            $output = shell_exec(sprintf('timeout 5s php %s 2>&1', $tempFile));
             @unlink($tempFile);
 
-            if (null === $output) {
+            if (null === $output || false === $output) {
                 return null;
             }
 
@@ -308,7 +295,7 @@ final class CalibrateIterationsCommand extends Command
             }
 
             return (float) $executionTime;
-        } catch (Exception $e) {
+        } catch (Exception) {
             return null;
         }
     }

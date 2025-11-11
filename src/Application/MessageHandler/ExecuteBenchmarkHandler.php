@@ -29,91 +29,92 @@ use Throwable;
 final readonly class ExecuteBenchmarkHandler
 {
     public function __construct(
-        private BenchmarkExecutorPort $benchmarkExecutor,
-        private ResultPersisterPort $resultPersister,
-        private EventDispatcherPort $eventDispatcher,
-        private BenchmarkRepositoryPort $benchmarkRepository,
+        private BenchmarkExecutorPort $benchmarkExecutorPort,
+        private ResultPersisterPort $resultPersisterPort,
+        private EventDispatcherPort $eventDispatcherPort,
+        private BenchmarkRepositoryPort $benchmarkRepositoryPort,
         private LoggerInterface $logger,
     ) {
     }
 
-    public function __invoke(ExecuteBenchmarkMessage $message): void
+    public function __invoke(ExecuteBenchmarkMessage $executeBenchmarkMessage): void
     {
-        set_time_limit((int) ($_ENV['BENCHMARK_TIMEOUT'] ?? 60));
+        $timeout = $_ENV['BENCHMARK_TIMEOUT'] ?? 60;
+        set_time_limit(is_numeric($timeout) ? (int) $timeout : 60);
 
         $this->logger->info('Processing benchmark execution', [
-            'benchmark' => $message->benchmarkName,
-            'php_version' => $message->phpVersion,
-            'iteration' => $message->iterationNumber,
-            'execution_id' => $message->executionId,
+            'benchmark' => $executeBenchmarkMessage->benchmarkName,
+            'php_version' => $executeBenchmarkMessage->phpVersion,
+            'iteration' => $executeBenchmarkMessage->iterationNumber,
+            'execution_id' => $executeBenchmarkMessage->executionId,
         ]);
 
         try {
             // Load benchmark from repository
-            $benchmark = $this->benchmarkRepository->findBenchmarkByName($message->benchmarkSlug);
-            if (!$benchmark) {
-                throw new RuntimeException(sprintf('Benchmark %s not found in repository', $message->benchmarkSlug));
+            $benchmark = $this->benchmarkRepositoryPort->findBenchmarkByName($executeBenchmarkMessage->benchmarkSlug);
+            if (null === $benchmark) {
+                throw new RuntimeException(sprintf('Benchmark %s not found in repository', $executeBenchmarkMessage->benchmarkSlug));
             }
 
-            $phpVersion = PhpVersion::from($message->phpVersion);
+            $phpVersion = PhpVersion::from($executeBenchmarkMessage->phpVersion);
 
             // Dispatch start event for first iteration
-            if (1 === $message->iterationNumber) {
-                $this->eventDispatcher->dispatch(
+            if (1 === $executeBenchmarkMessage->iterationNumber) {
+                $this->eventDispatcherPort->dispatch(
                     new BenchmarkStarted(
-                        benchmarkId: $message->benchmarkSlug,
-                        benchmarkName: $message->benchmarkName,
-                        phpVersion: $message->phpVersion,
-                        totalIterations: $message->iterations,
+                        benchmarkId: $executeBenchmarkMessage->benchmarkSlug,
+                        benchmarkName: $executeBenchmarkMessage->benchmarkName,
+                        phpVersion: $executeBenchmarkMessage->phpVersion,
+                        totalIterations: $executeBenchmarkMessage->iterations,
                     ),
                 );
             }
 
-            $configuration = new BenchmarkConfiguration(
+            $benchmarkConfiguration = new BenchmarkConfiguration(
                 benchmark: $benchmark,
                 phpVersion: $phpVersion,
                 iterations: 1, // Single iteration per message
             );
 
             // Execute benchmark
-            $result = $this->benchmarkExecutor->execute($configuration);
+            $result = $this->benchmarkExecutorPort->execute($benchmarkConfiguration);
 
             // Persist result
-            $this->resultPersister->persist($configuration, $result);
+            $this->resultPersisterPort->persist($benchmarkConfiguration, $result);
 
             // Dispatch progress event
-            $this->eventDispatcher->dispatch(
+            $this->eventDispatcherPort->dispatch(
                 new BenchmarkProgress(
-                    benchmarkId: $message->benchmarkSlug,
-                    benchmarkName: $message->benchmarkName,
-                    phpVersion: $message->phpVersion,
-                    currentIteration: $message->iterationNumber,
-                    totalIterations: $message->iterations,
+                    benchmarkId: $executeBenchmarkMessage->benchmarkSlug,
+                    benchmarkName: $executeBenchmarkMessage->benchmarkName,
+                    phpVersion: $executeBenchmarkMessage->phpVersion,
+                    currentIteration: $executeBenchmarkMessage->iterationNumber,
+                    totalIterations: $executeBenchmarkMessage->iterations,
                 ),
             );
 
             // Dispatch completed event for last iteration
-            if ($message->iterationNumber === $message->iterations) {
-                $this->eventDispatcher->dispatch(
+            if ($executeBenchmarkMessage->iterationNumber === $executeBenchmarkMessage->iterations) {
+                $this->eventDispatcherPort->dispatch(
                     new BenchmarkCompleted(
-                        benchmarkId: $message->benchmarkSlug,
-                        benchmarkName: $message->benchmarkName,
-                        phpVersion: $message->phpVersion,
-                        totalIterations: $message->iterations,
+                        benchmarkId: $executeBenchmarkMessage->benchmarkSlug,
+                        benchmarkName: $executeBenchmarkMessage->benchmarkName,
+                        phpVersion: $executeBenchmarkMessage->phpVersion,
+                        totalIterations: $executeBenchmarkMessage->iterations,
                     ),
                 );
             }
 
             $this->logger->info('Benchmark execution completed', [
-                'benchmark' => $message->benchmarkName,
-                'php_version' => $message->phpVersion,
+                'benchmark' => $executeBenchmarkMessage->benchmarkName,
+                'php_version' => $executeBenchmarkMessage->phpVersion,
                 'execution_time_ms' => $result->executionTimeMs,
                 'memory_usage_bytes' => $result->memoryUsedBytes,
             ]);
         } catch (Throwable $throwable) {
             $this->logger->error('Benchmark execution failed', [
-                'benchmark' => $message->benchmarkName,
-                'php_version' => $message->phpVersion,
+                'benchmark' => $executeBenchmarkMessage->benchmarkName,
+                'php_version' => $executeBenchmarkMessage->phpVersion,
                 'error' => $throwable->getMessage(),
                 'trace' => $throwable->getTraceAsString(),
             ]);

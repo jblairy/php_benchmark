@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  */
 final class ConfigurableScriptBuilder implements ScriptBuilderPort
 {
-    private ?IterationConfiguration $currentConfig = null;
+    private ?IterationConfiguration $iterationConfiguration = null;
 
     public function __construct(
         #[Autowire(env: 'BENCHMARK_WARMUP_ITERATIONS')]
@@ -27,22 +27,22 @@ final class ConfigurableScriptBuilder implements ScriptBuilderPort
     /**
      * Set the iteration configuration for the next build.
      */
-    public function setIterationConfiguration(?IterationConfiguration $config): void
+    public function setIterationConfiguration(?IterationConfiguration $iterationConfiguration): void
     {
-        $this->currentConfig = $config;
+        $this->iterationConfiguration = $iterationConfiguration;
     }
 
     public function build(string $methodBody): string
     {
         // Use current config or create smart defaults
-        $config = $this->currentConfig ?? IterationConfiguration::createWithDefaults(
+        $config = $this->iterationConfiguration ?? IterationConfiguration::createWithDefaults(
             $this->defaultWarmupIterations,
             $this->defaultInnerIterations,
             $methodBody,
         );
 
         // Reset current config after use
-        $this->currentConfig = null;
+        $this->iterationConfiguration = null;
 
         $warmupIterations = $config->warmupIterations;
         $innerIterations = $config->innerIterations;

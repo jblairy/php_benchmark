@@ -16,18 +16,18 @@ use Jblairy\PhpBenchmark\Domain\Dashboard\Service\EnhancedStatisticsCalculator;
 final readonly class GetBenchmarkStatistics
 {
     public function __construct(
-        private PulseRepositoryPort $pulseRepository,
-        private EnhancedStatisticsCalculator $statisticsCalculator,
+        private PulseRepositoryPort $pulseRepositoryPort,
+        private EnhancedStatisticsCalculator $enhancedStatisticsCalculator,
     ) {
     }
 
     public function execute(string $benchmarkId, string $benchmarkName): BenchmarkData
     {
-        $metrics = $this->pulseRepository->findMetricsByBenchmark($benchmarkId, $benchmarkName);
+        $metrics = $this->pulseRepositoryPort->findMetricsByBenchmark($benchmarkId, $benchmarkName);
 
         $phpVersionStats = [];
         foreach ($metrics as $metric) {
-            $statistics = $this->statisticsCalculator->calculate($metric);
+            $statistics = $this->enhancedStatisticsCalculator->calculate($metric);
             $phpVersionStats[$metric->phpVersion] = BenchmarkStatisticsData::fromDomain($statistics);
         }
 

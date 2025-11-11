@@ -34,10 +34,11 @@ use function usleep;
 final readonly class MultiSampleBenchmarkExecutor implements BenchmarkExecutorPort
 {
     private const int DEFAULT_SAMPLES = 1;
+
     private const int INTER_SAMPLE_PAUSE_MICROSECONDS = 10_000; // 10ms stabilization between samples
 
     public function __construct(
-        private BenchmarkExecutorPort $decoratedExecutor,
+        private BenchmarkExecutorPort $benchmarkExecutorPort,
         private LoggerInterface $logger,
         private int $numberOfSamples = self::DEFAULT_SAMPLES,
     ) {
@@ -49,7 +50,7 @@ final readonly class MultiSampleBenchmarkExecutor implements BenchmarkExecutorPo
 
         // Single sample: bypass multi-sample logic
         if (1 >= $samples) {
-            return $this->decoratedExecutor->execute($benchmarkConfiguration);
+            return $this->benchmarkExecutorPort->execute($benchmarkConfiguration);
         }
 
         $this->logger->debug('Starting multi-sample execution', [
@@ -59,11 +60,11 @@ final readonly class MultiSampleBenchmarkExecutor implements BenchmarkExecutorPo
         ]);
 
         $results = $this->collectSamples($benchmarkConfiguration, $samples);
-        $aggregatedResult = $this->aggregateResults($results);
+        $benchmarkResult = $this->aggregateResults($results);
 
-        $this->logSampleStatistics($benchmarkConfiguration, $results, $aggregatedResult);
+        $this->logSampleStatistics($benchmarkConfiguration, $results, $benchmarkResult);
 
-        return $aggregatedResult;
+        return $benchmarkResult;
     }
 
     /**
@@ -71,7 +72,7 @@ final readonly class MultiSampleBenchmarkExecutor implements BenchmarkExecutorPo
      *
      * @return BenchmarkResult[]
      */
-    private function collectSamples(BenchmarkConfiguration $configuration, int $samples): array
+    private function collectSamples(BenchmarkConfiguration $benchmarkConfiguration, int $samples): array
     {
         $results = [];
 
@@ -82,7 +83,7 @@ final readonly class MultiSampleBenchmarkExecutor implements BenchmarkExecutorPo
             ]);
 
             // Execute with fresh process state
-            $results[] = $this->decoratedExecutor->execute($configuration);
+            $results[] = $this->benchmarkExecutorPort->execute($benchmarkConfiguration);
 
             // Inter-sample stabilization pause (except after last sample)
             if ($i < $samples - 1) {
@@ -106,17 +107,17 @@ final readonly class MultiSampleBenchmarkExecutor implements BenchmarkExecutorPo
     private function aggregateResults(array $results): BenchmarkResult
     {
         $executionTimes = array_map(
-            static fn (BenchmarkResult $r): float => $r->executionTimeMs,
+            static fn (BenchmarkResult $benchmarkResult): float => $benchmarkResult->executionTimeMs,
             $results,
         );
 
         $memoryUsages = array_map(
-            static fn (BenchmarkResult $r): float => $r->memoryUsedBytes,
+            static fn (BenchmarkResult $benchmarkResult): float => $benchmarkResult->memoryUsedBytes,
             $results,
         );
 
         $memoryPeaks = array_map(
-            static fn (BenchmarkResult $r): float => $r->memoryPeakBytes,
+            static fn (BenchmarkResult $benchmarkResult): float => $benchmarkResult->memoryPeakBytes,
             $results,
         );
 
@@ -188,12 +189,12 @@ final readonly class MultiSampleBenchmarkExecutor implements BenchmarkExecutorPo
      * @param BenchmarkResult[] $results
      */
     private function logSampleStatistics(
-        BenchmarkConfiguration $configuration,
+        BenchmarkConfiguration $benchmarkConfiguration,
         array $results,
-        BenchmarkResult $aggregatedResult,
+        BenchmarkResult $benchmarkResult,
     ): void {
         $executionTimes = array_map(
-            static fn (BenchmarkResult $r): float => $r->executionTimeMs,
+            static fn (BenchmarkResult $benchmarkResult): float => $benchmarkResult->executionTimeMs,
             $results,
         );
 
@@ -206,10 +207,10 @@ final readonly class MultiSampleBenchmarkExecutor implements BenchmarkExecutorPo
         $cv = 0.0 !== $mean ? ($stdDev / $mean) * 100 : 0.0;
 
         $this->logger->info('Multi-sample execution completed', [
-            'benchmark' => $configuration->benchmark->getSlug(),
-            'php_version' => $configuration->phpVersion->value,
+            'benchmark' => $benchmarkConfiguration->benchmark->getSlug(),
+            'php_version' => $benchmarkConfiguration->phpVersion->value,
             'samples' => count($results),
-            'median_time_ms' => $aggregatedResult->executionTimeMs,
+            'median_time_ms' => $benchmarkResult->executionTimeMs,
             'mean_time_ms' => $mean,
             'std_dev_ms' => $stdDev,
             'cv_percent' => round($cv, 2),

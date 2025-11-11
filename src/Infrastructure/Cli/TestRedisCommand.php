@@ -8,100 +8,112 @@ use Exception;
 use Redis;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+
+use function extension_loaded;
+use function is_array;
+use function is_int;
+use function is_string;
+use function parse_url;
+use function sprintf;
+use function str_starts_with;
+use function uniqid;
 
 #[AsCommand(
     name: 'redis:test',
     description: 'Test Redis connection',
 )]
-final class TestRedisCommand extends Command
+final class TestRedisCommand
 {
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function __invoke(SymfonyStyle $symfonyStyle): int
     {
-        $io = new SymfonyStyle($input, $output);
-
-        $io->title('Testing Redis Connection');
-
+        $symfonyStyle->title('Testing Redis Connection');
         // Check if Redis extension is loaded
         if (!extension_loaded('redis')) {
-            $io->error('Redis PHP extension is not installed!');
-            $io->note('Install it with: pecl install redis');
+            $symfonyStyle->error('Redis PHP extension is not installed!');
+            $symfonyStyle->note('Install it with: pecl install redis');
 
             return Command::FAILURE;
         }
-
-        $io->success('Redis PHP extension is loaded');
-
+        $symfonyStyle->success('Redis PHP extension is loaded');
         // Get DSN
         $dsn = $_ENV['MESSENGER_TRANSPORT_DSN'] ?? '';
-        $io->info(sprintf('MESSENGER_TRANSPORT_DSN: %s', $dsn));
-
-        if (!str_starts_with($dsn, 'redis://')) {
-            $io->error('MESSENGER_TRANSPORT_DSN must start with redis://');
+        $dsnString = is_string($dsn) ? $dsn : '';
+        $symfonyStyle->info(sprintf('MESSENGER_TRANSPORT_DSN: %s', $dsnString));
+        if (!str_starts_with($dsnString, 'redis://')) {
+            $symfonyStyle->error('MESSENGER_TRANSPORT_DSN must start with redis://');
 
             return Command::FAILURE;
         }
-
         // Parse DSN
-        $parsedDsn = parse_url($dsn);
-        $host = $parsedDsn['host'] ?? 'localhost';
-        $port = $parsedDsn['port'] ?? 6379;
+        $parsedDsn = parse_url($dsnString);
+        if (false === $parsedDsn) {
+            $symfonyStyle->error('Invalid DSN format');
 
-        $io->info(sprintf('Connecting to Redis at %s:%d', $host, $port));
+            return Command::FAILURE;
+        }
+        $host = is_string($parsedDsn['host'] ?? null) ? $parsedDsn['host'] : 'localhost';
+        $port = is_int($parsedDsn['port'] ?? null) ? $parsedDsn['port'] : 6379;
+        $symfonyStyle->info(sprintf('Connecting to Redis at %s:%d', $host, $port));
 
         try {
             $redis = new Redis();
-            $connected = $redis->connect($host, (int) $port, 2.0); // 2 second timeout
+            $connected = $redis->connect($host, $port, 2.0); // 2 second timeout
 
             if (!$connected) {
-                $io->error('Could not connect to Redis!');
+                $symfonyStyle->error('Could not connect to Redis!');
 
                 return Command::FAILURE;
             }
 
-            $io->success('Successfully connected to Redis!');
+            $symfonyStyle->success('Successfully connected to Redis!');
 
             // Test operations
             $testKey = 'test:' . uniqid();
             $testValue = 'Hello from PHP Benchmark!';
 
-            $io->section('Testing Redis operations');
+            $symfonyStyle->section('Testing Redis operations');
 
             // SET
             $redis->set($testKey, $testValue);
-            $io->writeln(sprintf('SET %s = "%s"', $testKey, $testValue));
+            $symfonyStyle->writeln(sprintf('SET %s = "%s"', $testKey, $testValue));
 
             // GET
             $retrieved = $redis->get($testKey);
-            $io->writeln(sprintf('GET %s = "%s"', $testKey, $retrieved));
+            $retrievedString = is_string($retrieved) ? $retrieved : '';
+            $symfonyStyle->writeln(sprintf('GET %s = "%s"', $testKey, $retrievedString));
 
-            if ($retrieved === $testValue) {
-                $io->success('Redis read/write test passed!');
+            if ($retrievedString === $testValue) {
+                $symfonyStyle->success('Redis read/write test passed!');
             } else {
-                $io->error('Redis read/write test failed!');
+                $symfonyStyle->error('Redis read/write test failed!');
             }
 
             // Cleanup
             $redis->del($testKey);
 
             // Check Messenger queues
-            $io->section('Checking Messenger queues');
-            $messageKeys = $redis->keys('messages:*');
+            $symfonyStyle->section('Checking Messenger queues');
+            $messageKeysResult = $redis->keys('messages:*');
+            $messageKeys = is_array($messageKeysResult) ? $messageKeysResult : [];
 
-            if (empty($messageKeys)) {
-                $io->info('No Messenger queues found in Redis');
+            if ([] === $messageKeys) {
+                $symfonyStyle->info('No Messenger queues found in Redis');
             } else {
-                foreach ($messageKeys as $key) {
-                    $count = $redis->lLen($key);
-                    $io->writeln(sprintf('%s: %d messages', $key, $count));
+                foreach ($messageKeys as $messageKey) {
+                    if (!is_string($messageKey)) {
+                        continue;
+                    }
+
+                    $countResult = $redis->lLen($messageKey);
+                    $count = is_int($countResult) ? $countResult : 0;
+                    $symfonyStyle->writeln(sprintf('%s: %d messages', $messageKey, $count));
                 }
             }
 
             return Command::SUCCESS;
-        } catch (Exception $e) {
-            $io->error(sprintf('Redis error: %s', $e->getMessage()));
+        } catch (Exception $exception) {
+            $symfonyStyle->error(sprintf('Redis error: %s', $exception->getMessage()));
 
             return Command::FAILURE;
         }

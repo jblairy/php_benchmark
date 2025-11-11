@@ -24,7 +24,7 @@ final readonly class ConfigurableSingleBenchmarkExecutor implements BenchmarkExe
         private CodeExtractorPort $codeExtractorPort,
         private ScriptBuilderPort $scriptBuilderPort,
         private ScriptExecutorPort $scriptExecutorPort,
-        private BenchmarkRepositoryPort $benchmarkRepository,
+        private BenchmarkRepositoryPort $benchmarkRepositoryPort,
     ) {
     }
 
@@ -36,7 +36,7 @@ final readonly class ConfigurableSingleBenchmarkExecutor implements BenchmarkExe
         );
 
         // Try to get benchmark entity for custom iterations
-        $benchmark = $this->benchmarkRepository->findBenchmarkBySlug(
+        $benchmark = $this->benchmarkRepositoryPort->findBenchmarkBySlug(
             $benchmarkConfiguration->benchmark->getSlug(),
         );
 
@@ -47,7 +47,7 @@ final readonly class ConfigurableSingleBenchmarkExecutor implements BenchmarkExe
                 ? $benchmark->getEntity()
                 : null;
 
-            if (null !== $benchmarkEntity) {
+            if ($benchmarkEntity instanceof \Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Entity\Benchmark) {
                 $iterationConfig = IterationConfiguration::createWithDefaults(
                     $benchmarkEntity->getWarmupIterations(),
                     $benchmarkEntity->getInnerIterations(),

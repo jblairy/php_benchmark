@@ -16,42 +16,42 @@ use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Entity\Benchmark as
 final readonly class DatabaseBenchmark implements Benchmark
 {
     public function __construct(
-        private BenchmarkEntity $entity,
+        private BenchmarkEntity $benchmarkEntity,
     ) {
     }
 
     public function getMethodBody(PhpVersion $phpVersion): string
     {
-        if (!$this->entity->supportsPhpVersion($phpVersion)) {
-            throw new ReflexionMethodNotFound($this->entity->getSlug(), $phpVersion->value);
+        if (!$this->benchmarkEntity->supportsPhpVersion($phpVersion)) {
+            throw new ReflexionMethodNotFound($this->benchmarkEntity->getSlug(), $phpVersion->value);
         }
 
-        return $this->entity->getCode();
+        return $this->benchmarkEntity->getCode();
     }
 
     public function getEntity(): BenchmarkEntity
     {
-        return $this->entity;
+        return $this->benchmarkEntity;
     }
 
     public function getSlug(): string
     {
-        return $this->entity->getSlug();
+        return $this->benchmarkEntity->getSlug();
     }
 
     public function getName(): string
     {
-        return $this->entity->getName();
+        return $this->benchmarkEntity->getName();
     }
 
     public function getCategory(): string
     {
-        return $this->entity->getCategory();
+        return $this->benchmarkEntity->getCategory();
     }
 
     public function getDescription(): string
     {
-        return $this->entity->getDescription();
+        return $this->benchmarkEntity->getDescription();
     }
 
     /**
@@ -59,12 +59,12 @@ final readonly class DatabaseBenchmark implements Benchmark
      */
     public function getTags(): array
     {
-        return $this->entity->getTags();
+        return $this->benchmarkEntity->getTags();
     }
 
     public function getIcon(): ?string
     {
-        return $this->entity->getIcon();
+        return $this->benchmarkEntity->getIcon();
     }
 
     /**
@@ -72,6 +72,6 @@ final readonly class DatabaseBenchmark implements Benchmark
      */
     public function getSupportedPhpVersions(): array
     {
-        return $this->entity->getPhpVersionEnums();
+        return $this->benchmarkEntity->getPhpVersionEnums();
     }
 }

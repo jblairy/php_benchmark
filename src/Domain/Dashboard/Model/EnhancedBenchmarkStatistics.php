@@ -18,7 +18,7 @@ final readonly class EnhancedBenchmarkStatistics extends BenchmarkStatistics
         string $phpVersion,
         int $executionCount,
         float $averageExecutionTime,
-        PercentileMetrics $percentiles,
+        PercentileMetrics $percentileMetrics,
         float $averageMemoryUsed,
         float $peakMemoryUsed,
         float $minExecutionTime,
@@ -42,7 +42,7 @@ final readonly class EnhancedBenchmarkStatistics extends BenchmarkStatistics
             phpVersion: $phpVersion,
             executionCount: $executionCount,
             averageExecutionTime: $averageExecutionTime,
-            percentiles: $percentiles,
+            percentiles: $percentileMetrics, // This matches parent's parameter name
             averageMemoryUsed: $averageMemoryUsed,
             peakMemoryUsed: $peakMemoryUsed,
             minExecutionTime: $minExecutionTime,

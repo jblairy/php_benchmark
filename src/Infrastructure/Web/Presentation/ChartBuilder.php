@@ -52,8 +52,8 @@ final readonly class ChartBuilder
         $p90Data = [];
         $p99Data = [];
 
-        foreach ($allPhpVersions as $phpVersion) {
-            $stats = $benchmarkData->phpVersions[$phpVersion] ?? null;
+        foreach ($allPhpVersions as $allPhpVersion) {
+            $stats = $benchmarkData->phpVersions[$allPhpVersion] ?? null;
             $p50Data[] = $stats?->getP50();
             $p90Data[] = $stats?->getP90();
             $p99Data[] = $stats?->getP99();

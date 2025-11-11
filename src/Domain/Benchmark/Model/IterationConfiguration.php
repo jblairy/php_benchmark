@@ -13,14 +13,17 @@ use InvalidArgumentException;
 final readonly class IterationConfiguration
 {
     private const int DEFAULT_WARMUP_ITERATIONS = 10;
+
     private const int DEFAULT_INNER_ITERATIONS = 100;
 
     // Minimum values for statistical validity
     private const int MIN_WARMUP_ITERATIONS = 1;
+
     private const int MIN_INNER_ITERATIONS = 10;
 
     // Maximum reasonable values to prevent excessive runtime
     private const int MAX_WARMUP_ITERATIONS = 100;
+
     private const int MAX_INNER_ITERATIONS = 10000;
 
     public function __construct(
@@ -80,7 +83,7 @@ final readonly class IterationConfiguration
             'Warmup: %d, Inner: %d (Total: %d measurements)',
             $this->warmupIterations,
             $this->innerIterations,
-            $this->getTotalMeasurementIterations(),
+            $this->innerIterations,
         );
     }
 
@@ -96,11 +99,9 @@ final readonly class IterationConfiguration
         preg_match_all('/for\s*\([^;]+;\s*(\d+)\s*>/', $code, $loopMatches);
 
         $totalIterations = 1;
-        $matches = is_array($loopMatches[1] ?? null) ? $loopMatches[1] : [];
-        foreach ($matches as $iterations) {
-            if (is_numeric($iterations)) {
-                $totalIterations *= (int) $iterations;
-            }
+        $matches = $loopMatches[1];
+        foreach ($matches as $match) {
+            $totalIterations *= (int) $match;
         }
 
         // Check for heavy operations

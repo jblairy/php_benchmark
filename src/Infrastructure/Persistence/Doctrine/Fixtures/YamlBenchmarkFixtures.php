@@ -30,7 +30,7 @@ class YamlBenchmarkFixtures extends Fixture
         $fixturesPath = $this->projectDir . '/fixtures/benchmarks';
 
         if (!is_dir($fixturesPath)) {
-            throw new RuntimeException("Fixtures directory not found: {$fixturesPath}");
+            throw new RuntimeException('Fixtures directory not found: ' . $fixturesPath);
         }
 
         $finder = new Finder();
@@ -68,7 +68,7 @@ class YamlBenchmarkFixtures extends Fixture
      */
     private function createBenchmarkFromYaml(array $data, string $filename): Benchmark
     {
-        $fixtureData = new BenchmarkFixtureData(
+        $benchmarkFixtureData = new BenchmarkFixtureData(
             slug: $this->extractStringField($data, 'slug'),
             name: $this->extractStringField($data, 'name'),
             category: $this->extractStringField($data, 'category'),
@@ -81,9 +81,9 @@ class YamlBenchmarkFixtures extends Fixture
             innerIterations: $this->extractNullableIntField($data, 'innerIterations'),
         );
 
-        $this->validateFixtureData($fixtureData, $filename);
+        $this->validateFixtureData($benchmarkFixtureData, $filename);
 
-        return $this->buildBenchmarkEntity($fixtureData);
+        return $this->buildBenchmarkEntity($benchmarkFixtureData);
     }
 
     /**
@@ -120,13 +120,13 @@ class YamlBenchmarkFixtures extends Fixture
         return isset($data[$key]) && is_numeric($data[$key]) ? (int) $data[$key] : null;
     }
 
-    private function validateFixtureData(BenchmarkFixtureData $fixtureData, string $filename): void
+    private function validateFixtureData(BenchmarkFixtureData $benchmarkFixtureData, string $filename): void
     {
-        $violations = $this->validator->validate($fixtureData);
+        $constraintViolationList = $this->validator->validate($benchmarkFixtureData);
 
-        if (0 < count($violations)) {
+        if (0 < count($constraintViolationList)) {
             $errors = [];
-            foreach ($violations as $violation) {
+            foreach ($constraintViolationList as $violation) {
                 $errors[] = $violation->getPropertyPath() . ': ' . $violation->getMessage();
             }
 
@@ -134,19 +134,19 @@ class YamlBenchmarkFixtures extends Fixture
         }
     }
 
-    private function buildBenchmarkEntity(BenchmarkFixtureData $fixtureData): Benchmark
+    private function buildBenchmarkEntity(BenchmarkFixtureData $benchmarkFixtureData): Benchmark
     {
         return new Benchmark(
-            slug: $fixtureData->slug,
-            name: $fixtureData->name,
-            category: $fixtureData->category,
-            description: $fixtureData->description,
-            code: $fixtureData->code,
-            phpVersions: $fixtureData->phpVersions,
-            tags: $fixtureData->tags,
-            icon: $fixtureData->icon,
-            warmupIterations: $fixtureData->warmupIterations ?? null,
-            innerIterations: $fixtureData->innerIterations ?? null,
+            slug: $benchmarkFixtureData->slug,
+            name: $benchmarkFixtureData->name,
+            category: $benchmarkFixtureData->category,
+            description: $benchmarkFixtureData->description,
+            code: $benchmarkFixtureData->code,
+            phpVersions: $benchmarkFixtureData->phpVersions,
+            tags: $benchmarkFixtureData->tags,
+            icon: $benchmarkFixtureData->icon,
+            warmupIterations: $benchmarkFixtureData->warmupIterations ?? null,
+            innerIterations: $benchmarkFixtureData->innerIterations ?? null,
         );
     }
 
@@ -161,7 +161,7 @@ class YamlBenchmarkFixtures extends Fixture
             return [];
         }
 
-        return array_values(array_filter($data[$key], 'is_string'));
+        return array_values(array_filter($data[$key], is_string(...)));
     }
 
     private function logFixtureLoadingError(string $filename, Exception $exception): void

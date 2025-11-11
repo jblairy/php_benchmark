@@ -20,6 +20,8 @@ interface BenchmarkRepositoryPort
 
     public function findBenchmarkByName(string $name): ?Benchmark;
 
+    public function findBenchmarkBySlug(string $slug): ?Benchmark;
+
     public function hasBenchmark(string $name): bool;
 
     /**

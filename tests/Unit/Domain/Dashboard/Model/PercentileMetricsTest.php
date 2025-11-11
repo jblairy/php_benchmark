@@ -12,17 +12,17 @@ final class PercentileMetricsTest extends TestCase
 {
     public function testConstructorCreatesImmutableValueObject(): void
     {
-        $metrics = new PercentileMetrics(
+        $percentileMetrics = new PercentileMetrics(
             p50: 10.5,
             p90: 18.7,
             p95: 22.1,
             p99: 30.5,
         );
 
-        self::assertSame(10.5, $metrics->p50);
-        self::assertSame(18.7, $metrics->p90);
-        self::assertSame(22.1, $metrics->p95);
-        self::assertSame(30.5, $metrics->p99);
+        self::assertEqualsWithDelta(10.5, $percentileMetrics->p50, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(18.7, $percentileMetrics->p90, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(22.1, $percentileMetrics->p95, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(30.5, $percentileMetrics->p99, PHP_FLOAT_EPSILON);
     }
 
     public function testFromArrayWithValidData(): void
@@ -34,24 +34,24 @@ final class PercentileMetricsTest extends TestCase
             'p99' => 35.0,
         ];
 
-        $metrics = PercentileMetrics::fromArray($data);
+        $percentileMetrics = PercentileMetrics::fromArray($data);
 
-        self::assertSame(12.5, $metrics->p50);
-        self::assertSame(20.0, $metrics->p90);
-        self::assertSame(25.0, $metrics->p95);
-        self::assertSame(35.0, $metrics->p99);
+        self::assertEqualsWithDelta(12.5, $percentileMetrics->p50, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(20.0, $percentileMetrics->p90, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(25.0, $percentileMetrics->p95, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(35.0, $percentileMetrics->p99, PHP_FLOAT_EPSILON);
     }
 
     public function testFromArrayWithMissingKeysDefaultsToZero(): void
     {
         $data = [];
 
-        $metrics = PercentileMetrics::fromArray($data);
+        $percentileMetrics = PercentileMetrics::fromArray($data);
 
-        self::assertSame(0.0, $metrics->p50);
-        self::assertSame(0.0, $metrics->p90);
-        self::assertSame(0.0, $metrics->p95);
-        self::assertSame(0.0, $metrics->p99);
+        self::assertEqualsWithDelta(0.0, $percentileMetrics->p50, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $percentileMetrics->p90, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $percentileMetrics->p95, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $percentileMetrics->p99, PHP_FLOAT_EPSILON);
     }
 
     public function testFromArrayWithPartialDataDefaultsMissingToZero(): void
@@ -61,12 +61,12 @@ final class PercentileMetricsTest extends TestCase
             'p90' => 20.0,
         ];
 
-        $metrics = PercentileMetrics::fromArray($data);
+        $percentileMetrics = PercentileMetrics::fromArray($data);
 
-        self::assertSame(10.0, $metrics->p50);
-        self::assertSame(20.0, $metrics->p90);
-        self::assertSame(0.0, $metrics->p95);
-        self::assertSame(0.0, $metrics->p99);
+        self::assertEqualsWithDelta(10.0, $percentileMetrics->p50, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(20.0, $percentileMetrics->p90, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $percentileMetrics->p95, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0, $percentileMetrics->p99, PHP_FLOAT_EPSILON);
     }
 
     public function testFromArrayWithExtraKeysIgnoresThem(): void
@@ -80,30 +80,30 @@ final class PercentileMetricsTest extends TestCase
             'extra' => 100.0,
         ];
 
-        $metrics = PercentileMetrics::fromArray($data);
+        $percentileMetrics = PercentileMetrics::fromArray($data);
 
-        self::assertSame(10.0, $metrics->p50);
-        self::assertSame(20.0, $metrics->p90);
-        self::assertSame(25.0, $metrics->p95);
-        self::assertSame(30.0, $metrics->p99);
+        self::assertEqualsWithDelta(10.0, $percentileMetrics->p50, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(20.0, $percentileMetrics->p90, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(25.0, $percentileMetrics->p95, PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(30.0, $percentileMetrics->p99, PHP_FLOAT_EPSILON);
     }
 
     public function testValueObjectIsReadonly(): void
     {
-        $metrics = new PercentileMetrics(
+        $percentileMetrics = new PercentileMetrics(
             p50: 10.0,
             p90: 20.0,
             p95: 25.0,
             p99: 30.0,
         );
 
-        $reflection = new ReflectionClass($metrics);
-        self::assertTrue($reflection->isReadOnly());
+        $reflectionClass = new ReflectionClass($percentileMetrics);
+        self::assertTrue($reflectionClass->isReadOnly());
     }
 
     public function testPercentilesAreInAscendingOrder(): void
     {
-        $metrics = new PercentileMetrics(
+        $percentileMetrics = new PercentileMetrics(
             p50: 10.0,
             p90: 20.0,
             p95: 25.0,
@@ -111,8 +111,8 @@ final class PercentileMetricsTest extends TestCase
         );
 
         // Verify semantic meaning: higher percentiles should have higher or equal values
-        self::assertLessThanOrEqual($metrics->p90, $metrics->p50);
-        self::assertLessThanOrEqual($metrics->p95, $metrics->p90);
-        self::assertLessThanOrEqual($metrics->p99, $metrics->p95);
+        self::assertLessThanOrEqual($percentileMetrics->p90, $percentileMetrics->p50);
+        self::assertLessThanOrEqual($percentileMetrics->p95, $percentileMetrics->p90);
+        self::assertLessThanOrEqual($percentileMetrics->p99, $percentileMetrics->p95);
     }
 }

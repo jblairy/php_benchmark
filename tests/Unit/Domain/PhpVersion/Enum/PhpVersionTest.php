@@ -86,8 +86,8 @@ final class PhpVersionTest extends TestCase
     public function testEnumCasesAreSingleton(): void
     {
         $version1 = PhpVersion::PHP_8_4;
-        $version2 = PhpVersion::from('php84');
+        $phpVersion = PhpVersion::from('php84');
 
-        self::assertSame($version1, $version2);
+        self::assertSame($version1, $phpVersion);
     }
 }
