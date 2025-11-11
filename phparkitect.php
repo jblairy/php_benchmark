@@ -60,9 +60,7 @@ return static function (Config $config): void {
     //    → Dépend de Symfony\UX\Chartjs (Framework externe)
     //    FIX: Déplacer ChartBuilder vers Infrastructure OU créer un Port
     //
-    // 3. AsyncBenchmarkRunner (Application/UseCase) ligne 25
-    //    → Dépend de Spatie\Async\Pool (Bibliothèque externe)
-    //    FIX: Créer AsyncExecutorPort dans Domain et implémenter dans Infrastructure
+
     //
     // 4. Benchmark interface (Domain/Benchmark/Contract) ligne 10
     //    → Dépend de Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag
@@ -222,4 +220,4 @@ return static function (Config $config): void {
 //   2. Corriger AbstractBenchmark namespace (PRIORITÉ 2 - Simple refactor)
 //   3. Corriger Benchmark interface (PRIORITÉ 3 - Retirer annotation Symfony)
 //   4. Refactorer ChartBuilder (PRIORITÉ 4 - Le déplacer ou créer Port)
-//   5. Refactorer AsyncBenchmarkRunner (PRIORITÉ 5 - Créer AsyncExecutorPort)
+

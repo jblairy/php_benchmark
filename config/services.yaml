@@ -57,12 +57,6 @@ services:
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\EventDispatcherPort:
         class: Jblairy\PhpBenchmark\Infrastructure\Async\SymfonyEventDispatcherAdapter
 
-    # Async Executor (Port -> Adapter)
-    Jblairy\PhpBenchmark\Domain\Benchmark\Port\AsyncExecutorPort:
-        class: Jblairy\PhpBenchmark\Infrastructure\Async\SpatieAsyncExecutorAdapter
-        arguments:
-            $concurrency: '%env(int:BENCHMARK_CONCURRENCY)%'
-
     # Benchmark auto-tagging (moved from Domain to keep it framework-agnostic)
     _instanceof:
         Jblairy\PhpBenchmark\Domain\Benchmark\Contract\Benchmark:
