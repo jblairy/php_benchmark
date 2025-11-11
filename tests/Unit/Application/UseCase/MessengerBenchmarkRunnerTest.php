@@ -41,13 +41,9 @@ final class MessengerBenchmarkRunnerTest extends TestCase
     {
         // Given
         $benchmark = new class implements Benchmark {
-            public function code(): void {}
-            public function name(): string { return 'Test Benchmark'; }
-            public function slug(): string { return 'test-benchmark'; }
-            public function nameFr(): string { return 'Benchmark de test'; }
-            public function descriptionFr(): string { return 'Description du test'; }
-            public function descriptionEn(): string { return 'Test description'; }
-            public function tags(): array { return []; }
+            public function getMethodBody(PhpVersion $phpVersion): string {
+                return 'return 1;';
+            }
         };
         
         $configuration = new BenchmarkConfiguration(
@@ -84,7 +80,7 @@ final class MessengerBenchmarkRunnerTest extends TestCase
             $this->assertInstanceOf(ExecuteBenchmarkMessage::class, $message);
             $this->assertEquals($benchmark::class, $message->benchmarkClass);
             $this->assertEquals('test-benchmark', $message->benchmarkSlug);
-            $this->assertEquals('Test Benchmark', $message->benchmarkName);
+            $this->assertEquals('TestBenchmark', $message->benchmarkName);
             $this->assertEquals('php84', $message->phpVersion);
             $this->assertEquals(3, $message->iterations);
             $this->assertEquals($index + 1, $message->iterationNumber);

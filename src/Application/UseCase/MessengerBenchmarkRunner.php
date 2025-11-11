@@ -29,7 +29,12 @@ final readonly class MessengerBenchmarkRunner
     {
         $benchmarkId = $benchmarkConfiguration->benchmark::class;
         $benchmarkName = $benchmarkConfiguration->getBenchmarkName();
-        $benchmarkSlug = $benchmarkConfiguration->benchmark->slug();
+        
+        // Get slug from benchmark if method exists, otherwise generate from name
+        $benchmarkSlug = method_exists($benchmarkConfiguration->benchmark, 'getSlug')
+            ? $benchmarkConfiguration->benchmark->getSlug()
+            : $this->generateSlug($benchmarkName);
+            
         $phpVersion = $benchmarkConfiguration->phpVersion->value;
         $totalIterations = $benchmarkConfiguration->iterations;
         $executionId = uniqid('exec_', true);
@@ -71,5 +76,13 @@ final readonly class MessengerBenchmarkRunner
                 totalIterations: $totalIterations,
             ),
         );
+    }
+
+    private function generateSlug(string $benchmarkName): string
+    {
+        // Convert camelCase or PascalCase to kebab-case
+        $slug = preg_replace('/(?<!^)[A-Z]/', '-$0', $benchmarkName);
+        
+        return strtolower($slug ?? $benchmarkName);
     }
 }
