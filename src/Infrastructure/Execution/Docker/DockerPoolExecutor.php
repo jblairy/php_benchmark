@@ -24,7 +24,7 @@ use RuntimeException;
  */
 final class DockerPoolExecutor implements ScriptExecutorPort
 {
-    private const string TEMP_DIR = '/srv/php_benchmark/var/tmp';
+    private const string TEMP_DIR = '/app/var/tmp';
 
     /**
      * @var array<string, array{process: resource|false, pipes: array<int, resource>}>
@@ -100,11 +100,15 @@ final class DockerPoolExecutor implements ScriptExecutorPort
     private function executeInDockerPool(string $phpVersion, string $scriptPath): string
     {
         $timeout = (int) ($_ENV['BENCHMARK_TIMEOUT'] ?? 30);
+        $composeFile = $this->getComposeFile();
+        $projectName = $this->getProjectName();
 
         // Use docker-compose exec with -T flag for non-interactive execution
         $command = sprintf(
-            'timeout %ds docker-compose exec -T %s php -d max_execution_time=%d %s 2>&1',
+            'timeout %ds docker-compose -p %s -f %s exec -T %s php -d max_execution_time=%d %s 2>&1',
             $timeout,
+            escapeshellarg($projectName),
+            escapeshellarg($composeFile),
             escapeshellarg($phpVersion),
             $timeout,
             escapeshellarg($scriptPath),
@@ -125,6 +129,22 @@ final class DockerPoolExecutor implements ScriptExecutorPort
         }
 
         return implode('', $output);
+    }
+
+    private function getComposeFile(): string
+    {
+        $appEnv = $_ENV['APP_ENV'] ?? 'dev';
+
+        return match ($appEnv) {
+            'prod' => '/app/docker-compose.prod.yml',
+            'test' => '/app/docker-compose.ci.yml',
+            default => '/app/docker-compose.dev.yml',
+        };
+    }
+
+    private function getProjectName(): string
+    {
+        return $_ENV['COMPOSE_PROJECT_NAME'] ?? 'php_benchmark';
     }
 
     private function closeConnection(string $phpVersion): void
