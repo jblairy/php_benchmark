@@ -52,10 +52,10 @@ final class CalibrateIterationsCommand extends Command
 
         $targetTimeMsOption = $input->getOption('target-time');
         $targetTimeMs = is_numeric($targetTimeMsOption) ? (float) $targetTimeMsOption : self::DEFAULT_TARGET_TIME_MS;
-        
+
         $phpVersionOption = $input->getOption('php-version');
         $phpVersion = is_string($phpVersionOption) ? $phpVersionOption : 'php56';
-        
+
         $dryRun = (bool) $input->getOption('dry-run');
         $force = (bool) $input->getOption('force');
 
@@ -274,7 +274,7 @@ final class CalibrateIterationsCommand extends Command
             if (null === $output) {
                 return null;
             }
-            
+
             $trimmedOutput = mb_trim($output);
             if ('' === $trimmedOutput) {
                 return null;
@@ -322,7 +322,7 @@ final class CalibrateIterationsCommand extends Command
         if (!is_array($data)) {
             return;
         }
-        
+
         $data['warmupIterations'] = $calibration['suggested_warmup'];
         $data['innerIterations'] = $calibration['suggested_inner'];
 
