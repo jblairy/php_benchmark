@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Jblairy\PhpBenchmark\Domain\Dashboard\Model;
 
-use Jblairy\PhpBenchmark\Domain\PhpVersion\Model\PhpVersion;
-
 /**
  * Enhanced benchmark statistics with outlier detection metrics.
  */
@@ -17,7 +15,7 @@ final readonly class EnhancedBenchmarkStatistics extends BenchmarkStatistics
     public function __construct(
         string $benchmarkId,
         string $benchmarkName,
-        PhpVersion $phpVersion,
+        string $phpVersion,
         int $executionCount,
         float $averageExecutionTime,
         PercentileMetrics $percentiles,
