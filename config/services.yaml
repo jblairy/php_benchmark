@@ -6,6 +6,9 @@
 parameters:
     container.dumper.inline_class_loader: false
     locale: 'fr'
+    # Benchmark execution parameters
+    benchmark.warmup_iterations: '%env(int:BENCHMARK_WARMUP_ITERATIONS)%'
+    benchmark.inner_iterations: '%env(int:BENCHMARK_INNER_ITERATIONS)%'
 
 services:
     # default configuration for services in *this* file
@@ -40,7 +43,7 @@ services:
     # Result Persistence (Port -> Adapter)
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\ResultPersisterPort:
         class: Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\DoctrinePulseResultPersister
-    
+
     # Pulse Repository (Port -> Adapter)
     Jblairy\PhpBenchmark\Domain\Dashboard\Port\PulseRepositoryPort:
         class: Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Repository\PulseRepository
@@ -50,6 +53,8 @@ services:
         class: Jblairy\PhpBenchmark\Domain\Benchmark\Service\SingleBenchmarkExecutor
 
     # Script Builder (Port -> Adapter)
+    # Uses #[Autowire] attributes for environment variable injection
+    # See: https://symfony.com/doc/7.3/service_container/autowiring
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptBuilderPort:
         class: Jblairy\PhpBenchmark\Infrastructure\Execution\ScriptBuilding\ScriptBuilder
 
