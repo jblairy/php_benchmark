@@ -27,6 +27,17 @@ final readonly class ScriptBuilder implements ScriptBuilderPort
 
         return <<<PHP
                 // ============================================================
+                // Phase 0: CPU Affinity (if available)
+                // ============================================================
+                
+                // Pin to specific CPU cores to reduce context switching
+                // This reduces cache misses and improves consistency
+                if (function_exists('pcntl_setaffinity')) {
+                    // Pin to CPU cores 0 and 1 (matches docker cpuset)
+                    @pcntl_setaffinity(getmypid(), [0, 1]);
+                }
+                
+                // ============================================================
                 // Phase 1: GC Control and Memory Pre-allocation
                 // ============================================================
                 
