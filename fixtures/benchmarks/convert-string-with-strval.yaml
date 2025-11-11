@@ -20,3 +20,5 @@ code: |
   for ($i = 0; 100000 > $i; ++$i) {
               $result = (string) 123;
           }
+warmupIterations: 5
+innerIterations: 50

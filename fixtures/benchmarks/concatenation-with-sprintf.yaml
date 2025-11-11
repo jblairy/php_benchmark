@@ -21,3 +21,5 @@ code: |
           for ($i = 0; 10000 > $i; ++$i) {
               $result = sprintf('%s %s %d %s %s', 'Hello', 'World', $i, 'test', 'benchmark');
           }
+warmupIterations: 10
+innerIterations: 100

@@ -22,3 +22,5 @@ code: |
               $copy->value = 123;
               $copy->name = 'test';
           }
+warmupIterations: 5
+innerIterations: 50

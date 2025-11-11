@@ -16,6 +16,8 @@ phpVersions:
   - php83
   - php84
   - php85
+warmupIterations: 3
+innerIterations: 20
 code: |
   $text = 'Hello World, this is a test string for benchmarking purposes';
           for ($i = 0; 100000 > $i; ++$i) {

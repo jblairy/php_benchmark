@@ -49,14 +49,16 @@ services:
         class: Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Repository\PulseRepository
 
     # Benchmark Execution (Port -> Adapter)
+    # ConfigurableSingleBenchmarkExecutor uses per-benchmark iteration settings
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkExecutorPort:
-        class: Jblairy\PhpBenchmark\Domain\Benchmark\Service\SingleBenchmarkExecutor
+        class: Jblairy\PhpBenchmark\Domain\Benchmark\Service\ConfigurableSingleBenchmarkExecutor
 
     # Script Builder (Port -> Adapter)
     # Uses #[Autowire] attributes for environment variable injection
     # See: https://symfony.com/doc/7.3/service_container/autowiring
+    # ConfigurableScriptBuilder supports per-benchmark iteration configuration
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptBuilderPort:
-        class: Jblairy\PhpBenchmark\Infrastructure\Execution\ScriptBuilding\ScriptBuilder
+        class: Jblairy\PhpBenchmark\Infrastructure\Execution\ScriptBuilding\ConfigurableScriptBuilder
 
     # Event Dispatcher (Port -> Adapter)
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\EventDispatcherPort:

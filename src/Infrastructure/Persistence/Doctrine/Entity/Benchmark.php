@@ -66,6 +66,12 @@ class Benchmark
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private DateTimeImmutable $updatedAt;
 
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    private ?int $warmupIterations = null;
+
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    private ?int $innerIterations = null;
+
     /**
      * @param array<string> $phpVersions
      * @param array<string> $tags
@@ -79,6 +85,8 @@ class Benchmark
         array $phpVersions = [],
         array $tags = [],
         ?string $icon = null,
+        ?int $warmupIterations = null,
+        ?int $innerIterations = null,
     ) {
         $this->slug = $slug;
         $this->name = $name;
@@ -88,6 +96,8 @@ class Benchmark
         $this->phpVersions = array_values($phpVersions); // Ensure sequential array
         $this->tags = array_values($tags); // Ensure sequential array
         $this->icon = $icon;
+        $this->warmupIterations = $warmupIterations;
+        $this->innerIterations = $innerIterations;
         $this->createdAt = new DateTimeImmutable();
         $this->updatedAt = new DateTimeImmutable();
     }
@@ -214,5 +224,25 @@ class Benchmark
     public function setPhpVersions(array $phpVersions): void
     {
         $this->phpVersions = array_values($phpVersions);
+    }
+
+    public function getWarmupIterations(): ?int
+    {
+        return $this->warmupIterations;
+    }
+
+    public function setWarmupIterations(?int $warmupIterations): void
+    {
+        $this->warmupIterations = $warmupIterations;
+    }
+
+    public function getInnerIterations(): ?int
+    {
+        return $this->innerIterations;
+    }
+
+    public function setInnerIterations(?int $innerIterations): void
+    {
+        $this->innerIterations = $innerIterations;
     }
 }

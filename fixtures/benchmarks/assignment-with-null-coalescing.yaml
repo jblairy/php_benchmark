@@ -16,3 +16,5 @@ code: |
               $result = null;
               $result ??= 'default';
           }
+warmupIterations: 5
+innerIterations: 50

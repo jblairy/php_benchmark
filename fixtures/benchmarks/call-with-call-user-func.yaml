@@ -16,3 +16,5 @@ code: |
           for ($i = 0; 100000 > $i; ++$i) {
               $result = call_user_func($func, $i);
           }
+warmupIterations: 5
+innerIterations: 50

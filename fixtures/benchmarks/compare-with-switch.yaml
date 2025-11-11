@@ -21,3 +21,5 @@ code: |
                   default => 'other',
               };
           }
+warmupIterations: 5
+innerIterations: 50

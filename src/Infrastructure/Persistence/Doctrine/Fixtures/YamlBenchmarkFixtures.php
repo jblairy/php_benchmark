@@ -77,6 +77,8 @@ class YamlBenchmarkFixtures extends Fixture
             description: $this->extractStringField($data, 'description'),
             tags: $this->extractStringArray($data, 'tags'),
             icon: $this->extractNullableStringField($data, 'icon'),
+            warmupIterations: $this->extractNullableIntField($data, 'warmupIterations'),
+            innerIterations: $this->extractNullableIntField($data, 'innerIterations'),
         );
 
         $this->validateFixtureData($fixtureData, $filename);
@@ -110,6 +112,14 @@ class YamlBenchmarkFixtures extends Fixture
         return '' !== $code ? mb_trim($code) : '';
     }
 
+    /**
+     * @param array<mixed> $data
+     */
+    private function extractNullableIntField(array $data, string $key): ?int
+    {
+        return isset($data[$key]) && is_numeric($data[$key]) ? (int) $data[$key] : null;
+    }
+
     private function validateFixtureData(BenchmarkFixtureData $fixtureData, string $filename): void
     {
         $violations = $this->validator->validate($fixtureData);
@@ -135,6 +145,8 @@ class YamlBenchmarkFixtures extends Fixture
             phpVersions: $fixtureData->phpVersions,
             tags: $fixtureData->tags,
             icon: $fixtureData->icon,
+            warmupIterations: $fixtureData->warmupIterations ?? null,
+            innerIterations: $fixtureData->innerIterations ?? null,
         );
     }
 

@@ -36,6 +36,12 @@ final readonly class BenchmarkFixtureData
         ])]
         public array $tags = [],
         public ?string $icon = null,
+        #[Assert\Positive(message: 'warmupIterations must be positive')]
+        #[Assert\LessThanOrEqual(100, message: 'warmupIterations must not exceed 100')]
+        public ?int $warmupIterations = null,
+        #[Assert\Positive(message: 'innerIterations must be positive')]
+        #[Assert\LessThanOrEqual(10000, message: 'innerIterations must not exceed 10000')]
+        public ?int $innerIterations = null,
     ) {
     }
 }

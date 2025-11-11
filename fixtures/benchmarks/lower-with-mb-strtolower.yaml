@@ -16,6 +16,8 @@ phpVersions:
   - php83
   - php84
   - php85
+warmupIterations: 3
+innerIterations: 20
 code: |
   $text = 'HELLO WORLD THIS IS A TEST STRING';
 
