@@ -34,15 +34,7 @@ final readonly class MessengerBenchmarkRunner
         $totalIterations = $benchmarkConfiguration->iterations;
         $executionId = uniqid('exec_', true);
 
-        // Dispatch start event
-        $this->eventDispatcher->dispatch(
-            new BenchmarkStarted(
-                benchmarkId: $benchmarkId,
-                benchmarkName: $benchmarkName,
-                phpVersion: $phpVersion,
-                totalIterations: $totalIterations,
-            ),
-        );
+        // Start event will be dispatched by the first message handler
 
         // Dispatch each iteration as a separate message
         for ($i = 1; $i <= $totalIterations; ++$i) {
@@ -59,17 +51,6 @@ final readonly class MessengerBenchmarkRunner
             $this->messageBus->dispatch($message);
         }
 
-        // Note: The completion event will be dispatched by a separate process
-        // that monitors when all iterations are complete. For now, we dispatch
-        // it immediately for compatibility, but this should be handled by
-        // a completion monitor in a production system.
-        $this->eventDispatcher->dispatch(
-            new BenchmarkCompleted(
-                benchmarkId: $benchmarkId,
-                benchmarkName: $benchmarkName,
-                phpVersion: $phpVersion,
-                totalIterations: $totalIterations,
-            ),
-        );
+        // Completion event will be dispatched by the last message handler
     }
 }

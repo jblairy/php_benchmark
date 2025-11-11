@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Jblairy\PhpBenchmark\Application\MessageHandler;
 
 use Jblairy\PhpBenchmark\Application\Message\ExecuteBenchmarkMessage;
+use Jblairy\PhpBenchmark\Domain\Benchmark\Event\BenchmarkCompleted;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Event\BenchmarkProgress;
+use Jblairy\PhpBenchmark\Domain\Benchmark\Event\BenchmarkStarted;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkConfiguration;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkExecutorPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkRepositoryPort;
@@ -53,6 +55,18 @@ final readonly class ExecuteBenchmarkHandler
 
             $phpVersion = PhpVersion::from($message->phpVersion);
 
+            // Dispatch start event for first iteration
+            if ($message->iterationNumber === 1) {
+                $this->eventDispatcher->dispatch(
+                    new BenchmarkStarted(
+                        benchmarkId: $message->benchmarkClass,
+                        benchmarkName: $message->benchmarkName,
+                        phpVersion: $message->phpVersion,
+                        totalIterations: $message->iterations,
+                    ),
+                );
+            }
+
             $configuration = new BenchmarkConfiguration(
                 benchmark: $benchmark,
                 phpVersion: $phpVersion,
@@ -75,6 +89,18 @@ final readonly class ExecuteBenchmarkHandler
                     totalIterations: $message->iterations,
                 ),
             );
+
+            // Dispatch completed event for last iteration
+            if ($message->iterationNumber === $message->iterations) {
+                $this->eventDispatcher->dispatch(
+                    new BenchmarkCompleted(
+                        benchmarkId: $message->benchmarkClass,
+                        benchmarkName: $message->benchmarkName,
+                        phpVersion: $message->phpVersion,
+                        totalIterations: $message->iterations,
+                    ),
+                );
+            }
 
             $this->logger->info('Benchmark execution completed', [
                 'benchmark' => $message->benchmarkName,
