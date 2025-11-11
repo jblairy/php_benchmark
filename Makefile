@@ -144,15 +144,16 @@ ci.quality:
 #   make run test=Loop iterations=3
 #   make run test=HashWithSha256 iterations=50 version=php84
 #   make run iterations=10
+# Note: If iterations not specified, command uses calibrated values from fixtures (default: 10)
 run:
 	@if [ -z "$(version)" ]; then \
 		if [ -z "$(test)" ]; then \
-			docker-compose -f docker-compose.dev.yml exec frankenphp php bin/console benchmark:run --iterations=$(or $(iterations),1); \
+			docker-compose -f docker-compose.dev.yml exec frankenphp php bin/console benchmark:run $(if $(iterations),--iterations=$(iterations)); \
 		else \
-			docker-compose -f docker-compose.dev.yml exec frankenphp php bin/console benchmark:run --test=$(test) --iterations=$(or $(iterations),1); \
+			docker-compose -f docker-compose.dev.yml exec frankenphp php bin/console benchmark:run --test=$(test) $(if $(iterations),--iterations=$(iterations)); \
 		fi \
 	else \
-		docker-compose -f docker-compose.dev.yml exec frankenphp php bin/console benchmark:run --test=$(test) --iterations=$(or $(iterations),1) --php-version=$(version); \
+		docker-compose -f docker-compose.dev.yml exec frankenphp php bin/console benchmark:run --test=$(test) $(if $(iterations),--iterations=$(iterations)) --php-version=$(version); \
 	fi
 
 # Load fixtures into database from YAML files
