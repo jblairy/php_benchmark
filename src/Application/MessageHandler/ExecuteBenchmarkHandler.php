@@ -80,7 +80,7 @@ final readonly class ExecuteBenchmarkHandler
                 'benchmark' => $message->benchmarkName,
                 'php_version' => $message->phpVersion,
                 'execution_time_ms' => $result->executionTimeMs,
-                'memory_usage_bytes' => $result->memoryUsageBytes,
+                'memory_usage_bytes' => $result->memoryUsedBytes,
             ]);
         } catch (\Throwable $throwable) {
             $this->logger->error('Benchmark execution failed', [
