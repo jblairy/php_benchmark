@@ -49,11 +49,38 @@ final class ConfigurableScriptBuilder implements ScriptBuilderPort
 
         return <<<PHP
                 // Benchmark configuration: {$config->getDescription()}
-                // Warmup phase: Run the code several times to stabilize JIT/opcache
+                
+                // ============================================================
+                // Phase 1: GC Control and Memory Pre-allocation
+                // ============================================================
+                
+                // Save original GC state
+                \$gc_was_enabled = gc_enabled();
+                
+                // Pre-allocate memory to reduce allocation overhead during measurement
+                \$dummy = str_repeat('x', 10 * 1024 * 1024); // 10MB
+                unset(\$dummy);
+                
+                // Force GC collection before measurement to start in clean state
+                gc_collect_cycles();
+                
+                // ============================================================
+                // Phase 2: Warmup - Stabilize JIT/opcache and CPU caches
+                // ============================================================
                 for (\$warmup = 0; \$warmup < {$warmupIterations}; ++\$warmup) {
                     {$methodBody}
                 }
-
+                
+                // Stabilization pause: Let CPU caches settle after warmup
+                usleep(1000); // 1ms pause
+                
+                // ============================================================
+                // Phase 3: Measurement Preparation
+                // ============================================================
+                
+                // Disable GC during measurement to prevent timing spikes
+                gc_disable();
+                
                 // Reset memory tracking after warmup
                 \$mem_before = memory_get_usage(true);
                 \$mem_peak_before = memory_get_peak_usage(true);
@@ -61,12 +88,23 @@ final class ConfigurableScriptBuilder implements ScriptBuilderPort
                 // High precision timing with hrtime (nanoseconds)
                 \$start_time = hrtime(true);
 
-                // Run the benchmark multiple times to reduce noise
+                // ============================================================
+                // Phase 4: Measurement - GC is disabled here
+                // ============================================================
                 for (\$inner = 0; \$inner < {$innerIterations}; ++\$inner) {
                     {$methodBody}
                 }
 
                 \$end_time = hrtime(true);
+                
+                // ============================================================
+                // Phase 5: Cleanup
+                // ============================================================
+                
+                // Re-enable GC if it was enabled before
+                if (\$gc_was_enabled) {
+                    gc_enable();
+                }
 
                 // Memory measurement after all iterations
                 \$mem_after = memory_get_usage(true);
