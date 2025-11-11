@@ -1,0 +1,278 @@
+services:
+  # FrankenPHP for development with debug tools
+  frankenphp:
+    build:
+      context: .
+      dockerfile: docker/frankenphp/Dockerfile.dev
+    volumes:
+      - ./:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    working_dir: /app
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - APP_ENV=dev
+      - APP_DEBUG=1
+      - DATABASE_URL=mysql://root:password@mariadb:3306/php_benchmark
+      - MERCURE_URL=http://mercure/.well-known/mercure
+      - MERCURE_PUBLIC_URL=http://localhost:3000/.well-known/mercure
+      - MERCURE_JWT_SECRET=!ChangeThisMercureHubJWTSecretKey!
+      - MESSENGER_TRANSPORT_DSN=redis://redis:6379/messages
+      - REDIS_URL=redis://redis:6379
+      - BENCHMARK_CONCURRENCY=2
+      - BENCHMARK_TIMEOUT=30
+      - COMPOSER_ALLOW_SUPERUSER=1
+      - XDEBUG_MODE=debug
+    depends_on:
+      - mariadb
+      - mercure
+      - redis
+    ports:
+      - "8000:80"
+    networks:
+      - benchmark_network
+
+  # Redis for cache and queue (dev config - no persistence)
+  redis:
+    image: redis:7-alpine
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    networks:
+      - benchmark_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # Messenger worker 1 (dev)
+  messenger-worker-1:
+    build:
+      context: .
+      dockerfile: docker/frankenphp/Dockerfile.dev
+    command: php /app/bin/console messenger:consume async --time-limit=3600 --memory-limit=128M -vv
+    volumes:
+      - ./:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    working_dir: /app
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - APP_ENV=dev
+      - APP_DEBUG=1
+      - DATABASE_URL=mysql://root:password@mariadb:3306/php_benchmark
+      - MERCURE_URL=http://mercure/.well-known/mercure
+      - MESSENGER_TRANSPORT_DSN=redis://redis:6379/messages
+      - REDIS_URL=redis://redis:6379
+      - BENCHMARK_CONCURRENCY=2
+      - BENCHMARK_TIMEOUT=30
+    depends_on:
+      - redis
+      - mariadb
+    restart: unless-stopped
+    networks:
+      - benchmark_network
+
+  # Messenger worker 2 (dev)
+  messenger-worker-2:
+    build:
+      context: .
+      dockerfile: docker/frankenphp/Dockerfile.dev
+    command: php /app/bin/console messenger:consume async --time-limit=3600 --memory-limit=128M -vv
+    volumes:
+      - ./:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    working_dir: /app
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - APP_ENV=dev
+      - APP_DEBUG=1
+      - DATABASE_URL=mysql://root:password@mariadb:3306/php_benchmark
+      - MERCURE_URL=http://mercure/.well-known/mercure
+      - MESSENGER_TRANSPORT_DSN=redis://redis:6379/messages
+      - REDIS_URL=redis://redis:6379
+      - BENCHMARK_CONCURRENCY=2
+      - BENCHMARK_TIMEOUT=30
+    depends_on:
+      - redis
+      - mariadb
+    restart: unless-stopped
+    networks:
+      - benchmark_network
+
+  mariadb:
+    image: mariadb:10.11
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: php_benchmark
+      MYSQL_USER: php_user
+      MYSQL_PASSWORD: php_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      - benchmark_network
+
+  mercure:
+    image: dunglas/mercure
+    environment:
+      SERVER_NAME: ':80'
+      MERCURE_PUBLISHER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
+      MERCURE_SUBSCRIBER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
+      MERCURE_EXTRA_DIRECTIVES: |
+        cors_origins http://localhost:8000 http://127.0.0.1:8000
+        anonymous
+        heartbeat 15s
+    command: /usr/bin/caddy run --config /etc/caddy/dev.Caddyfile
+    ports:
+      - "3000:80"
+    volumes:
+      - mercure_data:/data
+      - mercure_config:/config
+    networks:
+      - benchmark_network
+
+  # PHP containers for benchmarks (same as before but optimized for dev)
+  php56:
+    image: php:5.6-cli
+    volumes:
+      - ./:/app
+    working_dir: /app
+    mem_limit: 1g
+    cpus: 2
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+  php70:
+    image: php:7.0-cli
+    volumes:
+      - ./:/app
+    working_dir: /app
+    mem_limit: 1g
+    cpus: 2
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+  php71:
+    image: php:7.1-cli
+    volumes:
+      - ./:/app
+    working_dir: /app
+    mem_limit: 1g
+    cpus: 2
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+  php72:
+    image: php:7.2-cli
+    volumes:
+      - ./:/app
+    working_dir: /app
+    mem_limit: 1g
+    cpus: 2
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+  php73:
+    image: php:7.3-cli
+    volumes:
+      - ./:/app
+    working_dir: /app
+    mem_limit: 1g
+    cpus: 2
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+  php74:
+    image: php:7.4-cli
+    volumes:
+      - ./:/app
+    working_dir: /app
+    mem_limit: 1g
+    cpus: 2
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+  php80:
+    image: php:8.0-cli
+    volumes:
+      - ./:/app
+    working_dir: /app
+    mem_limit: 1g
+    cpus: 2
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+  php81:
+    image: php:8.1-cli
+    volumes:
+      - ./:/app
+    working_dir: /app
+    mem_limit: 1g
+    cpus: 2
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+  php82:
+    image: php:8.2-cli
+    volumes:
+      - ./:/app
+    working_dir: /app
+    mem_limit: 1g
+    cpus: 2
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+  php83:
+    image: php:8.3-cli
+    volumes:
+      - ./:/app
+    working_dir: /app
+    mem_limit: 1g
+    cpus: 2
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+  php84:
+    image: php:8.4-cli
+    volumes:
+      - ./:/app
+    working_dir: /app
+    mem_limit: 1g
+    cpus: 2
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+  php85:
+    build:
+      context: .
+      dockerfile: Dockerfile.php85
+    volumes:
+      - ./:/app
+    working_dir: /app
+    mem_limit: 1g
+    cpus: 2
+    command: tail -f /dev/null
+    networks:
+      - benchmark_network
+
+volumes:
+  mariadb_data:
+  mercure_data:
+  mercure_config:
+
+networks:
+  benchmark_network:
+    driver: bridge

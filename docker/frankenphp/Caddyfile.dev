@@ -1,0 +1,23 @@
+{
+    # Global options
+    auto_https off
+    order php_server before file_server
+}
+
+:80 {
+    # Set the root directory
+    root * /app/public
+    
+    # Enable compression
+    encode gzip zstd
+    
+    # Log to stdout with DEBUG level for development
+    log {
+        output stdout
+        format console
+        level DEBUG
+    }
+    
+    # Handle PHP files (worker mode disabled for now due to PHP 8.3/8.4 compatibility issues)
+    php_server
+}

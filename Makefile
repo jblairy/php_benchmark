@@ -1,10 +1,59 @@
-.PHONY: up start run fixtures db.reset db.refresh phpcsfixer phpcsfixer-fix phpstan quality phpmd phparkitect infection assets.refresh trans.compile trans.update prod.up prod.build prod.down prod.restart prod.logs prod.status prod.run
+.PHONY: up start run fixtures db.reset db.refresh phpcsfixer phpcsfixer-fix phpstan quality phpmd phparkitect infection assets.refresh trans.compile trans.update dev.up dev.build dev.down dev.restart dev.logs dev.status dev.run prod.up prod.build prod.down prod.restart prod.logs prod.status prod.run
 
 up:
 	docker-compose up -d --remove-orphans
 
 start:
 	docker-compose build
+
+# Development commands (FrankenPHP + Redis + Messenger)
+dev.build:
+	@echo "🏗️  Building development infrastructure..."
+	docker-compose -f docker-compose.dev.yml build
+	@echo "✅ Development build complete"
+
+dev.up:
+	@echo "🚀 Starting development infrastructure..."
+	docker-compose -f docker-compose.dev.yml up -d
+	@echo "⏳ Waiting for services to be ready..."
+	@sleep 10
+	@echo "✅ Development infrastructure running"
+	@echo "📊 Check status with: make dev.status"
+
+dev.down:
+	@echo "⏹️  Stopping development infrastructure..."
+	docker-compose -f docker-compose.dev.yml down
+	@echo "✅ Development infrastructure stopped"
+
+dev.restart:
+	@echo "🔄 Restarting development infrastructure..."
+	docker-compose -f docker-compose.dev.yml restart
+	@echo "✅ Development infrastructure restarted"
+
+dev.logs:
+	docker-compose -f docker-compose.dev.yml logs -f frankenphp
+
+dev.status:
+	@echo "📊 Development Infrastructure Status:"
+	@echo ""
+	docker-compose -f docker-compose.dev.yml ps
+	@echo ""
+	@echo "🔍 Supervisord Processes:"
+	@docker-compose -f docker-compose.dev.yml exec frankenphp supervisorctl status || true
+	@echo ""
+	@echo "📈 Redis Stats:"
+	@docker-compose -f docker-compose.dev.yml exec redis redis-cli INFO stats | grep -E "total_commands_processed|instantaneous_ops_per_sec" || true
+
+dev.run:
+	@if [ -z "$(version)" ]; then \
+		if [ -z "$(test)" ]; then \
+			time docker-compose -f docker-compose.dev.yml exec frankenphp php bin/console benchmark:run --iterations=$(or $(iterations),1); \
+		else \
+			time docker-compose -f docker-compose.dev.yml exec frankenphp php bin/console benchmark:run --test=$(test) --iterations=$(or $(iterations),1); \
+		fi \
+	else \
+		time docker-compose -f docker-compose.dev.yml exec frankenphp php bin/console benchmark:run --test=$(test) --iterations=$(or $(iterations),1) --php-version=$(version); \
+	fi
 
 # Production commands
 prod.build:
