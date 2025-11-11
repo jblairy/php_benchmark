@@ -9,7 +9,7 @@
 ├── docker-compose.prod.yml      # Production mode
 ├── Dockerfile.php85             # Custom PHP 8.5 build (no official image yet)
 ├── .env.dev                     # Development environment variables
-├── .env.ci                      # CI/CD environment variables
+├── .env.test                    # Test/CI environment variables
 ├── .env.prod                    # Production environment variables
 └── docker/
     ├── frankenphp/
