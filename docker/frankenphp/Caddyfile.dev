@@ -18,6 +18,8 @@
         level DEBUG
     }
     
-    # Handle PHP files (worker mode disabled for now due to PHP 8.3/8.4 compatibility issues)
-    php_server
+    # Handle PHP files with worker mode (2 workers for development)
+    php_server {
+        worker index.php 2
+    }
 }

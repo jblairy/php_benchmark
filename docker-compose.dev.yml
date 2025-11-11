@@ -1,6 +1,8 @@
 services:
   # FrankenPHP for development with debug tools
   frankenphp:
+    tty: true
+    stdin_open: true
     build:
       context: .
       dockerfile: docker/frankenphp/Dockerfile.dev

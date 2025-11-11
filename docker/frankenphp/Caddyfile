@@ -18,6 +18,8 @@
         level INFO
     }
     
-    # Handle PHP files (worker mode disabled for now due to PHP 8.3/8.4 compatibility issues)
-    php_server
+    # Handle PHP files with worker mode (4 workers for production)
+    php_server {
+        worker index.php 4
+    }
 }
