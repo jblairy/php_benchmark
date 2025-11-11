@@ -35,15 +35,17 @@ export default class extends Controller {
         const url = new URL(this.urlValue);
         url.searchParams.append('topic', this.topicValue);
 
+        console.log('🔗 Connecting to Mercure:', url.toString());
 
         // Close existing connection if any
         if (this.eventSource) {
             this.eventSource.close();
         }
 
-        this.eventSource = new EventSource(url);
+        this.eventSource = new EventSource(url.toString());
 
         this.eventSource.onopen = () => {
+            console.log('✅ Mercure connection established');
             // Reset reconnection attempts on successful connection
             this.reconnectAttempts = 0;
             this.reconnectDelay = 1000;

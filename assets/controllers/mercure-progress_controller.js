@@ -25,10 +25,11 @@ export default class extends Controller {
         const url = new URL(this.urlValue);
         url.searchParams.append('topic', this.topicValue);
 
-
-        this.eventSource = new EventSource(url);
+        console.log('🔗 Connecting to Mercure:', url.toString());
+        this.eventSource = new EventSource(url.toString());
 
         this.eventSource.onopen = () => {
+            console.log('✅ Mercure connection established');
         };
 
         this.eventSource.onmessage = (event) => {
