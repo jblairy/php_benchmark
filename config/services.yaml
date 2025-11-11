@@ -86,3 +86,9 @@ services:
     Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Fixtures\YamlBenchmarkFixtures:
         arguments:
             $projectDir: '%kernel.project_dir%'
+    
+    # Calibration command
+    Jblairy\PhpBenchmark\Infrastructure\Cli\Command\CalibrateIterationsCommand:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+        tags: ['console.command']

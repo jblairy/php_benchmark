@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace Jblairy\PhpBenchmark\Infrastructure\Cli\Command;
 
-use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkRepositoryPort;
-use Jblairy\PhpBenchmark\Domain\Benchmark\Port\CodeExtractorPort;
-use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptBuilderPort;
-use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptExecutorPort;
-use Jblairy\PhpBenchmark\Domain\PhpVersion\Enum\PhpVersion;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,8 +15,8 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Command to calibrate benchmark iterations based on target execution time.
  * 
- * This command measures the actual execution time of benchmarks and suggests
- * optimal iteration values to achieve a target execution time (default: 1 second).
+ * Measures actual execution time with minimal iterations and calculates
+ * optimal values to achieve target time (default: 1 second).
  */
 #[AsCommand(
     name: 'benchmark:calibrate',
@@ -36,10 +31,7 @@ final class CalibrateIterationsCommand extends Command
     private const int MAX_INNER = 1000;
     
     public function __construct(
-        private readonly BenchmarkRepositoryPort $benchmarkRepository,
-        private readonly CodeExtractorPort $codeExtractor,
-        private readonly ScriptBuilderPort $scriptBuilder,
-        private readonly ScriptExecutorPort $scriptExecutor,
+        private readonly string $projectDir,
     ) {
         parent::__construct();
     }
@@ -61,67 +53,81 @@ final class CalibrateIterationsCommand extends Command
         $io = new SymfonyStyle($input, $output);
         
         $targetTimeMs = (float) $input->getOption('target-time');
-        $phpVersionStr = (string) $input->getOption('php-version');
+        $phpVersion = (string) $input->getOption('php-version');
         $dryRun = (bool) $input->getOption('dry-run');
         $force = (bool) $input->getOption('force');
         
-        try {
-            $phpVersion = PhpVersion::from($phpVersionStr);
-        } catch (\ValueError $e) {
-            $io->error(sprintf('Invalid PHP version: %s', $phpVersionStr));
-            return Command::FAILURE;
-        }
-
         $io->title('Benchmark Iteration Calibration');
         $io->info(sprintf('Target execution time: %.0f ms', $targetTimeMs));
-        $io->info(sprintf('Calibration PHP version: %s', $phpVersion->value));
+        $io->info(sprintf('Calibration PHP version: %s', $phpVersion));
         
         if ($dryRun) {
             $io->warning('DRY RUN MODE - No files will be modified');
         }
 
+        // Get fixtures path
+        $fixturesPath = $this->projectDir . '/fixtures/benchmarks';
+        
+        if (!is_dir($fixturesPath)) {
+            $io->error('Fixtures directory not found: ' . $fixturesPath);
+            return Command::FAILURE;
+        }
+
         // Get benchmarks to calibrate
+        $benchmarkFiles = [];
         if ($input->getOption('all')) {
-            $benchmarks = $this->benchmarkRepository->findAll();
-            $io->info(sprintf('Calibrating %d benchmarks...', count($benchmarks)));
+            $benchmarkFiles = glob($fixturesPath . '/*.yaml');
+            $io->info(sprintf('Calibrating %d benchmarks...', count($benchmarkFiles)));
         } elseif ($benchmarkSlug = $input->getOption('benchmark')) {
-            $benchmark = $this->benchmarkRepository->findBySlug($benchmarkSlug);
-            if (!$benchmark) {
+            $file = $fixturesPath . '/' . $benchmarkSlug . '.yaml';
+            if (!file_exists($file)) {
                 $io->error(sprintf('Benchmark not found: %s', $benchmarkSlug));
                 return Command::FAILURE;
             }
-            $benchmarks = [$benchmark];
+            $benchmarkFiles = [$file];
         } else {
             $io->error('Please specify --benchmark=<slug> or --all');
             return Command::FAILURE;
         }
 
-        $io->progressStart(count($benchmarks));
+        $io->progressStart(count($benchmarkFiles));
         
         $results = [];
         $errors = [];
+        $skipped = 0;
 
-        foreach ($benchmarks as $benchmark) {
+        foreach ($benchmarkFiles as $file) {
             $io->progressAdvance();
             
             try {
+                $data = Yaml::parseFile($file);
+                $slug = $data['slug'] ?? basename($file, '.yaml');
+                
                 // Skip if already configured and not forced
-                if (!$force && ($benchmark->getWarmupIterations() !== null || $benchmark->getInnerIterations() !== null)) {
+                if (!$force && (isset($data['warmupIterations']) || isset($data['innerIterations']))) {
+                    $skipped++;
                     continue;
                 }
 
-                $calibration = $this->calibrateBenchmark($benchmark, $phpVersion, $targetTimeMs);
+                // Skip loop/iteration benchmarks
+                $category = $data['category'] ?? '';
+                if (in_array($category, ['Iteration', 'Loop'], true)) {
+                    $skipped++;
+                    continue;
+                }
+
+                $calibration = $this->calibrateBenchmark($data, $targetTimeMs);
                 
                 if ($calibration !== null) {
                     $results[] = $calibration;
                     
                     if (!$dryRun) {
-                        $this->updateFixture($calibration);
+                        $this->updateFixture($file, $calibration);
                     }
                 }
             } catch (\Exception $e) {
                 $errors[] = [
-                    'benchmark' => $benchmark->getSlug(),
+                    'benchmark' => basename($file),
                     'error' => $e->getMessage(),
                 ];
             }
@@ -151,8 +157,10 @@ final class CalibrateIterationsCommand extends Command
             );
             
             $io->success(sprintf('Calibrated %d benchmarks', count($results)));
-        } else {
-            $io->info('No benchmarks needed calibration');
+        }
+
+        if ($skipped > 0) {
+            $io->info(sprintf('Skipped %d benchmarks (already configured or loop tests)', $skipped));
         }
 
         // Display errors
@@ -163,102 +171,118 @@ final class CalibrateIterationsCommand extends Command
             }
         }
 
+        if ($dryRun && count($results) > 0) {
+            $io->note('This was a DRY RUN. Run without --dry-run to apply changes.');
+        }
+
         return Command::SUCCESS;
     }
 
     /**
+     * @param array<string, mixed> $benchmarkData
      * @return array{benchmark: string, measured_time: float, suggested_warmup: int, suggested_inner: int, efficiency: float}|null
      */
-    private function calibrateBenchmark($benchmark, PhpVersion $phpVersion, float $targetTimeMs): ?array
+    private function calibrateBenchmark(array $benchmarkData, float $targetTimeMs): ?array
     {
-        $code = $this->codeExtractor->extractCode($benchmark, $phpVersion);
+        $code = $benchmarkData['code'] ?? '';
+        $slug = $benchmarkData['slug'] ?? 'unknown';
         
-        // Test with minimal iterations first
-        $testWarmup = 1;
-        $testInner = 10;
-        
-        // Measure execution time with minimal iterations
-        $measuredTime = $this->measureExecutionTime($code, $testWarmup, $testInner);
+        if (empty($code)) {
+            return null;
+        }
+
+        // Measure single execution (code already contains loops)
+        $measuredTime = $this->measureExecutionTime($code, 0, 0);
         
         if ($measuredTime === null || $measuredTime <= 0) {
             return null;
         }
 
-        // Calculate average time per iteration
-        $timePerIteration = $measuredTime / $testInner;
-        
-        // Calculate optimal inner iterations to reach target time
-        $optimalInner = (int) ($targetTimeMs / $timePerIteration);
+        // Calculate optimal inner iterations based on measured time
+        // Inner iterations multiply the execution time
+        $optimalInner = (int) ($targetTimeMs / $measuredTime);
         
         // Clamp to reasonable values
         $suggestedInner = max(self::MIN_INNER, min(self::MAX_INNER, $optimalInner));
         
-        // Adjust warmup based on inner iterations
+        // Adjust warmup based on inner iterations and measured time
         $suggestedWarmup = match (true) {
-            $suggestedInner <= 20 => 1,
-            $suggestedInner <= 50 => 3,
-            $suggestedInner <= 100 => 5,
-            $suggestedInner <= 200 => 10,
+            $measuredTime > 100 => 1,  // Heavy benchmark
+            $measuredTime > 50 => 3,
+            $measuredTime > 10 => 5,
+            $measuredTime > 1 => 10,
             default => 15,
         };
         
         // Calculate efficiency (how close we are to target)
-        $projectedTime = $timePerIteration * $suggestedInner;
+        $projectedTime = $measuredTime * $suggestedInner;
         $efficiency = min(100, ($projectedTime / $targetTimeMs) * 100);
 
         return [
-            'benchmark' => $benchmark->getSlug(),
+            'benchmark' => $slug,
             'measured_time' => $measuredTime,
             'suggested_warmup' => $suggestedWarmup,
             'suggested_inner' => $suggestedInner,
             'efficiency' => $efficiency,
-            'time_per_iteration' => $timePerIteration,
         ];
     }
 
     private function measureExecutionTime(string $code, int $warmup, int $inner): ?float
     {
-        // Build a simple script for measurement
-        $script = <<<PHP
-            // Quick calibration measurement
-            for (\$w = 0; \$w < {$warmup}; ++\$w) {
-                {$code}
-            }
-            
-            \$start = hrtime(true);
-            for (\$i = 0; \$i < {$inner}; ++\$i) {
-                {$code}
-            }
-            \$end = hrtime(true);
-            
-            \$elapsed_ns = \$end - \$start;
-            \$elapsed_ms = \$elapsed_ns / 1_000_000;
-            
-            echo json_encode([
-                "execution_time_ms" => \$elapsed_ms,
-                "warmup_iterations" => {$warmup},
-                "inner_iterations" => {$inner},
-            ]);
-        PHP;
+        try {
+            // Simple approach: execute the code once and measure
+            // The code in fixtures already contains loops, so we measure that
+            $script = "<?php\n\n";
+            $script .= "// Single execution measurement\n";
+            $script .= "\$start = hrtime(true);\n";
+            $script .= $code . "\n";
+            $script .= "\$end = hrtime(true);\n";
+            $script .= "\$elapsed_ms = (\$end - \$start) / 1_000_000;\n";
+            $script .= "echo json_encode(['execution_time_ms' => \$elapsed_ms]);\n";
 
-        // Execute and get result
-        // Note: This is a simplified version, in production you'd use ScriptExecutor
-        // For now, we'll return null to avoid complexity
-        return null;
+            // Create temporary file
+            $tempFile = sys_get_temp_dir() . '/benchmark_calibration_' . uniqid() . '.php';
+            file_put_contents($tempFile, $script);
+
+            // Execute with PHP CLI with timeout
+            $output = shell_exec("timeout 5s php {$tempFile} 2>&1");
+            @unlink($tempFile);
+
+            if ($output === null || trim($output) === '') {
+                return null;
+            }
+
+            // Extract JSON from output (ignore PHP notices/warnings)
+            $lines = explode("\n", trim($output));
+            $jsonLine = null;
+            foreach (array_reverse($lines) as $line) {
+                $trimmed = trim($line);
+                if ($trimmed !== '' && str_starts_with($trimmed, '{')) {
+                    $jsonLine = $trimmed;
+                    break;
+                }
+            }
+
+            if ($jsonLine === null) {
+                return null;
+            }
+
+            $result = json_decode($jsonLine, true);
+            if (!is_array($result) || !isset($result['execution_time_ms'])) {
+                return null;
+            }
+
+            return (float) $result['execution_time_ms'];
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     /**
      * @param array{benchmark: string, suggested_warmup: int, suggested_inner: int} $calibration
      */
-    private function updateFixture(array $calibration): void
+    private function updateFixture(string $filename, array $calibration): void
     {
-        $fixturesPath = __DIR__ . '/../../../../fixtures/benchmarks';
-        $filename = $fixturesPath . '/' . $calibration['benchmark'] . '.yaml';
-        
-        if (!file_exists($filename)) {
-            return;
-        }
-
         $data = Yaml::parseFile($filename);
         $data['warmupIterations'] = $calibration['suggested_warmup'];
         $data['innerIterations'] = $calibration['suggested_inner'];
