@@ -59,7 +59,7 @@ final readonly class ExecuteBenchmarkHandler
             if ($message->iterationNumber === 1) {
                 $this->eventDispatcher->dispatch(
                     new BenchmarkStarted(
-                        benchmarkId: $message->benchmarkClass,
+                        benchmarkId: $message->benchmarkSlug,
                         benchmarkName: $message->benchmarkName,
                         phpVersion: $message->phpVersion,
                         totalIterations: $message->iterations,
@@ -82,7 +82,7 @@ final readonly class ExecuteBenchmarkHandler
             // Dispatch progress event
             $this->eventDispatcher->dispatch(
                 new BenchmarkProgress(
-                    benchmarkId: $message->benchmarkClass,
+                    benchmarkId: $message->benchmarkSlug,
                     benchmarkName: $message->benchmarkName,
                     phpVersion: $message->phpVersion,
                     currentIteration: $message->iterationNumber,
@@ -94,7 +94,7 @@ final readonly class ExecuteBenchmarkHandler
             if ($message->iterationNumber === $message->iterations) {
                 $this->eventDispatcher->dispatch(
                     new BenchmarkCompleted(
-                        benchmarkId: $message->benchmarkClass,
+                        benchmarkId: $message->benchmarkSlug,
                         benchmarkName: $message->benchmarkName,
                         phpVersion: $message->phpVersion,
                         totalIterations: $message->iterations,

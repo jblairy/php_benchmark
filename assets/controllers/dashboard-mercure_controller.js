@@ -97,9 +97,11 @@ export default class extends Controller {
     }
 
     async reloadMatchingCard(benchmarkId, benchmarkName) {
+        console.log(`🔍 Looking for card with benchmarkId: ${benchmarkId}, benchmarkName: ${benchmarkName}`);
 
         // Find all BenchmarkCard components
         const cards = document.querySelectorAll('[data-live-name-value="BenchmarkCard"]');
+        console.log(`   Found ${cards.length} BenchmarkCard components`);
 
         for (const card of cards) {
             // Get benchmarkId from the props
@@ -109,18 +111,22 @@ export default class extends Controller {
             try {
                 const props = JSON.parse(propsJson);
                 const cardBenchmarkId = props.benchmarkId;
+                const cardBenchmarkName = props.benchmarkName;
+                console.log(`   Checking card: benchmarkId="${cardBenchmarkId}", benchmarkName="${cardBenchmarkName}"`);
 
-
-                if (cardBenchmarkId === benchmarkId) {
-
+                // Try matching by both benchmarkId OR benchmarkName
+                if (cardBenchmarkId === benchmarkId || cardBenchmarkName === benchmarkName) {
+                    console.log(`   ✅ Found matching card!`);
                     const component = await getComponent(card);
 
                     component.render().then(() => {
+                        console.log(`   ✅ Card refreshed successfully`);
                     }).catch(error => {
                         console.error('    ❌ Failed to refresh card:', error);
                     });
 
-                    break; // Found the match, stop searching
+                    // Don't break - there might be multiple cards for the same benchmark
+                    // break; // Found the match, stop searching
                 }
             } catch (error) {
                 console.error('    ❌ Error parsing props:', error);
