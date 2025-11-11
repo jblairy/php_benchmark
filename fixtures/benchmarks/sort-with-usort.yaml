@@ -17,3 +17,5 @@ code: |
               shuffle($data);
               usort($data, fn ($a, $b): int => $a <=> $b);
           }
+warmupIterations: 1
+innerIterations: 10

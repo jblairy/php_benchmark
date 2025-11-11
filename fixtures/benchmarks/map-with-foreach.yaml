@@ -23,3 +23,5 @@ code: |
           foreach ($data as $item) {
               $result[] = $item * 2;
           }
+warmupIterations: 10
+innerIterations: 670

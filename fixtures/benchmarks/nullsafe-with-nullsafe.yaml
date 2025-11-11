@@ -23,3 +23,5 @@ code: |
   for ($i = 0; $i < 100000; $i++) {
       $name = $user?->profile?->name;
   }
+warmupIterations: 10
+innerIterations: 131

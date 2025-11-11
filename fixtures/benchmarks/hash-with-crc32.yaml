@@ -20,3 +20,5 @@ code: |
   for ($i = 0; 50000 > $i; ++$i) {
               $result = crc32('test string ' . $i);
           }
+warmupIterations: 10
+innerIterations: 115

@@ -21,3 +21,5 @@ code: |
           for ($i = 0; 100000 > $i; ++$i) {
               $result = 1 === preg_match('/fox/', $haystack);
           }
+warmupIterations: 5
+innerIterations: 53

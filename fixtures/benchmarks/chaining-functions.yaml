@@ -43,3 +43,5 @@ code: |
       $calc = new Calculator();
       $result = $calc->add(5)->multiply(2)->add(3)->getValue();
   }
+warmupIterations: 5
+innerIterations: 78

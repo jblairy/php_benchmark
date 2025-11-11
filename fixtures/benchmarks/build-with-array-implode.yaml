@@ -21,3 +21,5 @@ code: |
           for ($i = 0; 1000 > $i; ++$i) {
               $lines[] = 'Line ' . $i;
           }
+warmupIterations: 15
+innerIterations: 1000

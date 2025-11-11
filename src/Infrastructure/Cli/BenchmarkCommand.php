@@ -36,7 +36,7 @@ final readonly class BenchmarkCommand
         #[Option]
         ?string $test = null,
         #[Option]
-        int $iterations = 0,
+        int $iterations = 10,
         #[Option]
         ?string $phpVersion = null,
     ): int {
@@ -44,12 +44,6 @@ final readonly class BenchmarkCommand
 
         $testName = $test;
         $phpVersionName = $phpVersion;
-
-        if (0 >= $iterations) {
-            $symfonyStyle->error('Iterations must be greater than 0');
-
-            return Command::FAILURE;
-        }
 
         try {
             $this->executeAppropriateStrategy($symfonyStyle, $testName, $phpVersionName, $iterations);

@@ -23,3 +23,5 @@ code: |
           foreach ($data as $item) {
               $result += $item;
           }
+warmupIterations: 15
+innerIterations: 1000

@@ -22,3 +22,5 @@ code: |
               shuffle($data);
               asort($data);
           }
+warmupIterations: 3
+innerIterations: 16

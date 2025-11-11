@@ -28,3 +28,5 @@ code: |
   for ($i = 0; $i < 100000; $i++) {
       $result = square(addFive(double(10)));
   }
+warmupIterations: 3
+innerIterations: 19

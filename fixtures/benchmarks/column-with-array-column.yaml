@@ -21,3 +21,5 @@ code: |
           for ($i = 0; 1000 > $i; ++$i) {
               $data[] = ['id' => $i, 'name' => 'User' . $i, 'email' => 'user' . $i . '@test.com'];
           }
+warmupIterations: 15
+innerIterations: 1000

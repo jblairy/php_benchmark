@@ -24,3 +24,5 @@ code: |
   for ($i = 0; $i < 10000; $i++) {
       $array = array_fill(0, 100, 'value');
   }
+warmupIterations: 10
+innerIterations: 181

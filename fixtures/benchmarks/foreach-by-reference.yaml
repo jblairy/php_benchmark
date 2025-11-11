@@ -22,3 +22,5 @@ code: |
           foreach ($data as &$value) {
               $value *= 2;
           }
+warmupIterations: 10
+innerIterations: 929

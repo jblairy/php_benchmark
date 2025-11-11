@@ -1,6 +1,6 @@
 slug: pass-by-value
 name: 'Pass by Value'
-category: 'References'
+category: References
 description: 'Function calls with parameters passed by value'
 icon: 📋
 tags:
@@ -29,3 +29,5 @@ code: |
   for ($i = 0; $i < 100000; $i++) {
       $counter = incrementByValue($counter);
   }
+warmupIterations: 5
+innerIterations: 46

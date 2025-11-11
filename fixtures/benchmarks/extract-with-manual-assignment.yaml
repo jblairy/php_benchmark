@@ -24,3 +24,5 @@ code: |
               $b = $data[1];
               $c = $data[2];
           }
+warmupIterations: 5
+innerIterations: 62

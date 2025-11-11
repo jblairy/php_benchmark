@@ -29,3 +29,5 @@ code: |
   for ($i = 0; $i < 100000; $i++) {
       $name = isset($user->profile->name) ? $user->profile->name : null;
   }
+warmupIterations: 10
+innerIterations: 115

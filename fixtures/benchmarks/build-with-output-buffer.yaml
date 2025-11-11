@@ -23,3 +23,5 @@ code: |
           }
 
           ob_get_clean();
+warmupIterations: 15
+innerIterations: 1000

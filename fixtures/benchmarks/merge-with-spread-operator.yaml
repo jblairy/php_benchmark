@@ -19,3 +19,5 @@ code: |
           for ($i = 0; 10000 > $i; ++$i) {
               $result = [...$array1, ...$array2, ...$array3];
           }
+warmupIterations: 10
+innerIterations: 218

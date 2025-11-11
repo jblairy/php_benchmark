@@ -21,3 +21,5 @@ code: |
           for ($i = 0; 100000 > $i; ++$i) {
               $result = str_contains($haystack, 'fox');
           }
+warmupIterations: 5
+innerIterations: 65

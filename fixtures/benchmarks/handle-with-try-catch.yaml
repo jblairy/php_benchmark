@@ -24,3 +24,5 @@ code: |
                   $result = 0;
               }
           }
+warmupIterations: 10
+innerIterations: 685

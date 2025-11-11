@@ -1,6 +1,6 @@
 slug: unpack-with-spread-operator
 name: 'Unpack with Spread Operator'
-category: 'Unpacking'
+category: Unpacking
 description: 'Unpack array arguments using spread operator ... (PHP 5.6+)'
 icon: 💫
 tags:
@@ -30,3 +30,5 @@ code: |
   for ($i = 0; $i < 100000; $i++) {
       $result = sum(...$args);
   }
+warmupIterations: 5
+innerIterations: 46

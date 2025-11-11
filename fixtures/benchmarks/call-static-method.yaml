@@ -30,3 +30,5 @@ code: |
   for ($i = 0; $i < 100000; $i++) {
       $result = TestClass::getValue();
   }
+warmupIterations: 5
+innerIterations: 27

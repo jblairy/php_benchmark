@@ -25,3 +25,5 @@ code: |
                   $result[] = $item;
               }
           }
+warmupIterations: 10
+innerIterations: 762

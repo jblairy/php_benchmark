@@ -22,3 +22,5 @@ code: |
                   $result = 0;
               }
           }
+warmupIterations: 15
+innerIterations: 1000

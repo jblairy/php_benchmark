@@ -22,3 +22,5 @@ code: |
           for ($i = 0; 50000 > $i; ++$i) {
               preg_match('/[\w.-]+@[\w.-]+\.\w+/', $text, $matches);
           }
+warmupIterations: 5
+innerIterations: 68

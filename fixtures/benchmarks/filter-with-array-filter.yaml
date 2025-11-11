@@ -15,3 +15,5 @@ code: |
   $data = range(1, 10000);
 
           array_filter($data, fn ($item): bool => 0 === $item % 2);
+warmupIterations: 10
+innerIterations: 342

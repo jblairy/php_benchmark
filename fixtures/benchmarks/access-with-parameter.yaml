@@ -29,3 +29,5 @@ code: |
   for ($i = 0; $i < 100000; $i++) {
       $result = accessParameter($value);
   }
+warmupIterations: 5
+innerIterations: 25

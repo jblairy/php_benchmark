@@ -1,6 +1,6 @@
 slug: unpack-with-call-user-func-array
 name: 'Unpack with call_user_func_array()'
-category: 'Unpacking'
+category: Unpacking
 description: 'Unpack array arguments using call_user_func_array()'
 icon: 📤
 tags:
@@ -29,3 +29,5 @@ code: |
   for ($i = 0; $i < 100000; $i++) {
       $result = call_user_func_array('sum', $args);
   }
+warmupIterations: 5
+innerIterations: 32

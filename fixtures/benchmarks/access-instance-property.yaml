@@ -30,3 +30,5 @@ code: |
   for ($i = 0; $i < 100000; $i++) {
       $result = $obj->value;
   }
+warmupIterations: 5
+innerIterations: 69

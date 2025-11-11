@@ -22,3 +22,5 @@ code: |
   for ($i = 0; $i < 10000; $i++) {
       $firstKey = array_key_first($array);
   }
+warmupIterations: 10
+innerIterations: 310

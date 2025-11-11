@@ -15,3 +15,5 @@ code: |
   $data = range(1, 10000);
 
           array_reduce($data, fn ($carry, $item): int => $carry + $item, 0);
+warmupIterations: 10
+innerIterations: 384

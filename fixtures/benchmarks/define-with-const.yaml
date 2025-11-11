@@ -26,3 +26,5 @@ code: |
   for ($i = 0; $i < 100000; $i++) {
       $result = MY_CONSTANT;
   }
+warmupIterations: 10
+innerIterations: 103

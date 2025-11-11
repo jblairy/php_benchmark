@@ -26,3 +26,5 @@ code: |
               $divisor = 0 === $i % 10 ? 1 : $i;
               $result = 0 !== $divisor ? 100 / $divisor : 0;
           }
+warmupIterations: 10
+innerIterations: 598

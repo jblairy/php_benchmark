@@ -25,3 +25,5 @@ code: |
   for ($i = 0; $i < 10000; $i++) {
       $first = reset($array);
   }
+warmupIterations: 10
+innerIterations: 274

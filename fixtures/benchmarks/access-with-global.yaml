@@ -31,3 +31,5 @@ code: |
   for ($i = 0; $i < 100000; $i++) {
       $result = accessGlobal();
   }
+warmupIterations: 5
+innerIterations: 21

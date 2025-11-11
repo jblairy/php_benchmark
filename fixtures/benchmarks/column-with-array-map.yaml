@@ -18,3 +18,5 @@ code: |
           }
 
           array_map(fn (array $item): string => $item['name'], $data);
+warmupIterations: 10
+innerIterations: 925
