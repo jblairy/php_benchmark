@@ -37,6 +37,9 @@ final readonly class EnhancedBenchmarkStatistics extends BenchmarkStatistics
      * Note: Named differently from parent's create() to avoid signature conflicts.
      *
      * @param array<int, float> $outliers
+     *
+     * @SuppressWarnings("PHPMD.ExcessiveParameterList") - Factory method with parameter objects would be less readable
+     * @SuppressWarnings("PHPMD.StaticAccess") - Static factory method pattern is acceptable
      */
     public static function createEnhanced(
         string $benchmarkId,
@@ -73,6 +76,8 @@ final readonly class EnhancedBenchmarkStatistics extends BenchmarkStatistics
 
     /**
      * Create empty enhanced statistics for a benchmark with no data.
+     *
+     * @SuppressWarnings("PHPMD.StaticAccess") - Static factory method pattern is acceptable for value objects
      */
     public static function empty(string $benchmarkId, string $benchmarkName, string $phpVersion): self
     {

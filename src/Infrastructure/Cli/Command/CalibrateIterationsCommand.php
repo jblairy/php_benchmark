@@ -36,6 +36,10 @@ final readonly class CalibrateIterationsCommand
     ) {
     }
 
+    /**
+     * @SuppressWarnings("PHPMD.BooleanArgumentFlag") - CLI command options require boolean flags
+     * @SuppressWarnings("PHPMD.StaticAccess") - Calling static factory method is acceptable
+     */
     public function __invoke(
         #[\Symfony\Component\Console\Attribute\Option(name: 'benchmark', shortcut: 'b', description: 'Benchmark slug to calibrate')]
         ?string $benchmark = null,

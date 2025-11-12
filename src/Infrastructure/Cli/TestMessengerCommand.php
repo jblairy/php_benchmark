@@ -51,12 +51,21 @@ final class TestMessengerCommand
 
             // Check which transport received the message
             $transportStamp = $envelope->last(TransportNamesStamp::class);
-            if ($transportStamp instanceof TransportNamesStamp) {
-                $transports = $transportStamp->getTransportNames();
-                $symfonyStyle->success(sprintf('Message dispatched to transport(s): %s', implode(', ', $transports)));
-            } else {
+            if (!($transportStamp instanceof TransportNamesStamp)) {
                 $symfonyStyle->warning('Message dispatched but transport information not available.');
+
+                $symfonyStyle->section('Next steps:');
+                $symfonyStyle->listing([
+                    'Run "php bin/console messenger:consume async -vv" to process the message',
+                    'Check worker logs in var/log/messenger-worker-*.log',
+                    'Use "php bin/console messenger:failed:show" to see failed messages',
+                ]);
+
+                return Command::SUCCESS;
             }
+
+            $transports = $transportStamp->getTransportNames();
+            $symfonyStyle->success(sprintf('Message dispatched to transport(s): %s', implode(', ', $transports)));
 
             $symfonyStyle->section('Next steps:');
             $symfonyStyle->listing([

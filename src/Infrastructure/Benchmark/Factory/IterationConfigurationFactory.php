@@ -27,6 +27,8 @@ final readonly class IterationConfigurationFactory
      * @param int|null    $warmupIterations Explicit warmup iterations
      * @param int|null    $innerIterations  Explicit inner iterations
      * @param string|null $benchmarkCode    Code to analyze for complexity-based defaults
+     *
+     * @SuppressWarnings("PHPMD.StaticAccess") - Calling static factory method is acceptable
      */
     public function create(
         ?int $warmupIterations = null,

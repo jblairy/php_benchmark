@@ -26,6 +26,8 @@ use Throwable;
  *
  * Configuration: Tagged as message handler in services.yaml to keep
  * Application layer independent of Symfony Messenger infrastructure.
+ *
+ * @SuppressWarnings("PHPMD.CouplingBetweenObjects") - Message handler coordinates multiple domain services
  */
 final readonly class ExecuteBenchmarkHandler
 {

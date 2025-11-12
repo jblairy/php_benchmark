@@ -54,6 +54,8 @@ class Benchmark
     /**
      * @param array<string> $phpVersions
      * @param array<string> $tags
+     *
+     * @SuppressWarnings("PHPMD.ExcessiveParameterList") - Doctrine entity requires all properties in constructor
      */
     public function __construct(
         #[ORM\Column(type: Types::STRING, length: self::SLUG_MAX_LENGTH, unique: true)]

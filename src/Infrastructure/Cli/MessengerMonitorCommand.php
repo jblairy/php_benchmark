@@ -36,6 +36,9 @@ final readonly class MessengerMonitorCommand
     ) {
     }
 
+    /**
+     * @SuppressWarnings("PHPMD.BooleanArgumentFlag") - CLI command options require boolean flags
+     */
     public function __invoke(
         #[\Symfony\Component\Console\Attribute\Option(name: 'interval', shortcut: 'i', description: 'Refresh interval in seconds')]
         string $interval = '2',

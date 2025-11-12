@@ -317,6 +317,9 @@ final readonly class EnhancedStatisticsCalculator
         return 1000.0 / $averageTimeMs;
     }
 
+    /**
+     * @SuppressWarnings("PHPMD.StaticAccess") - Calling static factory method is acceptable
+     */
     private function createEmptyStatistics(BenchmarkMetrics $benchmarkMetrics): EnhancedBenchmarkStatistics
     {
         return EnhancedBenchmarkStatistics::empty(

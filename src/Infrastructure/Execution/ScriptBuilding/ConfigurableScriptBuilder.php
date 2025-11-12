@@ -15,13 +15,13 @@ use Jblairy\PhpBenchmark\Infrastructure\Benchmark\Factory\IterationConfiguration
 final readonly class ConfigurableScriptBuilder implements ScriptBuilderPort
 {
     public function __construct(
-        private IterationConfigurationFactory $iterationConfigurationFactory,
+        private IterationConfigurationFactory $iterConfigFactory,
     ) {
     }
 
     public function build(string $methodBody): string
     {
-        $config = $this->iterationConfigurationFactory->create(
+        $config = $this->iterConfigFactory->create(
             benchmarkCode: $methodBody,
         );
 

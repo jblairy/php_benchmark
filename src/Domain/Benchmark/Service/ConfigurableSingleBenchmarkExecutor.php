@@ -22,7 +22,7 @@ final readonly class ConfigurableSingleBenchmarkExecutor implements BenchmarkExe
         private CodeExtractorPort $codeExtractorPort,
         private ScriptBuilderPort $scriptBuilderPort,
         private ScriptExecutorPort $scriptExecutorPort,
-        private IterationConfigurationFactory $iterationConfigurationFactory,
+        private IterationConfigurationFactory $iterConfigFactory,
     ) {
     }
 
@@ -57,7 +57,7 @@ final readonly class ConfigurableSingleBenchmarkExecutor implements BenchmarkExe
         ?int $innerIterations,
     ): string {
         if (null !== $warmupIterations && null !== $innerIterations) {
-            $iterationConfig = $this->iterationConfigurationFactory->createFromExplicitValues(
+            $iterationConfig = $this->iterConfigFactory->createFromExplicitValues(
                 warmupIterations: $warmupIterations,
                 innerIterations: $innerIterations,
             );

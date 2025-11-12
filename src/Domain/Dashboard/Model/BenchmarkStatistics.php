@@ -30,6 +30,9 @@ readonly class BenchmarkStatistics
     /**
      * Factory method for creating statistics with individual parameters.
      * Useful for backward compatibility and simpler construction.
+     *
+     * @SuppressWarnings("PHPMD.ExcessiveParameterList") - Factory method with parameter objects would be less readable
+     * @SuppressWarnings("PHPMD.StaticAccess") - Static factory method pattern is acceptable
      */
     public static function create(
         string $benchmarkId,
@@ -56,6 +59,8 @@ readonly class BenchmarkStatistics
 
     /**
      * Create empty statistics for a benchmark with no data.
+     *
+     * @SuppressWarnings("PHPMD.StaticAccess") - Static factory method pattern is acceptable for value objects
      */
     public static function empty(string $benchmarkId, string $benchmarkName, string $phpVersion): self
     {

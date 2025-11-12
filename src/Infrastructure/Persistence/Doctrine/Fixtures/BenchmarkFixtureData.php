@@ -14,6 +14,8 @@ final readonly class BenchmarkFixtureData
     /**
      * @param string[] $phpVersions
      * @param string[] $tags
+     *
+     * @SuppressWarnings("PHPMD.ExcessiveParameterList") - DTO for YAML validation requires all properties
      */
     public function __construct(
         #[Assert\NotBlank(message: 'slug field is required')]

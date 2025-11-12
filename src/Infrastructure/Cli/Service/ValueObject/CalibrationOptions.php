@@ -37,6 +37,9 @@ final readonly class CalibrationOptions
         return new self(isDryRun: true, forceRecalibration: true);
     }
 
+    /**
+     * @SuppressWarnings("PHPMD.BooleanArgumentFlag") - Factory method for CLI flags is acceptable
+     */
     public static function fromFlags(bool $dryRun, bool $force): self
     {
         return new self(isDryRun: $dryRun, forceRecalibration: $force);
