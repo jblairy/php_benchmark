@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jblairy\PhpBenchmark\Infrastructure\Cli\Service;
 
 use Exception;
+use Jblairy\PhpBenchmark\Infrastructure\Cli\Service\ValueObject\CalibrationOptions;
 use Jblairy\PhpBenchmark\Infrastructure\Cli\Service\ValueObject\CalibrationResult;
 
 /**
@@ -19,9 +20,9 @@ final readonly class CalibrationService
     /**
      * @param array<mixed> $data
      */
-    public function shouldSkipBenchmark(array $data, bool $force): bool
+    public function shouldSkipBenchmark(array $data, CalibrationOptions $options): bool
     {
-        if (!$force && (isset($data['warmupIterations']) || isset($data['innerIterations']))) {
+        if ($options->shouldSkipConfigured() && (isset($data['warmupIterations']) || isset($data['innerIterations']))) {
             return true;
         }
 

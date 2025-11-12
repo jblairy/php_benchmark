@@ -9,6 +9,7 @@ use Jblairy\PhpBenchmark\Domain\Benchmark\Model\ExecutionContext;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptExecutorPort;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final readonly class DockerScriptExecutor implements ScriptExecutorPort
 {
@@ -16,6 +17,12 @@ final readonly class DockerScriptExecutor implements ScriptExecutorPort
 
     public function __construct(
         private LoggerInterface $logger,
+        #[Autowire('%benchmark.timeout%')]
+        private int $benchmarkTimeout,
+        #[Autowire('%app.env%')]
+        private string $appEnv,
+        #[Autowire('%docker.compose_project_name%')]
+        private string $composeProjectName,
     ) {
     }
 
@@ -74,18 +81,15 @@ final readonly class DockerScriptExecutor implements ScriptExecutorPort
 
     private function executeInDocker(string $phpVersion, string $scriptPath): string
     {
-        $timeoutEnv = $_ENV['BENCHMARK_TIMEOUT'] ?? 30;
-        $timeout = is_numeric($timeoutEnv) ? (int) $timeoutEnv : 30;
         $composeFile = $this->getComposeFile();
-        $projectName = $this->getProjectName();
 
         $command = sprintf(
             'timeout %ds docker-compose -p %s -f %s exec -T %s php -d max_execution_time=%d %s 2>&1',
-            $timeout,
-            escapeshellarg($projectName),
+            $this->benchmarkTimeout,
+            escapeshellarg($this->composeProjectName),
             escapeshellarg($composeFile),
             escapeshellarg($phpVersion),
-            $timeout,
+            $this->benchmarkTimeout,
             escapeshellarg($scriptPath),
         );
 
@@ -96,7 +100,7 @@ final readonly class DockerScriptExecutor implements ScriptExecutorPort
 
         // Exit code 124 = timeout command timed out
         if (124 === $exitCode) {
-            throw new RuntimeException(sprintf('Script execution timed out after %d seconds', $timeout));
+            throw new RuntimeException(sprintf('Script execution timed out after %d seconds', $this->benchmarkTimeout));
         }
 
         if (0 !== $exitCode) {
@@ -108,20 +112,11 @@ final readonly class DockerScriptExecutor implements ScriptExecutorPort
 
     private function getComposeFile(): string
     {
-        $appEnv = $_ENV['APP_ENV'] ?? 'dev';
-
-        return match ($appEnv) {
+        return match ($this->appEnv) {
             'prod' => '/app/docker-compose.prod.yml',
             'test' => '/app/docker-compose.ci.yml',
             default => '/app/docker-compose.dev.yml',
         };
-    }
-
-    private function getProjectName(): string
-    {
-        $projectName = $_ENV['COMPOSE_PROJECT_NAME'] ?? 'php_benchmark';
-
-        return is_string($projectName) ? $projectName : 'php_benchmark';
     }
 
     private function parseOutput(string $output): BenchmarkResult

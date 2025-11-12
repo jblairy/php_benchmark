@@ -6,11 +6,17 @@
 parameters:
     container.dumper.inline_class_loader: false
     locale: 'fr'
+    
     # Benchmark execution parameters
     benchmark.warmup_iterations: '%env(int:BENCHMARK_WARMUP_ITERATIONS)%'
     benchmark.inner_iterations: '%env(int:BENCHMARK_INNER_ITERATIONS)%'
     benchmark.samples: '%env(int:BENCHMARK_SAMPLES)%'
     benchmark.timeout: '%env(int:BENCHMARK_TIMEOUT)%'
+    
+    # Docker execution parameters
+    app.env: '%env(APP_ENV)%'
+    docker.compose_project_name: '%env(default:docker_compose_project_name_default:COMPOSE_PROJECT_NAME)%'
+    docker_compose_project_name_default: 'php_benchmark'
 
 services:
     # default configuration for services in *this* file
@@ -94,10 +100,20 @@ services:
     # Enhanced Statistics Calculator with outlier detection
     Jblairy\PhpBenchmark\Domain\Dashboard\Service\OutlierDetector: ~
     
+    
+    # Outlier handling strategies
+    Jblairy\PhpBenchmark\Domain\Dashboard\Service\RemoveOutliersStrategy: ~
+    Jblairy\PhpBenchmark\Domain\Dashboard\Service\KeepOutliersStrategy: ~
+    
+    # Default strategy: Remove outliers for cleaner statistics
+    Jblairy\PhpBenchmark\Domain\Dashboard\Service\OutlierHandlingStrategy:
+        class: Jblairy\PhpBenchmark\Domain\Dashboard\Service\RemoveOutliersStrategy
+    
+    # Enhanced Statistics Calculator with strategy pattern
     Jblairy\PhpBenchmark\Domain\Dashboard\Service\EnhancedStatisticsCalculator:
         arguments:
             $outlierDetector: '@Jblairy\PhpBenchmark\Domain\Dashboard\Service\OutlierDetector'
-            $removeOutliers: true
+            $outlierHandlingStrategy: '@Jblairy\PhpBenchmark\Domain\Dashboard\Service\OutlierHandlingStrategy'
     
     # Legacy calculator kept for backward compatibility
     Jblairy\PhpBenchmark\Domain\Dashboard\Service\StatisticsCalculator: ~

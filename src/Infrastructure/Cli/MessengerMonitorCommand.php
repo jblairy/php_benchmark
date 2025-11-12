@@ -58,11 +58,13 @@ final readonly class MessengerMonitorCommand
             return Command::FAILURE;
         }
 
-        if ($watch) {
-            $this->runWatchMode($symfonyStyle, $output, $redis, $intervalSeconds);
-        } else {
+        if (!$watch) {
             $this->showDashboard($symfonyStyle, $output, $redis);
+
+            return Command::SUCCESS;
         }
+
+        $this->runWatchMode($symfonyStyle, $output, $redis, $intervalSeconds);
 
         return Command::SUCCESS;
     }

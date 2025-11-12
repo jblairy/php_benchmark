@@ -71,10 +71,12 @@ final readonly class DashboardRenderer
         int $totalPending,
         int $failedCount,
     ): void {
+        if (0 >= $totalPending) {
+            $symfonyStyle->success('All queues are empty');
+        }
+
         if (0 < $totalPending) {
             $symfonyStyle->warning(sprintf('%d messages pending processing', $totalPending));
-        } else {
-            $symfonyStyle->success('All queues are empty');
         }
 
         if (0 < $failedCount) {
@@ -106,12 +108,14 @@ final readonly class DashboardRenderer
     {
         $symfonyStyle->section('Worker Status');
 
-        if (0 < $activeWorkers) {
-            $symfonyStyle->success(sprintf('%d active workers detected', $activeWorkers));
-        } else {
+        if (0 >= $activeWorkers) {
             $symfonyStyle->info('Worker status detection via heartbeat not implemented.');
             $symfonyStyle->note('Workers are managed by supervisor/docker-compose');
+
+            return;
         }
+
+        $symfonyStyle->success(sprintf('%d active workers detected', $activeWorkers));
     }
 
     /**

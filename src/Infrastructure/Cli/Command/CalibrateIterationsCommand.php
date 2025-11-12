@@ -9,6 +9,7 @@ use Jblairy\PhpBenchmark\Infrastructure\Cli\Service\BenchmarkFileResolver;
 use Jblairy\PhpBenchmark\Infrastructure\Cli\Service\CalibrationProgressTracker;
 use Jblairy\PhpBenchmark\Infrastructure\Cli\Service\CalibrationResultFormatter;
 use Jblairy\PhpBenchmark\Infrastructure\Cli\Service\CalibrationService;
+use Jblairy\PhpBenchmark\Infrastructure\Cli\Service\ValueObject\CalibrationOptions;
 use Jblairy\PhpBenchmark\Infrastructure\Cli\Service\YamlFileManager;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -54,20 +55,21 @@ final readonly class CalibrateIterationsCommand
             return Command::FAILURE;
         }
 
+        $options = CalibrationOptions::fromFlags($dryRun, $force);
         $formatter = new CalibrationResultFormatter($symfonyStyle);
         $tracker = new CalibrationProgressTracker($symfonyStyle);
 
-        $formatter->displayHeader($targetTime, $phpVersion, $dryRun);
+        $formatter->displayHeader($targetTime, $phpVersion, $options->isDryRun);
 
         $benchmarkFiles = $this->fileResolver->resolveBenchmarkFiles($benchmark, $all, $symfonyStyle);
         if (null === $benchmarkFiles) {
             return Command::FAILURE;
         }
 
-        $this->calibrateBenchmarks($benchmarkFiles, $targetTime, $dryRun, $force, $tracker);
+        $this->calibrateBenchmarks($benchmarkFiles, $targetTime, $options, $tracker);
 
         $results = $tracker->getResults();
-        $formatter->displayResults($results['results'], $results['errors'], $results['skipped'], $dryRun);
+        $formatter->displayResults($results['results'], $results['errors'], $results['skipped'], $options->isDryRun);
 
         return Command::SUCCESS;
     }
@@ -78,15 +80,14 @@ final readonly class CalibrateIterationsCommand
     private function calibrateBenchmarks(
         array $benchmarkFiles,
         float $targetTime,
-        bool $dryRun,
-        bool $force,
+        CalibrationOptions $options,
         CalibrationProgressTracker $tracker,
     ): void {
         $tracker->startProgress(count($benchmarkFiles));
 
         foreach ($benchmarkFiles as $benchmarkFile) {
             $tracker->advanceProgress();
-            $this->calibrateSingleBenchmark($benchmarkFile, $targetTime, $dryRun, $force, $tracker);
+            $this->calibrateSingleBenchmark($benchmarkFile, $targetTime, $options, $tracker);
         }
 
         $tracker->finishProgress();
@@ -95,8 +96,7 @@ final readonly class CalibrateIterationsCommand
     private function calibrateSingleBenchmark(
         string $benchmarkFile,
         float $targetTime,
-        bool $dryRun,
-        bool $force,
+        CalibrationOptions $options,
         CalibrationProgressTracker $tracker,
     ): void {
         try {
@@ -107,7 +107,7 @@ final readonly class CalibrateIterationsCommand
                 return;
             }
 
-            if ($this->calibrationService->shouldSkipBenchmark($data, $force)) {
+            if ($this->calibrationService->shouldSkipBenchmark($data, $options)) {
                 $tracker->trackSkipped();
 
                 return;
@@ -121,7 +121,7 @@ final readonly class CalibrateIterationsCommand
                 return;
             }
 
-            if (!$dryRun) {
+            if ($options->shouldUpdateFixtures()) {
                 $this->yamlFileManager->updateBenchmarkIterations(
                     $benchmarkFile,
                     $calibration->suggestedWarmup,

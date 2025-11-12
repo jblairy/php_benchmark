@@ -15,12 +15,12 @@ use Jblairy\PhpBenchmark\Domain\Dashboard\Model\ValueObject\RawStatistics;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\ValueObject\StatisticalMetrics;
 
 /**
- * Enhanced statistics calculator with outlier detection and removal.
+ * Enhanced statistics calculator with outlier detection and configurable handling.
  *
  * This calculator improves upon the basic StatisticsCalculator by:
- * - Detecting and removing outliers before calculating statistics
+ * - Detecting and optionally removing outliers before calculating statistics
  * - Providing both raw and cleaned statistics
- * - Offering configurable outlier detection methods
+ * - Using strategy pattern for flexible outlier handling
  */
 final readonly class EnhancedStatisticsCalculator
 {
@@ -36,12 +36,12 @@ final readonly class EnhancedStatisticsCalculator
 
     public function __construct(
         private OutlierDetector $outlierDetector,
-        private bool $removeOutliers = true,
+        private OutlierHandlingStrategy $outlierHandlingStrategy,
     ) {
     }
 
     /**
-     * Calculate statistics with optional outlier removal.
+     * Calculate statistics with configurable outlier handling.
      */
     public function calculate(BenchmarkMetrics $benchmarkMetrics): EnhancedBenchmarkStatistics
     {
@@ -75,9 +75,10 @@ final readonly class EnhancedStatisticsCalculator
         OutlierDetectionResult $outlierResult,
         BenchmarkMetrics $benchmarkMetrics,
     ): array {
-        return $this->removeOutliers
-            ? $outlierResult->cleanedData
-            : $benchmarkMetrics->executionTimes;
+        return $this->outlierHandlingStrategy->selectDataForAnalysis(
+            $outlierResult->cleanedData,
+            $benchmarkMetrics->executionTimes,
+        );
     }
 
     /**
@@ -146,11 +147,16 @@ final readonly class EnhancedStatisticsCalculator
             phpVersion: $benchmarkMetrics->phpVersion,
         );
 
+        $executionCount = $this->outlierHandlingStrategy->getAnalysisCount(
+            $outlierDetectionResult,
+            $benchmarkMetrics->getExecutionCount(),
+        );
+
         $execution = new ExecutionMetrics(
             averageExecutionTime: $cleanedStats['average'],
             minExecutionTime: $cleanedStats['min'],
             maxExecutionTime: $cleanedStats['max'],
-            executionCount: count($this->selectDataForAnalysis($outlierDetectionResult, $benchmarkMetrics)),
+            executionCount: $executionCount,
             throughput: $cleanedStats['throughput'],
         );
 

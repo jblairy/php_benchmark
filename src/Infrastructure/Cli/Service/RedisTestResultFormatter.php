@@ -22,11 +22,13 @@ final readonly class RedisTestResultFormatter
         $io->writeln(sprintf('SET %s = "%s"', $testResult['key'], $testResult['value']));
         $io->writeln(sprintf('GET %s = "%s"', $testResult['key'], $testResult['retrieved']));
 
-        if ($testResult['success']) {
-            $io->success('Redis read/write test passed!');
-        } else {
+        if (!$testResult['success']) {
             $io->error('Redis read/write test failed!');
+
+            return;
         }
+
+        $io->success('Redis read/write test passed!');
     }
 
     /**
