@@ -49,8 +49,4 @@
     <exclude-pattern>*/config/bundles.php</exclude-pattern>
     <exclude-pattern>*/public/index.php</exclude-pattern>
     <exclude-pattern>*/bin/console</exclude-pattern>
-    <exclude-pattern>*/src/Benchmark/Case</exclude-pattern>
-    <exclude-pattern>*/src/Benchmark/Runner/Shell/Result/SchellCommandResult.php</exclude-pattern>
-    <exclude-pattern>*/src/Application/Dashboard/DTO/BenchmarkStatisticsData.php</exclude-pattern>
-    <exclude-pattern>*/src/Infrastructure/Persistence/Doctrine/Entity/Pulse.php</exclude-pattern>
 </ruleset>
