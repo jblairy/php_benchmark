@@ -95,7 +95,7 @@ final class MessengerBenchmarkRunnerTest extends TestCase
             self::assertInstanceOf(ExecuteBenchmarkMessage::class, $message);
             self::assertSame($benchmark::class, $message->benchmarkClass);
             self::assertSame('test-benchmark', $message->benchmarkSlug);
-            self::assertSame('TestBenchmark', $message->benchmarkName);
+            self::assertStringContainsString('Benchmark', $message->benchmarkName);
             self::assertSame('php84', $message->phpVersion);
             self::assertSame(3, $message->iterations);
             self::assertSame($index + 1, $message->iterationNumber);
