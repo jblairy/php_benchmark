@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Jblairy\PhpBenchmark\Infrastructure\Mercure\EventSubscriber;
 
+use Exception;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Event\BenchmarkCompleted;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Event\BenchmarkProgress;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Event\BenchmarkStarted;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
@@ -18,6 +20,7 @@ final readonly class BenchmarkProgressSubscriber implements EventSubscriberInter
 {
     public function __construct(
         private HubInterface $hub,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -54,11 +57,20 @@ final readonly class BenchmarkProgressSubscriber implements EventSubscriberInter
      */
     private function publishUpdate(string $topic, array $data): void
     {
-        $update = new Update(
-            $topic,
-            json_encode($data, JSON_THROW_ON_ERROR),
-        );
+        try {
+            $update = new Update(
+                $topic,
+                json_encode($data, JSON_THROW_ON_ERROR),
+            );
 
-        $this->hub->publish($update);
+            $this->hub->publish($update);
+        } catch (Exception $e) {
+            $this->logger->error('Failed to publish Mercure update', [
+                'topic' => $topic,
+                'error' => $e->getMessage(),
+                'exception' => $e,
+            ]);
+            // Don't re-throw - allow benchmark to continue even if Mercure fails
+        }
     }
 }

@@ -11,6 +11,7 @@ use Jblairy\PhpBenchmark\Domain\Dashboard\Model\DashboardStats;
 use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Adapter\DatabaseBenchmark;
 use Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Entity\Benchmark as BenchmarkEntity;
 use RuntimeException;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * Doctrine implementation of BenchmarkRepositoryPort
@@ -20,6 +21,7 @@ final readonly class DoctrineBenchmarkRepository implements BenchmarkRepositoryP
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
+        private CacheInterface $cache,
     ) {
     }
 
@@ -50,29 +52,33 @@ final readonly class DoctrineBenchmarkRepository implements BenchmarkRepositoryP
 
     public function getDashboardStats(): DashboardStats
     {
-        $totalBenchmarks = $this->countTotalBenchmarks();
-        $result = $this->fetchPulseStatistics($totalBenchmarks);
+        return $this->cache->get('dashboard_stats', function () {
+            $totalBenchmarks = $this->countTotalBenchmarks();
+            $result = $this->fetchPulseStatistics($totalBenchmarks);
 
-        if (!$result instanceof DashboardStats) {
-            throw new RuntimeException('Unexpected result type from Doctrine SELECT NEW query');
-        }
+            if (!$result instanceof DashboardStats) {
+                throw new RuntimeException('Unexpected result type from Doctrine SELECT NEW query');
+            }
 
-        return $result;
+            return $result;
+        });
     }
 
     public function getTopCategories(int $limit = 3): array
     {
-        $results = $this->entityManager
-            ->createQuery('
-                SELECT b.category, COUNT(b.id) as benchmark_count
-                FROM ' . BenchmarkEntity::class . ' b
-                GROUP BY b.category
-                ORDER BY benchmark_count DESC
-            ')
-            ->setMaxResults($limit)
-            ->getResult();
+        return $this->cache->get('top_categories_' . $limit, function () use ($limit) {
+            $results = $this->entityManager
+                ->createQuery('
+                    SELECT b.category, COUNT(b.id) as benchmark_count
+                    FROM ' . BenchmarkEntity::class . ' b
+                    GROUP BY b.category
+                    ORDER BY benchmark_count DESC
+                ')
+                ->setMaxResults($limit)
+                ->getResult();
 
-        return $this->extractCategoryNamesFromQueryResults($results);
+            return $this->extractCategoryNamesFromQueryResults($results);
+        });
     }
 
     public function findBenchmarkBySlug(string $slug): ?Benchmark
