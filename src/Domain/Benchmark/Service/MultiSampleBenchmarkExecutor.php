@@ -35,7 +35,7 @@ final readonly class MultiSampleBenchmarkExecutor implements BenchmarkExecutorPo
 {
     private const int DEFAULT_SAMPLES = 1;
 
-    private const int INTER_SAMPLE_PAUSE_MICROSECONDS = 10_000; // 10ms stabilization between samples
+    private const int INTER_SAMPLE_PAUSE_MICROSECONDS = 10_000;
 
     public function __construct(
         private BenchmarkExecutorPort $benchmarkExecutorPort,
@@ -153,17 +153,15 @@ final readonly class MultiSampleBenchmarkExecutor implements BenchmarkExecutorPo
             return 0.0;
         }
 
-        $sorted = array_values($values); // Re-index to ensure sequential keys
+        $sorted = array_values($values);
         sort($sorted);
         $count = count($sorted);
         $middle = (int) ($count / 2);
 
-        // Even count: average of two middle values
         if (0 === $count % 2 && isset($sorted[$middle - 1], $sorted[$middle])) {
             return ($sorted[$middle - 1] + $sorted[$middle]) / 2;
         }
 
-        // Odd count: middle value
         return $sorted[$middle] ?? 0.0;
     }
 
@@ -193,7 +191,7 @@ final readonly class MultiSampleBenchmarkExecutor implements BenchmarkExecutorPo
         $mean = $this->calculateMean($values);
         $variance = array_sum(
             array_map(
-                static fn (float $v): float => ($v - $mean) ** 2,
+                static fn (float $value): float => ($value - $mean) ** 2,
                 $values,
             ),
         ) / $count;

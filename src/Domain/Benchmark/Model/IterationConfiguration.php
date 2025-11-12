@@ -16,12 +16,10 @@ final readonly class IterationConfiguration
 
     private const int DEFAULT_INNER_ITERATIONS = 100;
 
-    // Minimum values for statistical validity
     private const int MIN_WARMUP_ITERATIONS = 1;
 
     private const int MIN_INNER_ITERATIONS = 10;
 
-    // Maximum reasonable values to prevent excessive runtime
     private const int MAX_WARMUP_ITERATIONS = 100;
 
     private const int MAX_INNER_ITERATIONS = 10000;
@@ -35,11 +33,19 @@ final readonly class IterationConfiguration
 
     /**
      * Create from nullable values with smart defaults.
+     *
+     * @param int|null    $warmupIterations Explicit warmup iterations
+     * @param int|null    $innerIterations  Explicit inner iterations
+     * @param string|null $benchmarkCode    Code to analyze for complexity-based defaults
+     * @param int         $defaultWarmup    Default warmup when no other source available
+     * @param int         $defaultInner     Default inner when no other source available
      */
     public static function createWithDefaults(
         ?int $warmupIterations = null,
         ?int $innerIterations = null,
         ?string $benchmarkCode = null,
+        int $defaultWarmup = self::DEFAULT_WARMUP_ITERATIONS,
+        int $defaultInner = self::DEFAULT_INNER_ITERATIONS,
     ): self {
         if (self::hasExplicitValues($warmupIterations, $innerIterations)) {
             return new self(
@@ -49,23 +55,20 @@ final readonly class IterationConfiguration
         }
 
         if (self::canCalculateFromCode($benchmarkCode)) {
-            return self::createFromCodeComplexity($benchmarkCode, $warmupIterations, $innerIterations);
+            return self::createFromCodeComplexity($benchmarkCode, $warmupIterations, $innerIterations, $defaultWarmup, $defaultInner);
         }
 
-        return self::createFromEnvironmentDefaults($warmupIterations, $innerIterations);
+        return new self(
+            $warmupIterations ?? $defaultWarmup,
+            $innerIterations ?? $defaultInner,
+        );
     }
 
-    /**
-     * Get total measurement iterations (excluding warmup).
-     */
     public function getTotalMeasurementIterations(): int
     {
         return $this->innerIterations;
     }
 
-    /**
-     * Get a description of the configuration.
-     */
     public function getDescription(): string
     {
         return sprintf(
@@ -90,9 +93,14 @@ final readonly class IterationConfiguration
         ?string $benchmarkCode,
         ?int $warmupIterations,
         ?int $innerIterations,
+        int $defaultWarmup,
+        int $defaultInner,
     ): self {
         if (null === $benchmarkCode) {
-            return self::createFromEnvironmentDefaults($warmupIterations, $innerIterations);
+            return new self(
+                $warmupIterations ?? $defaultWarmup,
+                $innerIterations ?? $defaultInner,
+            );
         }
 
         $complexity = self::analyzeBenchmarkComplexity($benchmarkCode);
@@ -103,30 +111,6 @@ final readonly class IterationConfiguration
         );
     }
 
-    private static function createFromEnvironmentDefaults(
-        ?int $warmupIterations,
-        ?int $innerIterations,
-    ): self {
-        return new self(
-            $warmupIterations ?? self::getWarmupFromEnvironment(),
-            $innerIterations ?? self::getInnerFromEnvironment(),
-        );
-    }
-
-    private static function getWarmupFromEnvironment(): int
-    {
-        $envValue = $_ENV['BENCHMARK_WARMUP_ITERATIONS'] ?? self::DEFAULT_WARMUP_ITERATIONS;
-
-        return is_numeric($envValue) ? (int) $envValue : self::DEFAULT_WARMUP_ITERATIONS;
-    }
-
-    private static function getInnerFromEnvironment(): int
-    {
-        $envValue = $_ENV['BENCHMARK_INNER_ITERATIONS'] ?? self::DEFAULT_INNER_ITERATIONS;
-
-        return is_numeric($envValue) ? (int) $envValue : self::DEFAULT_INNER_ITERATIONS;
-    }
-
     /**
      * Analyze benchmark code complexity.
      *
@@ -134,7 +118,6 @@ final readonly class IterationConfiguration
      */
     private static function analyzeBenchmarkComplexity(string $code): array
     {
-        // Count loop iterations
         $loopMatches = [];
         preg_match_all('/for\s*\([^;]+;\s*(\d+)\s*>/', $code, $loopMatches);
 
@@ -144,12 +127,11 @@ final readonly class IterationConfiguration
             $totalIterations *= (int) $match;
         }
 
-        // Check for heavy operations
         $heavyOperations = [
-            'mb_' => 2.0,           // Multibyte functions
-            'preg_' => 3.0,         // Regex operations
-            'hash(' => 3.0,         // Hashing
-            'crypt(' => 5.0,        // Cryptography
+            'mb_' => 2.0,
+            'preg_' => 3.0,
+            'hash(' => 3.0,
+            'crypt(' => 5.0,
             'serialize(' => 2.5,
             'json_encode(' => 2.0,
             'json_decode(' => 2.5,
@@ -164,7 +146,6 @@ final readonly class IterationConfiguration
             }
         }
 
-        // Calculate complexity score
         $score = log10($totalIterations + 1) * $operationScore;
 
         return [
@@ -181,14 +162,12 @@ final readonly class IterationConfiguration
     }
 
     /**
-     * Calculate optimal warmup iterations based on complexity.
-     *
      * @param array{level: string, score: float, estimatedOperations: int} $complexity
      */
     private static function calculateWarmupIterations(array $complexity): int
     {
         return match ($complexity['level']) {
-            'extreme' => 3,    // Minimal warmup for very heavy benchmarks
+            'extreme' => 3,
             'heavy' => 5,
             'moderate' => 10,
             'light' => 15,
@@ -197,19 +176,16 @@ final readonly class IterationConfiguration
     }
 
     /**
-     * Calculate optimal inner iterations based on complexity.
-     *
      * @param array{level: string, score: float, estimatedOperations: int} $complexity
      */
     private static function calculateInnerIterations(array $complexity): int
     {
-        // Target total operations for different complexity levels
         $targetOperations = match ($complexity['level']) {
-            'extreme' => 100_000,       // 100K operations max
-            'heavy' => 1_000_000,       // 1M operations max
-            'moderate' => 10_000_000,   // 10M operations max
-            'light' => 50_000_000,      // 50M operations max
-            default => 100_000_000,     // 100M operations max
+            'extreme' => 100_000,
+            'heavy' => 1_000_000,
+            'moderate' => 10_000_000,
+            'light' => 50_000_000,
+            default => 100_000_000,
         };
 
         $estimatedOps = $complexity['estimatedOperations'];

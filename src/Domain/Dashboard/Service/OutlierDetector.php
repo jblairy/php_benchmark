@@ -10,10 +10,6 @@ namespace Jblairy\PhpBenchmark\Domain\Dashboard\Service;
  */
 final readonly class OutlierDetector
 {
-    /**
-     * IQR multiplier for outlier detection.
-     * 1.5 = standard outliers, 3.0 = extreme outliers.
-     */
     private const float IQR_MULTIPLIER = 1.5;
 
     /**
@@ -85,11 +81,14 @@ final readonly class OutlierDetector
 
         foreach ($data as $index => $value) {
             $zScore = $zScores[$index] ?? 0.0;
+
             if (abs($zScore) > $threshold) {
                 $outliers[] = $value;
-            } else {
-                $cleanedData[] = $value;
+
+                continue;
             }
+
+            $cleanedData[] = $value;
         }
 
         return new OutlierDetectionResult(
@@ -156,9 +155,11 @@ final readonly class OutlierDetector
         foreach ($data as $key => $value) {
             if ($this->isOutlier($value, $bounds)) {
                 $outliers[$key] = $value;
-            } else {
-                $clean[$key] = $value;
+
+                continue;
             }
+
+            $clean[$key] = $value;
         }
 
         return compact('clean', 'outliers');
@@ -189,17 +190,14 @@ final readonly class OutlierDetector
             return $sortedData[0] ?? 0.0;
         }
 
-        // Calculate the position
         $position = ($count - 1) * $percentile;
         $lower = (int) floor($position);
         $upper = (int) ceil($position);
 
-        // If position is an integer, return that value
         if ($lower === $upper) {
             return $sortedData[$lower] ?? 0.0;
         }
 
-        // Linear interpolation between lower and upper
         $weight = $position - $lower;
         $lowerValue = $sortedData[$lower] ?? 0.0;
         $upperValue = $sortedData[$upper] ?? 0.0;

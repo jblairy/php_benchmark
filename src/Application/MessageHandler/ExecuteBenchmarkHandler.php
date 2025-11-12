@@ -35,13 +35,13 @@ final readonly class ExecuteBenchmarkHandler
         private EventDispatcherPort $eventDispatcherPort,
         private BenchmarkRepositoryPort $benchmarkRepositoryPort,
         private LoggerPort $logger,
+        private int $benchmarkTimeout = 60,
     ) {
     }
 
     public function __invoke(ExecuteBenchmarkMessage $executeBenchmarkMessage): void
     {
-        $timeout = $_ENV['BENCHMARK_TIMEOUT'] ?? 60;
-        set_time_limit(is_numeric($timeout) ? (int) $timeout : 60);
+        set_time_limit($this->benchmarkTimeout);
 
         $this->logger->info('Processing benchmark execution', [
             'benchmark' => $executeBenchmarkMessage->benchmarkName,
@@ -51,7 +51,6 @@ final readonly class ExecuteBenchmarkHandler
         ]);
 
         try {
-            // Load benchmark from repository
             $benchmark = $this->benchmarkRepositoryPort->findBenchmarkByName($executeBenchmarkMessage->benchmarkSlug);
             if (null === $benchmark) {
                 throw new RuntimeException(sprintf('Benchmark %s not found in repository', $executeBenchmarkMessage->benchmarkSlug));
@@ -59,7 +58,6 @@ final readonly class ExecuteBenchmarkHandler
 
             $phpVersion = PhpVersion::from($executeBenchmarkMessage->phpVersion);
 
-            // Dispatch start event for first iteration
             if (1 === $executeBenchmarkMessage->iterationNumber) {
                 $this->eventDispatcherPort->dispatch(
                     new BenchmarkStarted(
@@ -74,16 +72,13 @@ final readonly class ExecuteBenchmarkHandler
             $benchmarkConfiguration = new BenchmarkConfiguration(
                 benchmark: $benchmark,
                 phpVersion: $phpVersion,
-                iterations: 1, // Single iteration per message
+                iterations: 1,
             );
 
-            // Execute benchmark
             $result = $this->benchmarkExecutorPort->execute($benchmarkConfiguration);
 
-            // Persist result
             $this->resultPersisterPort->persist($benchmarkConfiguration, $result);
 
-            // Dispatch progress event
             $this->eventDispatcherPort->dispatch(
                 new BenchmarkProgress(
                     benchmarkId: $executeBenchmarkMessage->benchmarkSlug,
@@ -94,7 +89,6 @@ final readonly class ExecuteBenchmarkHandler
                 ),
             );
 
-            // Dispatch completed event for last iteration
             if ($executeBenchmarkMessage->iterationNumber === $executeBenchmarkMessage->iterations) {
                 $this->eventDispatcherPort->dispatch(
                     new BenchmarkCompleted(

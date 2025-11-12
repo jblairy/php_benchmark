@@ -10,6 +10,7 @@ parameters:
     benchmark.warmup_iterations: '%env(int:BENCHMARK_WARMUP_ITERATIONS)%'
     benchmark.inner_iterations: '%env(int:BENCHMARK_INNER_ITERATIONS)%'
     benchmark.samples: '%env(int:BENCHMARK_SAMPLES)%'
+    benchmark.timeout: '%env(int:BENCHMARK_TIMEOUT)%'
 
 services:
     # default configuration for services in *this* file
@@ -103,15 +104,28 @@ services:
         arguments:
             $projectDir: '%kernel.project_dir%'
     
+    # Calibration Services
+    Jblairy\PhpBenchmark\Infrastructure\Cli\Service\BenchmarkFileResolver:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+    
+    Jblairy\PhpBenchmark\Infrastructure\Cli\Service\YamlFileManager: ~
+    
+    Jblairy\PhpBenchmark\Infrastructure\Cli\Service\CalibrationService: ~
+    
     # Calibration command
     Jblairy\PhpBenchmark\Infrastructure\Cli\Command\CalibrateIterationsCommand:
         arguments:
-            $projectDir: '%kernel.project_dir%'
+            $fileResolver: '@Jblairy\PhpBenchmark\Infrastructure\Cli\Service\BenchmarkFileResolver'
+            $yamlFileManager: '@Jblairy\PhpBenchmark\Infrastructure\Cli\Service\YamlFileManager'
+            $calibrationService: '@Jblairy\PhpBenchmark\Infrastructure\Cli\Service\CalibrationService'
         tags: ['console.command']
 
     # Message Handlers
     # Configure handlers via services.yaml instead of attributes to keep Application layer
     # independent of Symfony Messenger infrastructure
     Jblairy\PhpBenchmark\Application\MessageHandler\ExecuteBenchmarkHandler:
+        arguments:
+            $benchmarkTimeout: '%benchmark.timeout%'
         tags:
             - { name: 'messenger.message_handler' }

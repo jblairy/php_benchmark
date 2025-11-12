@@ -24,9 +24,6 @@ final class ConfigurableScriptBuilder implements ScriptBuilderPort
     ) {
     }
 
-    /**
-     * Set the iteration configuration for the next build.
-     */
     public function setIterationConfiguration(?IterationConfiguration $iterationConfiguration): void
     {
         $this->iterationConfiguration = $iterationConfiguration;
@@ -34,14 +31,12 @@ final class ConfigurableScriptBuilder implements ScriptBuilderPort
 
     public function build(string $methodBody): string
     {
-        // Use current config or create smart defaults
         $config = $this->iterationConfiguration ?? IterationConfiguration::createWithDefaults(
-            $this->defaultWarmupIterations,
-            $this->defaultInnerIterations,
-            $methodBody,
+            benchmarkCode: $methodBody,
+            defaultWarmup: $this->defaultWarmupIterations,
+            defaultInner: $this->defaultInnerIterations,
         );
 
-        // Reset current config after use
         $this->iterationConfiguration = null;
 
         return $this->buildScript($methodBody, $config);
@@ -64,10 +59,7 @@ final class ConfigurableScriptBuilder implements ScriptBuilderPort
                 // Phase 0: CPU Affinity (if available)
                 // ============================================================
                 
-                // Pin to specific CPU cores to reduce context switching
-                // This reduces cache misses and improves consistency
                 if (function_exists('pcntl_setaffinity')) {
-                    // Pin to CPU cores 0 and 1 (matches docker cpuset)
                     @pcntl_setaffinity(getmypid(), [0, 1]);
                 }
                 
@@ -75,14 +67,11 @@ final class ConfigurableScriptBuilder implements ScriptBuilderPort
                 // Phase 1: GC Control and Memory Pre-allocation
                 // ============================================================
                 
-                // Save original GC state
                 \$gc_was_enabled = gc_enabled();
                 
-                // Pre-allocate memory to reduce allocation overhead during measurement
-                \$dummy = str_repeat('x', 10 * 1024 * 1024); // 10MB
+                \$dummy = str_repeat('x', 10 * 1024 * 1024);
                 unset(\$dummy);
                 
-                // Force GC collection before measurement to start in clean state
                 gc_collect_cycles();
                 
                 // ============================================================
@@ -92,21 +81,17 @@ final class ConfigurableScriptBuilder implements ScriptBuilderPort
                     {$methodBody}
                 }
                 
-                // Stabilization pause: Let CPU caches settle after warmup
-                usleep(1000); // 1ms pause
+                usleep(1000);
                 
                 // ============================================================
                 // Phase 3: Measurement Preparation
                 // ============================================================
                 
-                // Disable GC during measurement to prevent timing spikes
                 gc_disable();
                 
-                // Reset memory tracking after warmup
                 \$mem_before = memory_get_usage(true);
                 \$mem_peak_before = memory_get_peak_usage(true);
 
-                // High precision timing with hrtime (nanoseconds)
                 \$start_time = hrtime(true);
 
                 // ============================================================
@@ -122,18 +107,15 @@ final class ConfigurableScriptBuilder implements ScriptBuilderPort
                 // Phase 5: Cleanup
                 // ============================================================
                 
-                // Re-enable GC if it was enabled before
                 if (\$gc_was_enabled) {
                     gc_enable();
                 }
 
-                // Memory measurement after all iterations
                 \$mem_after = memory_get_usage(true);
                 \$mem_peak_after = memory_get_peak_usage(true);
 
-                // Calculate average time per iteration
                 \$elapsed_ns = \$end_time - \$start_time;
-                \$total_time_ms = \$elapsed_ns / 1_000_000; // nanoseconds to milliseconds
+                \$total_time_ms = \$elapsed_ns / 1_000_000;
                 \$avg_time_ms = \$total_time_ms / {$innerIterations};
 
                 echo json_encode([

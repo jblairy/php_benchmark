@@ -57,9 +57,9 @@ final readonly class ConfigurableSingleBenchmarkExecutor implements BenchmarkExe
     ): string {
         if (null !== $warmupIterations && null !== $innerIterations) {
             $iterationConfig = IterationConfiguration::createWithDefaults(
-                $warmupIterations,
-                $innerIterations,
-                $code,
+                warmupIterations: $warmupIterations,
+                innerIterations: $innerIterations,
+                benchmarkCode: $code,
             );
 
             return $this->scriptBuilderPort->buildWithIterationConfig($code, $iterationConfig);
