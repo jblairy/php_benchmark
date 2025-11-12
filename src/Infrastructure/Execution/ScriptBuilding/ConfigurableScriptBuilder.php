@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Jblairy\PhpBenchmark\Infrastructure\Execution\ScriptBuilding;
 
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\IterationConfiguration;
+use Jblairy\PhpBenchmark\Domain\Benchmark\Port\IterationConfigurationFactoryPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptBuilderPort;
-use Jblairy\PhpBenchmark\Infrastructure\Benchmark\Factory\IterationConfigurationFactory;
 
 /**
  * Script builder that uses per-benchmark iteration configuration.
@@ -15,7 +15,7 @@ use Jblairy\PhpBenchmark\Infrastructure\Benchmark\Factory\IterationConfiguration
 final readonly class ConfigurableScriptBuilder implements ScriptBuilderPort
 {
     public function __construct(
-        private IterationConfigurationFactory $iterConfigFactory,
+        private IterationConfigurationFactoryPort $iterConfigFactory,
     ) {
     }
 

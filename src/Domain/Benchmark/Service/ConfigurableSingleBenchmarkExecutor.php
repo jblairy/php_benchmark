@@ -9,9 +9,9 @@ use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkResult;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\ExecutionContext;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkExecutorPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\CodeExtractorPort;
+use Jblairy\PhpBenchmark\Domain\Benchmark\Port\IterationConfigurationFactoryPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptBuilderPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptExecutorPort;
-use Jblairy\PhpBenchmark\Infrastructure\Benchmark\Factory\IterationConfigurationFactory;
 
 /**
  * Enhanced benchmark executor that uses per-benchmark iteration configuration.
@@ -22,7 +22,7 @@ final readonly class ConfigurableSingleBenchmarkExecutor implements BenchmarkExe
         private CodeExtractorPort $codeExtractorPort,
         private ScriptBuilderPort $scriptBuilderPort,
         private ScriptExecutorPort $scriptExecutorPort,
-        private IterationConfigurationFactory $iterConfigFactory,
+        private IterationConfigurationFactoryPort $iterConfigFactory,
     ) {
     }
 

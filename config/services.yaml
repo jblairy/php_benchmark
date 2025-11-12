@@ -60,9 +60,10 @@ services:
     Jblairy\PhpBenchmark\Domain\Dashboard\Port\PulseRepositoryPort:
         class: Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Repository\PulseRepository
 
-    # Iteration Configuration Factory
+    # Iteration Configuration Factory (Port -> Adapter)
     # Centralizes IterationConfiguration creation with environment variable injection
-    Jblairy\PhpBenchmark\Infrastructure\Benchmark\Factory\IterationConfigurationFactory: ~
+    Jblairy\PhpBenchmark\Domain\Benchmark\Port\IterationConfigurationFactoryPort:
+        class: Jblairy\PhpBenchmark\Infrastructure\Benchmark\Factory\IterationConfigurationFactory
 
     # Benchmark Execution (Port -> Adapter)
     # Phase 3: Multi-sample execution wraps ConfigurableSingleBenchmarkExecutor

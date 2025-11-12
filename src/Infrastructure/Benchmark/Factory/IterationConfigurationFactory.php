@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Jblairy\PhpBenchmark\Infrastructure\Benchmark\Factory;
 
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\IterationConfiguration;
+use Jblairy\PhpBenchmark\Domain\Benchmark\Port\IterationConfigurationFactoryPort;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Factory for creating IterationConfiguration instances.
  * Centralizes configuration creation logic and environment variable injection.
  */
-final readonly class IterationConfigurationFactory
+final readonly class IterationConfigurationFactory implements IterationConfigurationFactoryPort
 {
     public function __construct(
         #[Autowire(env: 'BENCHMARK_WARMUP_ITERATIONS')]
