@@ -6,38 +6,24 @@ namespace Jblairy\PhpBenchmark\Infrastructure\Execution\ScriptBuilding;
 
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\IterationConfiguration;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptBuilderPort;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Jblairy\PhpBenchmark\Infrastructure\Benchmark\Factory\IterationConfigurationFactory;
 
 /**
  * Script builder that uses per-benchmark iteration configuration.
  * Falls back to smart defaults based on code complexity analysis.
  */
-final class ConfigurableScriptBuilder implements ScriptBuilderPort
+final readonly class ConfigurableScriptBuilder implements ScriptBuilderPort
 {
-    private ?IterationConfiguration $iterationConfiguration = null;
-
     public function __construct(
-        #[Autowire(env: 'BENCHMARK_WARMUP_ITERATIONS')]
-        private readonly int $defaultWarmupIterations = 10,
-        #[Autowire(env: 'BENCHMARK_INNER_ITERATIONS')]
-        private readonly int $defaultInnerIterations = 100,
+        private IterationConfigurationFactory $iterationConfigurationFactory,
     ) {
-    }
-
-    public function setIterationConfiguration(?IterationConfiguration $iterationConfiguration): void
-    {
-        $this->iterationConfiguration = $iterationConfiguration;
     }
 
     public function build(string $methodBody): string
     {
-        $config = $this->iterationConfiguration ?? IterationConfiguration::createWithDefaults(
+        $config = $this->iterationConfigurationFactory->create(
             benchmarkCode: $methodBody,
-            defaultWarmup: $this->defaultWarmupIterations,
-            defaultInner: $this->defaultInnerIterations,
         );
-
-        $this->iterationConfiguration = null;
 
         return $this->buildScript($methodBody, $config);
     }

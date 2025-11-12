@@ -113,7 +113,7 @@ final class BenchmarkStatisticsDataTest extends TestCase
 
     public function testFromDomainCreatesDTO(): void
     {
-        // Arrange
+        // Arrange - Use the new factory method
         $percentileMetrics = new PercentileMetrics(
             p50: 1.5,
             p90: 2.5,
@@ -121,20 +121,20 @@ final class BenchmarkStatisticsDataTest extends TestCase
             p99: 4.0,
         );
 
-        $benchmarkStatistics = new BenchmarkStatistics(
+        $benchmarkStatistics = BenchmarkStatistics::create(
             benchmarkId: 'test-benchmark',
             benchmarkName: 'Test Benchmark',
             phpVersion: 'php84',
-            executionCount: 100,
             averageExecutionTime: 1.8,
-            percentiles: $percentileMetrics,
-            averageMemoryUsed: 1024.5,
-            peakMemoryUsed: 2048.0,
             minExecutionTime: 1.0,
             maxExecutionTime: 5.0,
+            executionCount: 100,
+            throughput: 555.56,
+            averageMemoryUsed: 1024.5,
+            peakMemoryUsed: 2048.0,
             standardDeviation: 0.5,
             coefficientOfVariation: 27.78,
-            throughput: 555.56,
+            percentiles: $percentileMetrics,
         );
 
         // Act
@@ -156,7 +156,7 @@ final class BenchmarkStatisticsDataTest extends TestCase
 
     public function testFromDomainPreservesPercentiles(): void
     {
-        // Arrange
+        // Arrange - Use the new factory method
         $percentileMetrics = new PercentileMetrics(
             p50: 10.0,
             p90: 30.0,
@@ -164,20 +164,20 @@ final class BenchmarkStatisticsDataTest extends TestCase
             p99: 50.0,
         );
 
-        $benchmarkStatistics = new BenchmarkStatistics(
+        $benchmarkStatistics = BenchmarkStatistics::create(
             benchmarkId: 'test',
             benchmarkName: 'Test',
             phpVersion: 'php85',
-            executionCount: 50,
             averageExecutionTime: 25.0,
-            percentiles: $percentileMetrics,
-            averageMemoryUsed: 512.0,
-            peakMemoryUsed: 1024.0,
             minExecutionTime: 5.0,
             maxExecutionTime: 60.0,
+            executionCount: 50,
+            throughput: 40.0,
+            averageMemoryUsed: 512.0,
+            peakMemoryUsed: 1024.0,
             standardDeviation: 10.5,
             coefficientOfVariation: 42.0,
-            throughput: 40.0,
+            percentiles: $percentileMetrics,
         );
 
         // Act

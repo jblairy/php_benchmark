@@ -7,6 +7,12 @@ namespace Jblairy\PhpBenchmark\Domain\Dashboard\Service;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\BenchmarkMetrics;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\EnhancedBenchmarkStatistics;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\PercentileMetrics;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Model\ValueObject\BenchmarkIdentity;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Model\ValueObject\ExecutionMetrics;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Model\ValueObject\MemoryMetrics;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Model\ValueObject\OutlierAnalysis;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Model\ValueObject\RawStatistics;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Model\ValueObject\StatisticalMetrics;
 
 /**
  * Enhanced statistics calculator with outlier detection and removal.
@@ -133,28 +139,53 @@ final readonly class EnhancedStatisticsCalculator
         array $rawStats,
         OutlierDetectionResult $outlierDetectionResult,
     ): EnhancedBenchmarkStatistics {
-        return new EnhancedBenchmarkStatistics(
+        // Build parameter objects
+        $identity = new BenchmarkIdentity(
             benchmarkId: $benchmarkMetrics->benchmarkId,
             benchmarkName: $benchmarkMetrics->benchmarkName,
             phpVersion: $benchmarkMetrics->phpVersion,
-            executionCount: count($this->selectDataForAnalysis($outlierDetectionResult, $benchmarkMetrics)),
+        );
+
+        $execution = new ExecutionMetrics(
             averageExecutionTime: $cleanedStats['average'],
-            percentileMetrics: $cleanedStats['percentiles'],
-            averageMemoryUsed: $this->calculateAverage($benchmarkMetrics->memoryUsages),
-            peakMemoryUsed: $this->calculateMax($benchmarkMetrics->memoryPeaks),
             minExecutionTime: $cleanedStats['min'],
             maxExecutionTime: $cleanedStats['max'],
+            executionCount: count($this->selectDataForAnalysis($outlierDetectionResult, $benchmarkMetrics)),
+            throughput: $cleanedStats['throughput'],
+        );
+
+        $memory = new MemoryMetrics(
+            averageMemoryUsed: $this->calculateAverage($benchmarkMetrics->memoryUsages),
+            peakMemoryUsed: $this->calculateMax($benchmarkMetrics->memoryPeaks),
+        );
+
+        $statistics = new StatisticalMetrics(
             standardDeviation: $cleanedStats['stdDev'],
             coefficientOfVariation: $cleanedStats['cv'],
-            throughput: $cleanedStats['throughput'],
+            percentiles: $cleanedStats['percentiles'],
+        );
+
+        $outlierAnalysis = new OutlierAnalysis(
             outlierCount: $outlierDetectionResult->outlierCount,
             outlierPercentage: $outlierDetectionResult->getOutlierPercentage(),
             outliers: $outlierDetectionResult->outliers,
+            stabilityScore: $this->calculateStabilityScore($cleanedStats['cv'], $outlierDetectionResult),
+        );
+
+        $rawStatistics = new RawStatistics(
             rawExecutionCount: $benchmarkMetrics->getExecutionCount(),
             rawAverage: $rawStats['average'],
             rawStdDev: $rawStats['stdDev'],
             rawCV: $rawStats['cv'],
-            stabilityScore: $this->calculateStabilityScore($cleanedStats['cv'], $outlierDetectionResult),
+        );
+
+        return new EnhancedBenchmarkStatistics(
+            identity: $identity,
+            execution: $execution,
+            memory: $memory,
+            statistics: $statistics,
+            outlierAnalysis: $outlierAnalysis,
+            rawStatistics: $rawStatistics,
         );
     }
 
@@ -282,29 +313,10 @@ final readonly class EnhancedStatisticsCalculator
 
     private function createEmptyStatistics(BenchmarkMetrics $benchmarkMetrics): EnhancedBenchmarkStatistics
     {
-        return new EnhancedBenchmarkStatistics(
+        return EnhancedBenchmarkStatistics::empty(
             benchmarkId: $benchmarkMetrics->benchmarkId,
             benchmarkName: $benchmarkMetrics->benchmarkName,
             phpVersion: $benchmarkMetrics->phpVersion,
-            executionCount: 0,
-            averageExecutionTime: 0.0,
-            percentileMetrics: new PercentileMetrics(0.0, 0.0, 0.0, 0.0),
-            averageMemoryUsed: 0.0,
-            peakMemoryUsed: 0.0,
-            minExecutionTime: 0.0,
-            maxExecutionTime: 0.0,
-            standardDeviation: 0.0,
-            coefficientOfVariation: 0.0,
-            throughput: 0.0,
-            // Enhanced metrics
-            outlierCount: 0,
-            outlierPercentage: 0.0,
-            outliers: [],
-            rawExecutionCount: 0,
-            rawAverage: 0.0,
-            rawStdDev: 0.0,
-            rawCV: 0.0,
-            stabilityScore: 0.0,
         );
     }
 }

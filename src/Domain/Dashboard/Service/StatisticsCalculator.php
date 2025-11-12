@@ -7,6 +7,10 @@ namespace Jblairy\PhpBenchmark\Domain\Dashboard\Service;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\BenchmarkMetrics;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\BenchmarkStatistics;
 use Jblairy\PhpBenchmark\Domain\Dashboard\Model\PercentileMetrics;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Model\ValueObject\BenchmarkIdentity;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Model\ValueObject\ExecutionMetrics;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Model\ValueObject\MemoryMetrics;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Model\ValueObject\StatisticalMetrics;
 
 /**
  * Domain Service for calculating benchmark statistics.
@@ -44,20 +48,37 @@ final readonly class StatisticsCalculator
         $coefficientOfVariation = $this->calculateCoefficientOfVariation($standardDeviation, $average);
         $throughput = $this->calculateThroughput($average);
 
-        return new BenchmarkStatistics(
+        // Build parameter objects
+        $identity = new BenchmarkIdentity(
             benchmarkId: $benchmarkMetrics->benchmarkId,
             benchmarkName: $benchmarkMetrics->benchmarkName,
             phpVersion: $benchmarkMetrics->phpVersion,
-            executionCount: $benchmarkMetrics->getExecutionCount(),
+        );
+
+        $execution = new ExecutionMetrics(
             averageExecutionTime: $average,
-            percentiles: $percentileMetrics,
-            averageMemoryUsed: $this->calculateAverage($benchmarkMetrics->memoryUsages),
-            peakMemoryUsed: $this->calculateMax($benchmarkMetrics->memoryPeaks),
             minExecutionTime: $this->calculateMin($benchmarkMetrics->executionTimes),
             maxExecutionTime: $this->calculateMax($benchmarkMetrics->executionTimes),
+            executionCount: $benchmarkMetrics->getExecutionCount(),
+            throughput: $throughput,
+        );
+
+        $memory = new MemoryMetrics(
+            averageMemoryUsed: $this->calculateAverage($benchmarkMetrics->memoryUsages),
+            peakMemoryUsed: $this->calculateMax($benchmarkMetrics->memoryPeaks),
+        );
+
+        $statistics = new StatisticalMetrics(
             standardDeviation: $standardDeviation,
             coefficientOfVariation: $coefficientOfVariation,
-            throughput: $throughput,
+            percentiles: $percentileMetrics,
+        );
+
+        return new BenchmarkStatistics(
+            identity: $identity,
+            execution: $execution,
+            memory: $memory,
+            statistics: $statistics,
         );
     }
 
@@ -167,20 +188,10 @@ final readonly class StatisticsCalculator
 
     private function createEmptyStatistics(BenchmarkMetrics $benchmarkMetrics): BenchmarkStatistics
     {
-        return new BenchmarkStatistics(
+        return BenchmarkStatistics::empty(
             benchmarkId: $benchmarkMetrics->benchmarkId,
             benchmarkName: $benchmarkMetrics->benchmarkName,
             phpVersion: $benchmarkMetrics->phpVersion,
-            executionCount: 0,
-            averageExecutionTime: 0.0,
-            percentiles: new PercentileMetrics(0.0, 0.0, 0.0, 0.0),
-            averageMemoryUsed: 0.0,
-            peakMemoryUsed: 0.0,
-            minExecutionTime: 0.0,
-            maxExecutionTime: 0.0,
-            standardDeviation: 0.0,
-            coefficientOfVariation: 0.0,
-            throughput: 0.0,
         );
     }
 }

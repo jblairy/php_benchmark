@@ -7,11 +7,11 @@ namespace Jblairy\PhpBenchmark\Domain\Benchmark\Service;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkConfiguration;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkResult;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\ExecutionContext;
-use Jblairy\PhpBenchmark\Domain\Benchmark\Model\IterationConfiguration;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkExecutorPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\CodeExtractorPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptBuilderPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptExecutorPort;
+use Jblairy\PhpBenchmark\Infrastructure\Benchmark\Factory\IterationConfigurationFactory;
 
 /**
  * Enhanced benchmark executor that uses per-benchmark iteration configuration.
@@ -22,6 +22,7 @@ final readonly class ConfigurableSingleBenchmarkExecutor implements BenchmarkExe
         private CodeExtractorPort $codeExtractorPort,
         private ScriptBuilderPort $scriptBuilderPort,
         private ScriptExecutorPort $scriptExecutorPort,
+        private IterationConfigurationFactory $iterationConfigurationFactory,
     ) {
     }
 
@@ -56,10 +57,9 @@ final readonly class ConfigurableSingleBenchmarkExecutor implements BenchmarkExe
         ?int $innerIterations,
     ): string {
         if (null !== $warmupIterations && null !== $innerIterations) {
-            $iterationConfig = IterationConfiguration::createWithDefaults(
+            $iterationConfig = $this->iterationConfigurationFactory->createFromExplicitValues(
                 warmupIterations: $warmupIterations,
                 innerIterations: $innerIterations,
-                benchmarkCode: $code,
             );
 
             return $this->scriptBuilderPort->buildWithIterationConfig($code, $iterationConfig);

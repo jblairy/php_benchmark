@@ -4,52 +4,85 @@ declare(strict_types=1);
 
 namespace Jblairy\PhpBenchmark\Domain\Dashboard\Model;
 
+use Jblairy\PhpBenchmark\Domain\Dashboard\Model\ValueObject\BenchmarkIdentity;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Model\ValueObject\ExecutionMetrics;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Model\ValueObject\MemoryMetrics;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Model\ValueObject\OutlierAnalysis;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Model\ValueObject\RawStatistics;
+use Jblairy\PhpBenchmark\Domain\Dashboard\Model\ValueObject\StatisticalMetrics;
+
 /**
  * Enhanced benchmark statistics with outlier detection metrics.
+ *
+ * Refactored to use Parameter Object pattern to reduce constructor complexity.
+ * Previously had 21 constructor parameters, now has 6 cohesive parameter objects.
  */
 final readonly class EnhancedBenchmarkStatistics extends BenchmarkStatistics
 {
+    public function __construct(
+        BenchmarkIdentity $identity,
+        ExecutionMetrics $execution,
+        MemoryMetrics $memory,
+        StatisticalMetrics $statistics,
+        public OutlierAnalysis $outlierAnalysis,
+        public RawStatistics $rawStatistics,
+    ) {
+        parent::__construct($identity, $execution, $memory, $statistics);
+    }
+
     /**
+     * Factory method for creating enhanced statistics with individual parameters.
+     * Useful for backward compatibility and simpler construction.
+     *
+     * Note: Named differently from parent's create() to avoid signature conflicts.
+     *
      * @param array<int, float> $outliers
      */
-    public function __construct(
+    public static function createEnhanced(
         string $benchmarkId,
         string $benchmarkName,
         string $phpVersion,
-        int $executionCount,
         float $averageExecutionTime,
-        PercentileMetrics $percentileMetrics,
-        float $averageMemoryUsed,
-        float $peakMemoryUsed,
         float $minExecutionTime,
         float $maxExecutionTime,
+        int $executionCount,
+        float $throughput,
+        float $averageMemoryUsed,
+        float $peakMemoryUsed,
         float $standardDeviation,
         float $coefficientOfVariation,
-        float $throughput,
-        // Enhanced metrics
-        public int $outlierCount,
-        public float $outlierPercentage,
-        public array $outliers,
-        public int $rawExecutionCount,
-        public float $rawAverage,
-        public float $rawStdDev,
-        public float $rawCV,
-        public float $stabilityScore,
-    ) {
-        parent::__construct(
-            benchmarkId: $benchmarkId,
-            benchmarkName: $benchmarkName,
-            phpVersion: $phpVersion,
-            executionCount: $executionCount,
-            averageExecutionTime: $averageExecutionTime,
-            percentiles: $percentileMetrics, // This matches parent's parameter name
-            averageMemoryUsed: $averageMemoryUsed,
-            peakMemoryUsed: $peakMemoryUsed,
-            minExecutionTime: $minExecutionTime,
-            maxExecutionTime: $maxExecutionTime,
-            standardDeviation: $standardDeviation,
-            coefficientOfVariation: $coefficientOfVariation,
-            throughput: $throughput,
+        PercentileMetrics $percentiles,
+        int $outlierCount,
+        float $outlierPercentage,
+        array $outliers,
+        float $stabilityScore,
+        int $rawExecutionCount,
+        float $rawAverage,
+        float $rawStdDev,
+        float $rawCV,
+    ): self {
+        return new self(
+            identity: new BenchmarkIdentity($benchmarkId, $benchmarkName, $phpVersion),
+            execution: new ExecutionMetrics($averageExecutionTime, $minExecutionTime, $maxExecutionTime, $executionCount, $throughput),
+            memory: new MemoryMetrics($averageMemoryUsed, $peakMemoryUsed),
+            statistics: new StatisticalMetrics($standardDeviation, $coefficientOfVariation, $percentiles),
+            outlierAnalysis: new OutlierAnalysis($outlierCount, $outlierPercentage, $outliers, $stabilityScore),
+            rawStatistics: new RawStatistics($rawExecutionCount, $rawAverage, $rawStdDev, $rawCV),
+        );
+    }
+
+    /**
+     * Create empty enhanced statistics for a benchmark with no data.
+     */
+    public static function empty(string $benchmarkId, string $benchmarkName, string $phpVersion): self
+    {
+        return new self(
+            identity: new BenchmarkIdentity($benchmarkId, $benchmarkName, $phpVersion),
+            execution: ExecutionMetrics::empty(),
+            memory: MemoryMetrics::empty(),
+            statistics: StatisticalMetrics::empty(),
+            outlierAnalysis: OutlierAnalysis::empty(),
+            rawStatistics: RawStatistics::empty(),
         );
     }
 
@@ -58,11 +91,7 @@ final readonly class EnhancedBenchmarkStatistics extends BenchmarkStatistics
      */
     public function getCVImprovement(): float
     {
-        if (0.0 === $this->rawCV) {
-            return 0.0;
-        }
-
-        return (($this->rawCV - $this->coefficientOfVariation) / $this->rawCV) * 100.0;
+        return $this->rawStatistics->calculateCVImprovement($this->statistics->coefficientOfVariation);
     }
 
     /**
@@ -70,7 +99,7 @@ final readonly class EnhancedBenchmarkStatistics extends BenchmarkStatistics
      */
     public function isStable(float $maxCV = 10.0): bool
     {
-        return $this->coefficientOfVariation <= $maxCV;
+        return $this->statistics->coefficientOfVariation <= $maxCV;
     }
 
     /**
@@ -78,13 +107,7 @@ final readonly class EnhancedBenchmarkStatistics extends BenchmarkStatistics
      */
     public function getStabilityRating(): string
     {
-        return match (true) {
-            90 <= $this->stabilityScore => 'Excellent',
-            75 <= $this->stabilityScore => 'Good',
-            60 <= $this->stabilityScore => 'Fair',
-            40 <= $this->stabilityScore => 'Poor',
-            default => 'Very Poor',
-        };
+        return $this->outlierAnalysis->getStabilityRating();
     }
 
     /**
@@ -92,14 +115,14 @@ final readonly class EnhancedBenchmarkStatistics extends BenchmarkStatistics
      */
     public function getOutlierSummary(): string
     {
-        if (0 === $this->outlierCount) {
+        if (0 === $this->outlierAnalysis->outlierCount) {
             return 'No outliers detected';
         }
 
         return sprintf(
             '%d outliers (%.1f%%) removed, CV improved by %.1f%%',
-            $this->outlierCount,
-            $this->outlierPercentage,
+            $this->outlierAnalysis->outlierCount,
+            $this->outlierAnalysis->outlierPercentage,
             $this->getCVImprovement(),
         );
     }

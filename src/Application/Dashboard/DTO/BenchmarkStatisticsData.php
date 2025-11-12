@@ -83,38 +83,39 @@ final class BenchmarkStatisticsData
 
     public static function fromDomain(BenchmarkStatistics $benchmarkStatistics): self
     {
+        // Access nested properties from parameter objects
         $basicMetrics = new BasicMetrics(
-            avg: $benchmarkStatistics->averageExecutionTime,
-            min: $benchmarkStatistics->minExecutionTime,
-            max: $benchmarkStatistics->maxExecutionTime,
-            stdDev: $benchmarkStatistics->standardDeviation,
-            coefficientOfVariation: $benchmarkStatistics->coefficientOfVariation,
-            throughput: $benchmarkStatistics->throughput,
+            avg: $benchmarkStatistics->execution->averageExecutionTime,
+            min: $benchmarkStatistics->execution->minExecutionTime,
+            max: $benchmarkStatistics->execution->maxExecutionTime,
+            stdDev: $benchmarkStatistics->statistics->standardDeviation,
+            coefficientOfVariation: $benchmarkStatistics->statistics->coefficientOfVariation,
+            throughput: $benchmarkStatistics->execution->throughput,
         );
 
         $memoryMetrics = new MemoryMetrics(
-            memoryUsed: $benchmarkStatistics->averageMemoryUsed,
-            memoryPeak: $benchmarkStatistics->peakMemoryUsed,
+            memoryUsed: $benchmarkStatistics->memory->averageMemoryUsed,
+            memoryPeak: $benchmarkStatistics->memory->peakMemoryUsed,
         );
 
         $outlierMetrics = null;
         if ($benchmarkStatistics instanceof EnhancedBenchmarkStatistics) {
             $outlierMetrics = new OutlierMetrics(
-                outlierCount: $benchmarkStatistics->outlierCount,
-                outlierPercentage: $benchmarkStatistics->outlierPercentage,
-                rawCV: $benchmarkStatistics->rawCV,
-                stabilityScore: $benchmarkStatistics->stabilityScore,
+                outlierCount: $benchmarkStatistics->outlierAnalysis->outlierCount,
+                outlierPercentage: $benchmarkStatistics->outlierAnalysis->outlierPercentage,
+                rawCV: $benchmarkStatistics->rawStatistics->rawCV,
+                stabilityScore: $benchmarkStatistics->outlierAnalysis->stabilityScore,
                 stabilityRating: $benchmarkStatistics->getStabilityRating(),
             );
         }
 
         return new self(
-            benchmarkId: $benchmarkStatistics->benchmarkId,
-            benchmarkName: $benchmarkStatistics->benchmarkName,
-            phpVersion: $benchmarkStatistics->phpVersion,
-            count: $benchmarkStatistics->executionCount,
+            benchmarkId: $benchmarkStatistics->identity->benchmarkId,
+            benchmarkName: $benchmarkStatistics->identity->benchmarkName,
+            phpVersion: $benchmarkStatistics->identity->phpVersion,
+            count: $benchmarkStatistics->execution->executionCount,
             basicMetrics: $basicMetrics,
-            percentiles: $benchmarkStatistics->percentiles,
+            percentiles: $benchmarkStatistics->statistics->percentiles,
             memoryMetrics: $memoryMetrics,
             outlierMetrics: $outlierMetrics,
         );

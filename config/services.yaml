@@ -50,6 +50,10 @@ services:
     Jblairy\PhpBenchmark\Domain\Dashboard\Port\PulseRepositoryPort:
         class: Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Repository\PulseRepository
 
+    # Iteration Configuration Factory
+    # Centralizes IterationConfiguration creation with environment variable injection
+    Jblairy\PhpBenchmark\Infrastructure\Benchmark\Factory\IterationConfigurationFactory: ~
+
     # Benchmark Execution (Port -> Adapter)
     # Phase 3: Multi-sample execution wraps ConfigurableSingleBenchmarkExecutor
     # Executes each benchmark N times and aggregates results for CV% < 2%
@@ -62,9 +66,8 @@ services:
             $numberOfSamples: '%benchmark.samples%'
 
     # Script Builder (Port -> Adapter)
-    # Uses #[Autowire] attributes for environment variable injection
-    # See: https://symfony.com/doc/7.3/service_container/autowiring
     # ConfigurableScriptBuilder supports per-benchmark iteration configuration
+    # Uses IterationConfigurationFactory for dependency injection
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptBuilderPort:
         class: Jblairy\PhpBenchmark\Infrastructure\Execution\ScriptBuilding\ConfigurableScriptBuilder
 
