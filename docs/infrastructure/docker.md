@@ -22,7 +22,7 @@ The PHP Benchmark project uses a multi-container Docker architecture to:
 - **Ensure fair testing**: Resource limits (CPU, memory) prevent version-specific bias
 - **Manage dependencies**: The main container orchestrates benchmark execution across all PHP containers
 - **Persist results**: MariaDB stores benchmark results for the web dashboard
-- **Enable real-time updates**: Mercure broadcasts benchmark progress to the web interface
+- **Process asynchronously**: Symfony Messenger handles benchmark execution via Redis queue
 
 ## Architecture Diagram
 
@@ -33,11 +33,11 @@ The PHP Benchmark project uses a multi-container Docker architecture to:
 │  │                    Docker Network                           │ │
 │  │                                                              │ │
 │  │  ┌──────────────┐         ┌─────────────┐  ┌────────────┐ │ │
-│  │  │   main       │────────▶│  mariadb    │  │  mercure   │ │ │
-│  │  │  (PHP 8.4)   │         │ (MariaDB    │  │  (SSE Hub) │ │ │
-│  │  │              │         │  10.11)     │  │ Port 3000  │ │ │
+│  │  │   main       │────────▶│  mariadb    │  │   redis    │ │ │
+│  │  │  (PHP 8.4)   │         │ (MariaDB    │  │  (Cache &  │ │ │
+│  │  │              │         │  10.11)     │  │   Queue)   │ │ │
 │  │  │ - Web server │         │             │  │            │ │ │
-│  │  │ - CLI        │         └─────────────┘  └──────▲─────┘ │ │
+│  │  │ - CLI        │         └─────────────┘  └────────────┘ │ │
 │  │  │ - Orchestrator│              │                  │       │ │
 │  │  └──────┬───────┘              │                  │       │ │
 │  │         │                       │          Publishes       │ │
@@ -384,64 +384,6 @@ docker-compose build php85
 
 ---
 
-## Real-Time Updates
-
-### Mercure Service
-
-**Purpose**: Real-time Server-Sent Events (SSE) hub for broadcasting benchmark progress
-
-**Image**: Official `dunglas/mercure`
-
-**Exposed ports**: `3000:80` (HTTP, HTTPS disabled for development)
-
-**Environment variables**:
-- `SERVER_NAME: ':80'` - HTTP mode (no HTTPS)
-- `MERCURE_PUBLISHER_JWT_KEY` - Authentication for publishing updates
-- `MERCURE_SUBSCRIBER_JWT_KEY` - Authentication for subscribers
-- `MERCURE_EXTRA_DIRECTIVES` - CORS and anonymous access configuration
-
-**Volumes**:
-- `mercure_data:/data` - Persistent data
-- `mercure_config:/config` - Configuration files
-
-**How it works**:
-
-1. **Backend publishes**: When benchmarks run, Symfony publishes progress events to Mercure
-   ```php
-   $hub->publish(new Update('benchmark/progress', json_encode($data)));
-   ```
-
-2. **Mercure broadcasts**: Mercure receives updates and broadcasts them to all subscribers
-
-3. **Frontend subscribes**: Browser connects via EventSource (SSE)
-   ```javascript
-   const eventSource = new EventSource('http://localhost:3000/.well-known/mercure?topic=benchmark/progress');
-   ```
-
-4. **Live updates**: Frontend receives real-time updates and updates UI automatically
-
-**Configuration**: See [mercure-realtime.md](mercure-realtime.md) for detailed setup
-
-**Topics**:
-- `benchmark/progress` - All progress updates (start, progress, complete)
-- `benchmark/results` - Final results only
-
-**Testing Mercure**:
-
-```bash
-# Subscribe to updates (terminal 1)
-curl -N "http://localhost:3000/.well-known/mercure?topic=benchmark/progress"
-
-# Run benchmark (terminal 2)
-make run test=Loop iterations=5
-
-# Terminal 1 will show real-time SSE events
-```
-
-**Security note**: Current configuration uses `anonymous` mode for development. For production, implement proper JWT authentication. See [mercure-realtime.md#security](mercure-realtime.md#security).
-
----
-
 ## Best Practices
 
 ### Development
@@ -558,9 +500,8 @@ docker-compose exec main mysql -h mariadb -u root -ppassword php_benchmark
 - [Docker Compose Documentation](https://docs.docker.com/compose/)
 - [PHP Official Docker Images](https://hub.docker.com/_/php)
 - [MariaDB Docker Image](https://hub.docker.com/_/mariadb)
-- [Mercure Docker Image](https://hub.docker.com/r/dunglas/mercure)
+- [Redis Docker Image](https://hub.docker.com/_/redis)
 - [DockerScriptExecutor Implementation](../../src/Infrastructure/Execution/Docker/DockerScriptExecutor.php)
-- [Real-Time Updates Guide](mercure-realtime.md)
 
 ---
 

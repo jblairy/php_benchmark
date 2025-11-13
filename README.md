@@ -40,9 +40,9 @@
     <td width="50%">
       <h3>⚡ High Performance</h3>
       <ul>
-        <li><strong>Parallel Execution</strong> using Spatie\Async (100 concurrent tasks)</li>
+        <li><strong>Asynchronous Processing</strong> with Symfony Messenger and Redis queue</li>
         <li><strong>Docker Isolation</strong> each version in isolated containers</li>
-        <li><strong>Real-Time Updates</strong> via Mercure (Server-Sent Events)</li>
+        <li><strong>Event-Driven Architecture</strong> for extensibility</li>
       </ul>
     </td>
     <td width="50%">
@@ -156,21 +156,6 @@ make trans.update      # Extract new keys from templates + compile
 ```
 </details>
 
-<details>
-<summary><strong>Mercure Real-Time Testing</strong></summary>
-
-```bash
-# Verify Mercure setup
-./scripts/mercure-verify.sh
-
-# Watch real-time events
-./scripts/mercure-listen.sh
-
-# End-to-end test (5 iterations, Loop benchmark, PHP 8.4)
-./scripts/mercure-test.sh 5 Loop php84
-```
-</details>
-
 ### 📊 View Results
 
 Access the web dashboard to explore benchmark results:
@@ -208,10 +193,9 @@ src/
 │   └── Dashboard/             # Dashboard data aggregation
 │
 └── Infrastructure/            # 🔧 Technical Implementation
-    ├── Async/                 # Async execution (Spatie\Async)
+    ├── Async/                 # Event dispatcher and message bus adapters
     ├── Cli/                   # Symfony Console commands
     ├── Execution/             # Docker script execution
-    ├── Mercure/               # Real-time SSE events
     ├── Persistence/           # Doctrine entities, repositories, fixtures
     └── Web/                   # Symfony controllers, components, Twig
 ```
@@ -369,10 +353,6 @@ make db.refresh # Reset database + reload all benchmarks
       <strong>MariaDB</strong>
     </td>
     <td align="center">
-      <img src="https://mercure.rocks/static/logo-blue.svg" width="48" height="48" alt="Mercure"/><br/>
-      <strong>Mercure</strong>
-    </td>
-    <td align="center">
       <img src="https://www.chartjs.org/media/logo-title.svg" width="48" height="48" alt="Chart.js"/><br/>
       <strong>Chart.js</strong>
     </td>
@@ -418,8 +398,7 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
 Special thanks to the maintainers of:
 - [Symfony](https://symfony.com/) - The PHP framework
 - [Doctrine](https://www.doctrine-project.org/) - Database ORM
-- [Spatie Async](https://github.com/spatie/async) - Parallel execution
-- [Mercure](https://mercure.rocks/) - Real-time updates
+- [Symfony Messenger](https://symfony.com/doc/current/messenger.html) - Asynchronous processing
 - [PHPStan](https://phpstan.org/) - Static analysis
 
 ## 📞 Support & Community

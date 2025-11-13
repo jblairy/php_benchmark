@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus';
 
 /**
  * Real-time benchmark card controller
- * Updates individual cells when new data arrives via Mercure
+ * Updates individual cells when new data arrives
  * NO page reload, NO DOM replacement - just smooth value updates
  */
 export default class extends Controller {
@@ -16,7 +16,7 @@ export default class extends Controller {
         // Bind the event handler to this instance so we can remove it later
         this.boundHandleEvent = this.handleEvent.bind(this);
 
-        // Listen for Mercure updates on document (bubbles up)
+        // Listen for updates on document (bubbles up)
         document.addEventListener('benchmark:dataUpdated', this.boundHandleEvent);
     }
 
@@ -39,6 +39,14 @@ export default class extends Controller {
             return;
         }
 
+        // Check if table exists (card might still be in loading state)
+        const table = this.element.querySelector('table.benchmark-card__table');
+        if (!table) {
+            console.warn(`⚠️  Table not found for ${this.benchmarkIdValue} - card might still be loading`);
+            return;
+        }
+
+        console.log(`🔄 Updating ${this.benchmarkIdValue} with stats for ${Object.keys(data.phpVersions || {}).length} PHP versions`);
 
         // Update each PHP version's data
         Object.entries(data.phpVersions || {}).forEach(([phpVersion, stats]) => {
@@ -52,30 +60,45 @@ export default class extends Controller {
     updatePhpVersionStats(phpVersion, stats) {
 
         // Find the column for this PHP version
-        const headers = this.element.querySelectorAll('th.table__cell--metric');
+        // Look for headers that are NOT the metric column (first column)
+        const headers = this.element.querySelectorAll('thead th.benchmark-card__table-cell:not(.benchmark-card__table-cell--metric)');
 
         let columnIndex = -1;
+        
+        // Extract just the version number (e.g., "php82" -> "82")
+        const versionNumber = phpVersion.replace('php', '');
 
         headers.forEach((header, index) => {
             const text = header.textContent.trim();
-            if (text.includes(phpVersion.replace('php', ''))) {
+            // Match "PHP 82" with "82" or "PHP 8.2" with "82"
+            // Support both "PHP 82" and "PHP 8.2" formats
+            const normalizedText = text.replace(/\s+/g, '').toLowerCase();
+            const phpPrefix = 'php' + versionNumber;
+            
+            if (normalizedText === phpPrefix || text.includes(versionNumber)) {
                 columnIndex = index;
             }
         });
 
         if (columnIndex === -1) {
-            console.warn(`     ❌ Column not found for ${phpVersion}`);
+            // This is normal - the card may not have data for all PHP versions
+            // Just silently skip this version
             return;
         }
 
 
-        // Update each metric
+        // Update each metric that exists in the template
         this.updateCellValue('p50', columnIndex, stats.p50);
-        this.updateCellValue('p80', columnIndex, stats.p80);
+        this.updateCellValue('min', columnIndex, stats.min);
+        this.updateCellValue('max', columnIndex, stats.max);
         this.updateCellValue('p90', columnIndex, stats.p90);
         this.updateCellValue('p95', columnIndex, stats.p95);
         this.updateCellValue('p99', columnIndex, stats.p99);
-        this.updateCellValue('avg', columnIndex, stats.avg);
+        this.updateCellValue('throughput', columnIndex, stats.throughput, false); // no decimal
+        this.updateCellValue('stdDev', columnIndex, stats.stdDev);
+        this.updateCellValue('cv', columnIndex, stats.cv);
+        this.updateCellValue('memoryUsed', columnIndex, stats.memoryUsed);
+        this.updateCellValue('memoryPeak', columnIndex, stats.memoryPeak);
         this.updateCellValue('count', columnIndex, stats.count, false); // no decimal
     }
 
@@ -92,7 +115,8 @@ export default class extends Controller {
                 const metric = metricCell.dataset.metric;
 
                 if (metric === metricName) {
-                    const cells = row.querySelectorAll('td.table__cell:not(.table__cell--metric)');
+                    // Select cells that are NOT the metric column (first column)
+                    const cells = row.querySelectorAll('td.benchmark-card__table-cell:not(.benchmark-card__table-cell--metric)');
                     targetCell = cells[columnIndex];
                 }
             }

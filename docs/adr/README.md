@@ -19,6 +19,6 @@ Each ADR follows this structure:
 
 - [ADR-001](001-hexagonal-architecture.md) - Hexagonal Architecture (Ports & Adapters)
 - [ADR-002](002-symfony-validator-for-fixtures.md) - Use Symfony Validator for YAML Fixtures
-- [ADR-003](003-mercure-for-realtime.md) - Use Mercure for Real-Time Updates
 - [ADR-004](004-docker-for-benchmark-isolation.md) - Use Docker for Benchmark Execution Isolation
 - [ADR-005](005-phpstan-level-max.md) - Enforce PHPStan Level Max
+- [ADR-006](006-async-executor-and-event-dispatcher-ports.md) - Async Executor and Event Dispatcher Ports

@@ -65,15 +65,6 @@ docker-compose run --rm main php bin/console doctrine:migrations:migrate --no-in
 docker-compose run --rm main php bin/console doctrine:fixtures:load --no-interaction
 ```
 
-### Mercure Real-Time (Debugging & Testing)
-```bash
-./scripts/mercure-verify.sh              # Verify Mercure configuration
-./scripts/mercure-listen.sh              # Listen to real-time events (pretty format)
-./scripts/mercure-listen.sh "" json      # Listen with JSON output
-./scripts/mercure-listen.sh "" stats     # Show event statistics
-./scripts/mercure-test.sh 5 Loop php84   # End-to-end test (5 iterations)
-```
-
 ### Running Benchmarks
 ```bash
 # Run all benchmarks across all PHP versions

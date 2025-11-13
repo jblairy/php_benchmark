@@ -83,9 +83,6 @@ services:
     Jblairy\PhpBenchmark\Domain\Benchmark\Port\ScriptBuilderPort:
         class: Jblairy\PhpBenchmark\Infrastructure\Execution\ScriptBuilding\ConfigurableScriptBuilder
 
-    # Event Dispatcher (Port -> Adapter)
-    Jblairy\PhpBenchmark\Domain\Benchmark\Port\EventDispatcherPort:
-        class: Jblairy\PhpBenchmark\Infrastructure\Async\SymfonyEventDispatcherAdapter
 
     # Logger (Port -> Adapter)
     # Bridges Domain LoggerPort to PSR-3 LoggerInterface
@@ -121,10 +118,6 @@ services:
         arguments:
             $outlierDetector: '@Jblairy\PhpBenchmark\Domain\Dashboard\Service\OutlierDetector'
             $outlierHandlingStrategy: '@Jblairy\PhpBenchmark\Domain\Dashboard\Service\OutlierHandlingStrategy'
-    
-    # Legacy calculator kept for backward compatibility
-    Jblairy\PhpBenchmark\Domain\Dashboard\Service\StatisticsCalculator:
-        lazy: true
 
     # Fixtures configuration
     Jblairy\PhpBenchmark\Infrastructure\Persistence\Doctrine\Fixtures\YamlBenchmarkFixtures:

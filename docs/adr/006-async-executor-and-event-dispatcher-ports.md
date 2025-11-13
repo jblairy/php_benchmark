@@ -4,7 +4,7 @@ Date: 2025-11-04 (Updated: 2025-11-11)
 
 ## Status
 
-Superseded by Symfony Messenger implementation
+Accepted - Symfony Messenger fully implemented (Spatie\Async removed)
 
 ## Context
 

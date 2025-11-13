@@ -8,7 +8,6 @@ use Jblairy\PhpBenchmark\Domain\Benchmark\Port\BenchmarkRepositoryPort;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -16,8 +15,6 @@ final class DashboardController extends AbstractController
 {
     public function __construct(
         private readonly BenchmarkRepositoryPort $benchmarkRepositoryPort,
-        #[Autowire(env: 'MERCURE_PUBLIC_URL')]
-        private readonly string $mercurePublicUrl,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -39,7 +36,6 @@ final class DashboardController extends AbstractController
         }
 
         $response = $this->render('dashboard/index.html.twig', [
-            'mercure_public_url' => $this->mercurePublicUrl,
             'stats' => $stats,
             'top_categories' => $topCategories,
         ]);

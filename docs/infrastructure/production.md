@@ -9,7 +9,6 @@ This production infrastructure uses:
 - **4 Messenger workers** for parallel benchmark processing
 - **Supervisord** to automatically manage all processes
 - **MariaDB** for persistence
-- **Mercure** for real-time updates
 
 ## Expected Performance
 
@@ -291,11 +290,10 @@ docker-compose -f docker-compose.prod.yml exec frankenphp php bin/console doctri
 ⚠️ **IMPORTANT**: Before deploying to production:
 
 1. Change `APP_SECRET` in `.env.prod`
-2. Change `MERCURE_JWT_SECRET`
-3. Change MariaDB passwords
-4. Enable HTTPS (FrankenPHP supports Let's Encrypt automatically)
-5. Restrict Redis access (password)
-6. Configure a firewall
+2. Change MariaDB passwords
+3. Enable HTTPS (FrankenPHP supports Let's Encrypt automatically)
+4. Restrict Redis access (password)
+5. Configure a firewall
 
 ## Support
 

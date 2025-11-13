@@ -189,10 +189,6 @@ src/Infrastructure/
 │   └── ScriptBuilding/
 │       └── InstrumentedScriptBuilder.php
 │
-├── Mercure/                   # Real-time events
-│   └── EventSubscriber/
-│       └── BenchmarkProgressSubscriber.php
-│
 ├── Persistence/               # Data persistence
 │   ├── Doctrine/
 │   │   ├── Entity/

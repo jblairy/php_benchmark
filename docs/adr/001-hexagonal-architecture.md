@@ -14,7 +14,7 @@ PHP Benchmark is a web application for comparing PHP performance across methods 
 - Load fixtures from YAML files
 - Present data through a web interface
 
-Without a clear architectural structure, business logic would become entangled with framework code (Symfony), database access (Doctrine), and external services (Docker, Mercure). This makes testing difficult, reduces maintainability, and creates tight coupling to specific technologies.
+Without a clear architectural structure, business logic would become entangled with framework code (Symfony), database access (Doctrine), and external services (Docker, Redis). This makes testing difficult, reduces maintainability, and creates tight coupling to specific technologies.
 
 ## Decision
 
@@ -35,7 +35,7 @@ We adopt **Hexagonal Architecture** (also known as Ports & Adapters) with three 
 ### 3. Infrastructure Layer (`src/Infrastructure/`)
 - Implements **Adapters** for Domain Ports
 - Contains framework-specific code (Symfony controllers, Doctrine entities, CLI commands)
-- Handles external integrations (Docker, Mercure, filesystem)
+- Handles external integrations (Docker, Redis, filesystem)
 - Example: `DoctrineBenchmarkRepository` implements `BenchmarkRepositoryPort`
 
 ### Dependency Rule

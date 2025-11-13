@@ -30,8 +30,6 @@ final readonly class MessengerBenchmarkRunner
         $totalIterations = $benchmarkConfiguration->iterations;
         $executionId = uniqid('exec_', true);
 
-        // Start event will be dispatched by the first message handler
-
         // Dispatch each iteration as a separate message
         for ($i = 1; $i <= $totalIterations; ++$i) {
             $message = new ExecuteBenchmarkMessage(
@@ -46,7 +44,5 @@ final readonly class MessengerBenchmarkRunner
 
             $this->messageBus->dispatch($message);
         }
-
-        // Completion event will be dispatched by the last message handler
     }
 }

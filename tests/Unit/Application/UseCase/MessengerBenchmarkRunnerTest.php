@@ -7,10 +7,7 @@ namespace Jblairy\PhpBenchmark\Tests\Unit\Application\UseCase;
 use Jblairy\PhpBenchmark\Application\Message\ExecuteBenchmarkMessage;
 use Jblairy\PhpBenchmark\Application\UseCase\MessengerBenchmarkRunner;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Contract\Benchmark;
-use Jblairy\PhpBenchmark\Domain\Benchmark\Event\BenchmarkCompleted;
-use Jblairy\PhpBenchmark\Domain\Benchmark\Event\BenchmarkStarted;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Model\BenchmarkConfiguration;
-use Jblairy\PhpBenchmark\Domain\Benchmark\Port\EventDispatcherPort;
 use Jblairy\PhpBenchmark\Domain\Benchmark\Port\MessageBusPort;
 use Jblairy\PhpBenchmark\Domain\PhpVersion\Enum\PhpVersion;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -22,8 +19,6 @@ final class MessengerBenchmarkRunnerTest extends TestCase
 {
     private MessageBusPort&MockObject $messageBus;
 
-    private EventDispatcherPort&MockObject $eventDispatcher;
-
     private MessengerBenchmarkRunner $messengerBenchmarkRunner;
 
     protected function setUp(): void
@@ -31,7 +26,6 @@ final class MessengerBenchmarkRunnerTest extends TestCase
         parent::setUp();
 
         $this->messageBus = $this->createMock(MessageBusPort::class);
-        $this->eventDispatcher = $this->createMock(EventDispatcherPort::class);
         $this->messengerBenchmarkRunner = new MessengerBenchmarkRunner(
             $this->messageBus,
         );
@@ -75,15 +69,6 @@ final class MessengerBenchmarkRunnerTest extends TestCase
             ->willReturnCallback(function (object $message) use (&$messagesDispatched): void {
                 $messagesDispatched[] = $message;
             });
-
-        // Expect start and completed events
-        $this->eventDispatcher
-            ->expects($this->exactly(2))
-            ->method('dispatch')
-            ->with(self::logicalOr(
-                self::isInstanceOf(BenchmarkStarted::class),
-                self::isInstanceOf(BenchmarkCompleted::class),
-            ));
 
         // When
         $this->messengerBenchmarkRunner->run($benchmarkConfiguration);

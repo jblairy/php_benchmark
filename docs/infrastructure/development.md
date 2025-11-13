@@ -9,7 +9,6 @@ The development stack includes:
 - **Redis** - Message queue and cache backend
 - **Messenger Workers** (2) - Async benchmark execution
 - **MariaDB** - Database
-- **Mercure** - Real-time updates
 - **PHP 5.6-8.5** - Benchmark execution containers
 
 ## Quick Start
@@ -95,11 +94,6 @@ Development-specific settings:
 - **Database:** php_benchmark
 - **User:** php_user / php_password
 - **Root:** root / password
-
-### Mercure
-- **Port:** 3000
-- **URL:** http://localhost:3000/.well-known/mercure
-- **Features:** Real-time updates for benchmark progress
 
 ## Development vs Production
 

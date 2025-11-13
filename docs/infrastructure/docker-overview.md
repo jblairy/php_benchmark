@@ -31,7 +31,7 @@
   - `frankenphp` (with Xdebug)
   - `redis` (message queue, no persistence)
   - `messenger-worker-1`, `messenger-worker-2` (separate containers)
-  - `mariadb`, `mercure`, `php56-php85` (benchmarks)
+  - `mariadb`, `php56-php85` (benchmarks)
 - **Configuration**:
   - Xdebug enabled (port 9003)
   - OPcache validation on (hot reload)
@@ -48,7 +48,7 @@
   - `frankenphp` (production-like, lighter resources)
   - `redis` (no persistence, 512MB)
   - `mariadb` (in-memory tmpfs for speed)
-  - `mercure`, `php56-php85` (benchmarks)
+  - `php56-php85` (benchmarks)
 - **Configuration**:
   - Production Dockerfile (FrankenPHP worker mode)
   - No Xdebug (faster execution)
@@ -65,7 +65,7 @@
 - **Key services**:
   - `frankenphp` (with Supervisord managing 4 workers internally)
   - `redis` (with AOF persistence, 1GB)
-  - `mariadb`, `mercure`, `php56-php85` (benchmarks)
+  - `mariadb`, `php56-php85` (benchmarks)
 - **Configuration**:
   - OPcache preload enabled
   - 4 Messenger workers (managed by Supervisord)
@@ -99,7 +99,6 @@
 ### Common Services (All Modes)
 - **frankenphp**: Web server + PHP application
 - **mariadb**: Database (MariaDB 10.11)
-- **mercure**: Real-time updates (Server-Sent Events)
 - **redis**: Message queue + cache
 - **php56-php85**: Benchmark execution containers (isolated environments)
 

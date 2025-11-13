@@ -29,11 +29,6 @@ docker-compose run --rm main php bin/console benchmark:run --test=Loop --php-ver
 docker-compose run --rm main php bin/console benchmark:calibrate --all --dry-run  # Preview optimal iterations
 docker-compose run --rm main php bin/console benchmark:calibrate --all            # Apply calibration
 docker-compose run --rm main php bin/console benchmark:calibrate --benchmark=access-instance-property  # Single benchmark
-
-# Mercure (Real-Time)
-./scripts/mercure-verify.sh              # Verify Mercure setup
-./scripts/mercure-listen.sh              # Watch real-time events
-./scripts/mercure-test.sh 5 Loop php84   # End-to-end test
 ```
 
 ## Code Style

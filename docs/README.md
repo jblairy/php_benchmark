@@ -17,10 +17,6 @@
 - **[infrastructure/docker.md](infrastructure/docker.md)** - Docker architecture, services, and execution flow
 - **[infrastructure/development.md](infrastructure/development.md)** - Development environment setup (FrankenPHP, Redis, Xdebug)
 - **[infrastructure/production.md](infrastructure/production.md)** - Production infrastructure (FrankenPHP workers, Supervisord)
-- **[infrastructure/mercure-index.md](infrastructure/mercure-index.md)** - **⭐ Mercure real-time guide**
-  - [mercure-realtime.md](infrastructure/mercure-realtime.md) - Architecture & Configuration
-  - [mercure-practical-guide.md](infrastructure/mercure-practical-guide.md) - Debugging & Usage
-  - [mercure-implementation-summary.md](infrastructure/mercure-implementation-summary.md) - Implementation Summary
 
 ## 💡 Concepts
 
