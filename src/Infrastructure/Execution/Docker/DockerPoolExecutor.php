@@ -25,8 +25,6 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  */
 final class DockerPoolExecutor implements ScriptExecutorPort
 {
-    private const string TEMP_DIR = '/app/var/tmp';
-
     /**
      * @var array<string, bool> Track which containers have been warmed up
      */
@@ -48,19 +46,18 @@ final class DockerPoolExecutor implements ScriptExecutorPort
         // Ensure container is warmed up before executing benchmark
         $this->ensureContainerWarmed($executionContext->phpVersion->value);
 
-        $tempFile = $this->createTempScriptFile($executionContext->scriptContent);
-
         $this->logger->info('Executing benchmark via pool', [
             'benchmark_slug' => $executionContext->benchmarkSlug,
             'benchmark_class' => $executionContext->benchmarkClassName,
             'php_version' => $executionContext->phpVersion->value,
-            'script_file' => $tempFile,
         ]);
 
         try {
-            $output = $this->executeInDockerPool($executionContext->phpVersion->value, $tempFile);
+            $output = $this->executeInDockerPool(
+                $executionContext->phpVersion->value,
+                $executionContext->scriptContent,
+            );
             $result = $this->parseOutput($output);
-            $this->cleanupTempFile($tempFile);
 
             $this->logger->info('Benchmark executed successfully', [
                 'benchmark_slug' => $executionContext->benchmarkSlug,
@@ -73,30 +70,12 @@ final class DockerPoolExecutor implements ScriptExecutorPort
                 'benchmark_slug' => $executionContext->benchmarkSlug,
                 'benchmark_class' => $executionContext->benchmarkClassName,
                 'php_version' => $executionContext->phpVersion->value,
-                'script_file' => $tempFile,
                 'error' => $runtimeException->getMessage(),
                 'script_preview' => mb_substr($executionContext->scriptContent, 0, 200),
             ]);
 
-            throw $this->enrichExceptionWithContext($runtimeException, $executionContext, $tempFile);
+            throw $this->enrichExceptionWithContext($runtimeException, $executionContext);
         }
-    }
-
-    private function createTempScriptFile(string $scriptContent): string
-    {
-        $tempFile = sprintf(
-            '%s/benchmark_script_%s.php',
-            self::TEMP_DIR,
-            uniqid('', true),
-        );
-
-        $fullScript = "<?php\n\n" . $scriptContent;
-
-        if (false === file_put_contents($tempFile, $fullScript)) {
-            throw new RuntimeException('Failed to create temp file: ' . $tempFile);
-        }
-
-        return $tempFile;
     }
 
     /**
@@ -132,13 +111,8 @@ final class DockerPoolExecutor implements ScriptExecutorPort
                     echo json_encode(['status' => 'warm', 'result' => $x]);
                 PHP;
 
-            $tempFile = $this->createTempScriptFile($warmupScript);
-
             // Execute warmup script (result is discarded)
-            $this->executeInDockerPool($phpVersion, $tempFile);
-
-            // Cleanup
-            $this->cleanupTempFile($tempFile);
+            $this->executeInDockerPool($phpVersion, $warmupScript);
 
             // Mark as warmed
             $this->warmedContainers[$phpVersion] = true;
@@ -158,25 +132,55 @@ final class DockerPoolExecutor implements ScriptExecutorPort
         }
     }
 
-    private function executeInDockerPool(string $phpVersion, string $scriptPath): string
+    private function executeInDockerPool(string $phpVersion, string $scriptContent): string
     {
         $composeFile = $this->getComposeFile();
 
+        // Wrap script with PHP opening tag if not present
+        $fullScript = str_starts_with($scriptContent, '<?php') ? $scriptContent : "<?php\n\n" . $scriptContent;
+
         // Use docker-compose exec with -T flag for non-interactive execution
+        // Pass script via stdin instead of file path to avoid container/host filesystem issues
         $command = sprintf(
-            'timeout %ds docker-compose -p %s -f %s exec -T %s php -d max_execution_time=%d %s 2>&1',
+            'timeout %ds docker-compose -p %s -f %s exec -T %s php -d max_execution_time=%d 2>&1',
             $this->benchmarkTimeout,
             escapeshellarg($this->composeProjectName),
             escapeshellarg($composeFile),
             escapeshellarg($phpVersion),
             $this->benchmarkTimeout,
-            escapeshellarg($scriptPath),
         );
 
-        $output = [];
-        $exitCode = 0;
+        // Use proc_open to have better control over stdin/stdout
+        $descriptors = [
+            0 => ['pipe', 'r'],  // stdin
+            1 => ['pipe', 'w'],  // stdout
+            2 => ['pipe', 'w'],  // stderr
+        ];
 
-        exec($command, $output, $exitCode);
+        $pipes = [];
+        $process = proc_open($command, $descriptors, $pipes);
+
+        if (false === $process) {
+            throw new RuntimeException('Failed to open process for script execution');
+        }
+
+        if (!isset($pipes[0], $pipes[1], $pipes[2])) {
+            throw new RuntimeException('Failed to open process pipes');
+        }
+
+        // Write the script to stdin
+        fwrite($pipes[0], $fullScript);
+        fclose($pipes[0]);
+
+        // Read output
+        $output = stream_get_contents($pipes[1]);
+        fclose($pipes[1]);
+
+        // Read stderr (might contain error info)
+        $stderrContent = stream_get_contents($pipes[2]);
+        fclose($pipes[2]);
+
+        $exitCode = proc_close($process);
 
         // Exit code 124 = timeout command timed out
         if (124 === $exitCode) {
@@ -184,10 +188,12 @@ final class DockerPoolExecutor implements ScriptExecutorPort
         }
 
         if (0 !== $exitCode) {
-            throw new RuntimeException(sprintf('Script execution failed with code %d: %s', $exitCode, implode("\n", $output)));
+            $errorMsg = '' !== $stderrContent ? $stderrContent : implode("\n", (array) $output);
+
+            throw new RuntimeException(sprintf('Script execution failed with code %d: %s', $exitCode, $errorMsg));
         }
 
-        return implode('', $output);
+        return (string) $output;
     }
 
     private function getComposeFile(): string
@@ -231,25 +237,16 @@ final class DockerPoolExecutor implements ScriptExecutorPort
         );
     }
 
-    private function cleanupTempFile(string $tempFile): void
-    {
-        if (file_exists($tempFile)) {
-            unlink($tempFile);
-        }
-    }
-
     private function enrichExceptionWithContext(
         RuntimeException $runtimeException,
         ExecutionContext $executionContext,
-        string $tempFile,
     ): RuntimeException {
         return new RuntimeException(
             $runtimeException->getMessage() . sprintf(
-                ' [Benchmark Slug: %s, Class: %s, PHP Version: %s, File: %s]',
+                ' [Benchmark Slug: %s, Class: %s, PHP Version: %s]',
                 $executionContext->benchmarkSlug,
                 $executionContext->benchmarkClassName,
                 $executionContext->phpVersion->value,
-                $tempFile,
             ),
             (int) $runtimeException->getCode(),
             $runtimeException,

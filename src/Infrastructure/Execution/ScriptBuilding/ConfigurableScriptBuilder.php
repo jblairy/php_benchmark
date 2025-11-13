@@ -38,7 +38,21 @@ final readonly class ConfigurableScriptBuilder implements ScriptBuilderPort
         $warmupIterations = $config->warmupIterations;
         $innerIterations = $config->innerIterations;
 
+        // Helper function for high-precision timing (hrtime fallback for older PHP)
+        $timerHelper = <<<'PHP'
+            function get_time_ns() {
+                if (function_exists('hrtime')) {
+                    return hrtime(true);
+                }
+                // Fallback for PHP < 7.1: microtime in nanoseconds
+                $mt = microtime(true) * 1000000000;
+                return (int)$mt;
+            }
+            PHP;
+
         return <<<PHP
+                {$timerHelper}
+                
                 // Benchmark configuration: {$config->getDescription()}
                 
                 // ============================================================
@@ -78,7 +92,7 @@ final readonly class ConfigurableScriptBuilder implements ScriptBuilderPort
                 \$mem_before = memory_get_usage(true);
                 \$mem_peak_before = memory_get_peak_usage(true);
 
-                \$start_time = hrtime(true);
+                \$start_time = get_time_ns();
 
                 // ============================================================
                 // Phase 4: Measurement - GC is disabled here
@@ -87,7 +101,7 @@ final readonly class ConfigurableScriptBuilder implements ScriptBuilderPort
                     {$methodBody}
                 }
 
-                \$end_time = hrtime(true);
+                \$end_time = get_time_ns();
                 
                 // ============================================================
                 // Phase 5: Cleanup
@@ -101,7 +115,7 @@ final readonly class ConfigurableScriptBuilder implements ScriptBuilderPort
                 \$mem_peak_after = memory_get_peak_usage(true);
 
                 \$elapsed_ns = \$end_time - \$start_time;
-                \$total_time_ms = \$elapsed_ns / 1_000_000;
+                \$total_time_ms = \$elapsed_ns / 1000000;
                 \$avg_time_ms = \$total_time_ms / {$innerIterations};
 
                 echo json_encode([
