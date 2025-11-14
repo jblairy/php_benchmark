@@ -1,17 +1,11 @@
 <div {{ attributes.defaults({
         class: 'stats-card__container benchmark-card',
-        'data-controller': 'benchmark-card-live toggle',
-        'data-benchmark-card-live-benchmark-id-value': this.benchmarkId,
-        'data-benchmark-card-live-benchmark-name-value': this.benchmarkName,
+        'data-controller': 'toggle',
         'data-description': this.description,
         'data-tags': this.tags|join(',')
     }) }}>
 
     {% if this.data %}
-        {# Loading indicator overlay - non-intrusive #}
-        <div class="benchmark-card__loading-overlay" data-loading="show">
-            <div class="benchmark-card__loading-spinner"></div>
-        </div>
 
         <div>
             <div>
