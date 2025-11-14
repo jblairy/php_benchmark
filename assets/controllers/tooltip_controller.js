@@ -60,7 +60,9 @@ export default class extends Controller {
 
         // Show with animation
         requestAnimationFrame(() => {
-            this.tooltip.classList.add('tooltip-floating--visible');
+            if (this.tooltip) {
+                this.tooltip.classList.add('tooltip-floating--visible');
+            }
         });
     }
 
