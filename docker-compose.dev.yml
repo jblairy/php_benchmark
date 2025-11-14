@@ -50,7 +50,7 @@ services:
     build:
       context: .
       dockerfile: docker/frankenphp/Dockerfile.dev
-    command: php /app/bin/console messenger:consume async --time-limit=3600 --memory-limit=128M -vv
+    command: php /app/bin/console messenger:consume async --time-limit=3600 --memory-limit=512M -vv
     volumes:
       - ./:/app
       - /var/run/docker.sock:/var/run/docker.sock
@@ -76,7 +76,7 @@ services:
     build:
       context: .
       dockerfile: docker/frankenphp/Dockerfile.dev
-    command: php /app/bin/console messenger:consume async --time-limit=3600 --memory-limit=128M -vv
+    command: php /app/bin/console messenger:consume async --time-limit=3600 --memory-limit=512M -vv
     volumes:
       - ./:/app
       - /var/run/docker.sock:/var/run/docker.sock
