@@ -81,7 +81,7 @@ final readonly class ConfigurableScriptBuilder implements ScriptBuilderPort
                     {$methodBody}
                 }
                 
-                usleep(1000);
+                usleep(5000);
                 
                 // ============================================================
                 // Phase 3: Measurement Preparation
