@@ -1,4 +1,4 @@
-.PHONY: up start run fixtures db.reset db.refresh phpcsfixer phpcsfixer-fix phpstan quality phpmd phparkitect infection assets.refresh trans.compile trans.update dev.up dev.build dev.down dev.restart dev.logs dev.status dev.run prod.up prod.build prod.down prod.restart prod.logs prod.status prod.run ci.up ci.build ci.down ci.logs ci.test ci.quality
+.PHONY: up start run fixtures db.reset db.refresh phpcsfixer phpcsfixer-fix phpstan quality phpmd phparkitect infection assets.refresh trans.compile trans.update dev.up dev.build dev.down dev.restart dev.logs dev.status dev.run prod.up prod.build prod.down prod.restart prod.logs prod.status prod.run ci.up ci.build ci.down ci.logs ci.test ci.quality calibrate calibrate-force calibrate-force-dry
 
 # Default: Use dev environment
 up:
@@ -155,6 +155,29 @@ run:
 	else \
 		docker-compose -f docker-compose.dev.yml exec frankenphp php bin/console benchmark:run --test=$(test) $(if $(iterations),--iterations=$(iterations)) --php-version=$(version); \
 	fi
+
+# Calibrate benchmark iterations based on target execution time
+# Usage: make calibrate (all benchmarks)
+#        make calibrate [benchmark=abs-with-abs] (specific benchmark)
+#        make calibrate [target-time=500] (custom target time)
+calibrate:
+	@docker-compose -f docker-compose.dev.yml run --rm frankenphp \
+		php bin/console benchmark:calibrate --all $(if $(benchmark),--benchmark=$(benchmark)) $(if $(target-time),--target-time=$(target-time))
+
+# Calibrate with --force flag to update already configured benchmarks
+# Usage: make calibrate-force (all benchmarks)
+#        make calibrate-force [benchmark=abs-with-abs] (specific benchmark)
+#        make calibrate-force [target-time=500] (custom target time)
+calibrate-force:
+	@docker-compose -f docker-compose.dev.yml run --rm frankenphp \
+		php bin/console benchmark:calibrate --all --force $(if $(benchmark),--benchmark=$(benchmark)) $(if $(target-time),--target-time=$(target-time))
+
+# Dry-run calibration with --force flag (preview changes without modifying fixtures)
+# Usage: make calibrate-force-dry
+#        make calibrate-force-dry [benchmark=abs-with-abs]
+calibrate-force-dry:
+	@docker-compose -f docker-compose.dev.yml run --rm frankenphp \
+		php bin/console benchmark:calibrate --all --force --dry-run $(if $(benchmark),--benchmark=$(benchmark)) $(if $(target-time),--target-time=$(target-time))
 
 # Load fixtures into database from YAML files
 fixtures:
