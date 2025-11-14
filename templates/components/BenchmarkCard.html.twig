@@ -286,14 +286,17 @@
                                     data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
                                     aria-label="Plus d'informations">ℹ️</button>
                         </td>
-                        {% set best_stdDev = 999999 %}
                         {% for stats in this.data.phpVersions %}
-                            {% if stats.stdDev < best_stdDev %}
-                                {% set best_stdDev = stats.stdDev %}
+                            {% set stddev_percentage = (stats.stdDev / stats.getP50()) * 100 %}
+                            {% set stability_class = '' %}
+                            {% if stddev_percentage < 4 %}
+                                {% set stability_class = 'benchmark-card__table-cell--stability-good' %}
+                            {% elseif stddev_percentage < 10 %}
+                                {% set stability_class = 'benchmark-card__table-cell--stability-medium' %}
+                            {% else %}
+                                {% set stability_class = 'benchmark-card__table-cell--stability-poor' %}
                             {% endif %}
-                        {% endfor %}
-                        {% for stats in this.data.phpVersions %}
-                            <td class="benchmark-card__table-cell {% if stats.stdDev == best_stdDev %}benchmark-card__table-cell--best-value{% endif %}">
+                            <td class="benchmark-card__table-cell {{ stability_class }}">
                                 <span data-unit-switch-target="cell" data-value="{{ stats.stdDev }}">{{ stats.stdDev|number_format(5) }}</span>
                             </td>
                         {% endfor %}
@@ -318,14 +321,14 @@
                         {% endfor %}
                         {% for stats in this.data.phpVersions %}
                             {% set stability_class = '' %}
-                            {% if stats.cv < 5 %}
+                            {% if stats.cv < 4 %}
                                 {% set stability_class = 'benchmark-card__table-cell--stability-good' %}
-                            {% elseif stats.cv < 15 %}
+                            {% elseif stats.cv < 10 %}
                                 {% set stability_class = 'benchmark-card__table-cell--stability-medium' %}
                             {% else %}
                                 {% set stability_class = 'benchmark-card__table-cell--stability-poor' %}
                             {% endif %}
-                            <td class="benchmark-card__table-cell {{ stability_class }} {% if stats.cv == best_cv %}benchmark-card__table-cell--best-value{% endif %}">
+                            <td class="benchmark-card__table-cell {{ stability_class }}">
                                 {{ stats.cv|number_format(2) }}%
                             </td>
                         {% endfor %}
