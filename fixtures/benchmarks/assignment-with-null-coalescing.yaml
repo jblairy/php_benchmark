@@ -13,8 +13,8 @@ phpVersions:
   - php85
 code: |-
   for ($i = 0; 100000 > $i; ++$i) {
-              $result = null;
-              $result ??= 'default';
-          }
+      $result = null;
+      $result ??= 'default';
+  }
 warmupIterations: 5
 innerIterations: 50

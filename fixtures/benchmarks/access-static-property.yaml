@@ -24,7 +24,7 @@ code: |-
   $class = new class {
       public static $value = 42;
   };
-
+  
   for ($i = 0; $i < 100000; $i++) {
       $result = $class::$value;
   }

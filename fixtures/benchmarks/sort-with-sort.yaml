@@ -18,9 +18,9 @@ phpVersions:
   - php85
 code: |-
   for ($i = 0; 1000 > $i; ++$i) {
-              $data = range(1, 1000);
-              shuffle($data);
-              sort($data);
-          }
+      $data = range(1, 1000);
+      shuffle($data);
+      sort($data);
+  }
 warmupIterations: 3
 innerIterations: 15

@@ -22,11 +22,11 @@ phpVersions:
   - php85
 code: |-
   function double($x) { return $x * 2; }
-  function addFive($x) { return $x + 5; }
-  function square($x) { return $x * $x; }
-
-  for ($i = 0; $i < 100000; $i++) {
-      $result = square(addFive(double(10)));
-  }
+      function addFive($x) { return $x + 5; }
+          function square($x) { return $x * $x; }
+  
+              for ($i = 0; $i < 100000; $i++) {
+                  $result = square(addFive(double(10)));
+              }
 warmupIterations: 3
 innerIterations: 19

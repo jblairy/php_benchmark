@@ -18,9 +18,9 @@ phpVersions:
   - php85
 code: |-
   $text = 'Numbers: 123, 456, 789, 012, 345';
-
-          for ($i = 0; 50000 > $i; ++$i) {
-              preg_match_all('/\d+/', $text, $matches);
-          }
+  
+  for ($i = 0; 50000 > $i; ++$i) {
+      preg_match_all('/\d+/', $text, $matches);
+  }
 warmupIterations: 5
 innerIterations: 66

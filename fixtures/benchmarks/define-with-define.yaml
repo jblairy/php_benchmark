@@ -21,7 +21,7 @@ phpVersions:
   - php85
 code: |-
   define('MY_CONSTANT', 42);
-
+  
   for ($i = 0; $i < 100000; $i++) {
       $result = constant('MY_CONSTANT');
   }

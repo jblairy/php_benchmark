@@ -24,7 +24,7 @@ code: |-
   function accessParameter($value) {
       return $value;
   }
-
+  
   $value = 42;
   for ($i = 0; $i < 100000; $i++) {
       $result = accessParameter($value);

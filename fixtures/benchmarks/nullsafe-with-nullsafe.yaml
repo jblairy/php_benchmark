@@ -18,7 +18,7 @@ code: |-
   class User {
       public $profile = null;
   }
-
+  
   $user = new User();
   for ($i = 0; $i < 100000; $i++) {
       $name = $user?->profile?->name;

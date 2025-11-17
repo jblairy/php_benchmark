@@ -18,9 +18,9 @@ phpVersions:
   - php85
 code: |-
   $text = 'one,two,three,four,five';
-
-          for ($i = 0; 50000 > $i; ++$i) {
-              $result = explode(',', $text);
-          }
+  
+  for ($i = 0; 50000 > $i; ++$i) {
+      $result = explode(',', $text);
+  }
 warmupIterations: 10
 innerIterations: 100

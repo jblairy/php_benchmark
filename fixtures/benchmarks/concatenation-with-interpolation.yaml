@@ -18,8 +18,8 @@ phpVersions:
   - php85
 code: |-
   $result = '';
-          for ($i = 0; 10000 > $i; ++$i) {
-              $result = sprintf('Hello World %d test benchmark', $i);
-          }
+  for ($i = 0; 10000 > $i; ++$i) {
+      $result = sprintf('Hello World %d test benchmark', $i);
+  }
 warmupIterations: 10
 innerIterations: 100

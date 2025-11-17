@@ -18,10 +18,10 @@ phpVersions:
   - php85
 code: |-
   $data = range(1, 10000);
-          $result = 0;
-
-          foreach ($data as $item) {
-              $result += $item;
-          }
+  $result = 0;
+  
+  foreach ($data as $item) {
+      $result += $item;
+  }
 warmupIterations: 15
 innerIterations: 1000

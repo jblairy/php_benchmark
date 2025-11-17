@@ -18,7 +18,7 @@ phpVersions:
   - php85
 code: |-
   for ($i = -50000; 50000 > $i; ++$i) {
-              $result = abs($i);
-          }
+      $result = abs($i);
+  }
 warmupIterations: 10
 innerIterations: 100

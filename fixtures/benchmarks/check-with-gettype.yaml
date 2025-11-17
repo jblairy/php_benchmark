@@ -18,9 +18,9 @@ phpVersions:
   - php85
 code: |-
   $data = [1, 2, 3, 4, 5];
-
-          for ($i = 0; 100000 > $i; ++$i) {
-              $result = 'array' === gettype($data);
-          }
+  
+  for ($i = 0; 100000 > $i; ++$i) {
+      $result = 'array' === gettype($data);
+  }
 warmupIterations: 5
 innerIterations: 50

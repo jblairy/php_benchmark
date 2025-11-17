@@ -18,10 +18,10 @@ phpVersions:
   - php85
 code: |-
   $obj = new stdClass();
-          $obj->value = 123;
-
-          for ($i = 0; 100000 > $i; ++$i) {
-              $result = isset($obj->value);
-          }
+  $obj->value = 123;
+  
+  for ($i = 0; 100000 > $i; ++$i) {
+      $result = isset($obj->value);
+  }
 warmupIterations: 5
 innerIterations: 50

@@ -23,22 +23,22 @@ phpVersions:
 code: |-
   class Calculator {
       private $value = 0;
-
+  
       public function add($n) {
           $this->value += $n;
           return $this;
       }
-
+  
       public function multiply($n) {
           $this->value *= $n;
           return $this;
       }
-
+  
       public function getValue() {
           return $this->value;
       }
   }
-
+  
   for ($i = 0; $i < 10000; $i++) {
       $calc = new Calculator();
       $result = $calc->add(5)->multiply(2)->add(3)->getValue();

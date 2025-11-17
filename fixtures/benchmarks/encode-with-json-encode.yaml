@@ -18,14 +18,14 @@ phpVersions:
   - php85
 code: |-
   $data = [
-              'name' => 'John Doe',
-              'email' => 'john@example.com',
-              'age' => 30,
-              'items' => range(1, 100),
-          ];
-
-          for ($i = 0; 10000 > $i; ++$i) {
-              $result = json_encode($data);
-          }
+  'name' => 'John Doe',
+  'email' => 'john@example.com',
+  'age' => 30,
+  'items' => range(1, 100),
+  ];
+  
+  for ($i = 0; 10000 > $i; ++$i) {
+      $result = json_encode($data);
+  }
 warmupIterations: 10
 innerIterations: 100

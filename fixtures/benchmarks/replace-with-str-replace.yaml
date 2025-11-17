@@ -18,8 +18,8 @@ phpVersions:
   - php85
 code: |-
   $text = 'Hello World, this is a test string for benchmarking purposes';
-          for ($i = 0; 100000 > $i; ++$i) {
-              $result = str_replace('test', 'sample', $text);
-          }
+  for ($i = 0; 100000 > $i; ++$i) {
+      $result = str_replace('test', 'sample', $text);
+  }
 warmupIterations: 5
 innerIterations: 51

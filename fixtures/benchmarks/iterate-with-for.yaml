@@ -18,9 +18,9 @@ phpVersions:
   - php85
 code: |-
   $data = range(1, 10000);
-          $sum = 0;
-          $count = count($data);
-
-          for ($i = 0; $i < $count; ++$i) {
-              $sum += $data[$i];
-          }
+  $sum = 0;
+  $count = count($data);
+  
+  for ($i = 0; $i < $count; ++$i) {
+      $sum += $data[$i];
+  }

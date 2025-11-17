@@ -27,7 +27,7 @@ code: |-
           return true;
       }
   };
-
+  
   for ($i = 0; $i < 100000; $i++) {
       $exists = is_callable([$obj, 'testMethod']);
   }

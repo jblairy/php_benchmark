@@ -13,7 +13,7 @@ phpVersions:
   - php85
 code: |-
   $data = range(1, 10000);
-
-          array_map(fn ($item): int => $item * 2, $data);
+  
+  array_map(fn ($item): int => $item * 2, $data);
 warmupIterations: 10
 innerIterations: 204

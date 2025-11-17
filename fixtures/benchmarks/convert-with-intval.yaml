@@ -18,7 +18,7 @@ phpVersions:
   - php85
 code: |-
   for ($i = 0; 100000 > $i; ++$i) {
-              $result = (int) '123';
-          }
+      $result = (int) '123';
+  }
 warmupIterations: 5
 innerIterations: 50

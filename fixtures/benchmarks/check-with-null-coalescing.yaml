@@ -17,9 +17,9 @@ phpVersions:
   - php85
 code: |-
   $data = ['key1' => 'value1', 'key2' => null, 'key3' => 'value3'];
-
-          for ($i = 0; 100000 > $i; ++$i) {
-              $result = $data['key2'] ?? 'default';
-          }
+  
+  for ($i = 0; 100000 > $i; ++$i) {
+      $result = $data['key2'] ?? 'default';
+  }
 warmupIterations: 5
 innerIterations: 50

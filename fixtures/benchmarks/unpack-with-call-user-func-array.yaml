@@ -24,7 +24,7 @@ code: |-
   function sum($a, $b, $c) {
       return $a + $b + $c;
   }
-
+  
   $args = [1, 2, 3];
   for ($i = 0; $i < 100000; $i++) {
       $result = call_user_func_array('sum', $args);

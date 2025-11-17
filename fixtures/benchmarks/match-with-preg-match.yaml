@@ -18,9 +18,9 @@ phpVersions:
   - php85
 code: |-
   $text = 'Email: test@example.com, Phone: 123-456-7890';
-
-          for ($i = 0; 50000 > $i; ++$i) {
-              preg_match('/[\w.-]+@[\w.-]+\.\w+/', $text, $matches);
-          }
+  
+  for ($i = 0; 50000 > $i; ++$i) {
+      preg_match('/[\w.-]+@[\w.-]+\.\w+/', $text, $matches);
+  }
 warmupIterations: 5
 innerIterations: 68

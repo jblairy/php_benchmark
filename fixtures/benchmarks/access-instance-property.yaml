@@ -25,7 +25,7 @@ code: |-
   $obj = new class {
       public $value = 42;
   };
-
+  
   for ($i = 0; $i < 100000; $i++) {
       $result = $obj->value;
   }

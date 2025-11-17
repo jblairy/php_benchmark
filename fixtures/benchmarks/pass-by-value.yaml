@@ -24,7 +24,7 @@ code: |-
   function incrementByValue($value) {
       return $value + 1;
   }
-
+  
   $counter = 0;
   for ($i = 0; $i < 100000; $i++) {
       $counter = incrementByValue($counter);

@@ -12,9 +12,9 @@ phpVersions:
   - php85
 code: |-
   $text = 'Hello World';
-
-          for ($i = 0; 100000 > $i; ++$i) {
-              $result = str_ends_with($text, 'World');
-          }
+  
+  for ($i = 0; 100000 > $i; ++$i) {
+      $result = str_ends_with($text, 'World');
+  }
 warmupIterations: 5
 innerIterations: 67

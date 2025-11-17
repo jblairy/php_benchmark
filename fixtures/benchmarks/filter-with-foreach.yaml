@@ -18,12 +18,12 @@ phpVersions:
   - php85
 code: |-
   $data = range(1, 10000);
-          $result = [];
-
-          foreach ($data as $item) {
-              if (0 === $item % 2) {
-                  $result[] = $item;
-              }
-          }
+  $result = [];
+  
+  foreach ($data as $item) {
+      if (0 === $item % 2) {
+          $result[] = $item;
+      }
+  }
 warmupIterations: 10
 innerIterations: 762

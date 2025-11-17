@@ -18,10 +18,10 @@ phpVersions:
   - php85
 code: |-
   ob_start();
-          for ($i = 0; 1000 > $i; ++$i) {
-              echo 'Line ' . $i . "\n";
-          }
-
-          ob_get_clean();
+  for ($i = 0; 1000 > $i; ++$i) {
+      echo 'Line ' . $i . "\n";
+  }
+  
+  ob_get_clean();
 warmupIterations: 15
 innerIterations: 1000

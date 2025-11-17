@@ -18,14 +18,14 @@ phpVersions:
   - php85
 code: |-
   $data = [
-              'name' => 'John Doe',
-              'email' => 'john@example.com',
-              'age' => 30,
-              'items' => range(1, 100),
-          ];
-
-          for ($i = 0; 10000 > $i; ++$i) {
-              $result = serialize($data);
-          }
+  'name' => 'John Doe',
+  'email' => 'john@example.com',
+  'age' => 30,
+  'items' => range(1, 100),
+  ];
+  
+  for ($i = 0; 10000 > $i; ++$i) {
+      $result = serialize($data);
+  }
 warmupIterations: 5
 innerIterations: 74

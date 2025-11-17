@@ -12,9 +12,9 @@ phpVersions:
   - php85
 code: |-
   $func = (fn ($x): int|float => $x * 2);
-
-          for ($i = 0; 100000 > $i; ++$i) {
-              $result = $func($i);
-          }
+  
+  for ($i = 0; 100000 > $i; ++$i) {
+      $result = $func($i);
+  }
 warmupIterations: 5
 innerIterations: 50

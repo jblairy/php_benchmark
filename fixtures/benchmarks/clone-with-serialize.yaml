@@ -18,11 +18,11 @@ phpVersions:
   - php85
 code: |-
   $original = new stdClass();
-          $original->value = 123;
-          $original->name = 'test';
-
-          for ($i = 0; 100000 > $i; ++$i) {
-              $copy = unserialize(serialize($original));
-          }
+  $original->value = 123;
+  $original->name = 'test';
+  
+  for ($i = 0; 100000 > $i; ++$i) {
+      $copy = unserialize(serialize($original));
+  }
 warmupIterations: 5
 innerIterations: 50

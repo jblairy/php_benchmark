@@ -13,7 +13,7 @@ phpVersions:
   - php85
 code: |-
   for ($i = 0; 100000 > $i; ++$i) {
-              $result = (fn ($x): int => $x * 2)($i);
-          }
+      $result = (fn ($x): int => $x * 2)($i);
+  }
 warmupIterations: 5
 innerIterations: 50

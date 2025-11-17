@@ -18,10 +18,10 @@ phpVersions:
   - php85
 code: |-
   $data = range(1, 10000);
-          $result = [];
-
-          foreach ($data as $item) {
-              $result[] = $item * 2;
-          }
+  $result = [];
+  
+  foreach ($data as $item) {
+      $result[] = $item * 2;
+  }
 warmupIterations: 10
 innerIterations: 670

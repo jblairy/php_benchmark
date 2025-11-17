@@ -23,8 +23,8 @@ phpVersions:
   - php85
 code: |-
   $result = '';
-          for ($i = 0; 10000 > $i; ++$i) {
-              $result = 'Hello World ' . $i . ' test benchmark';
-          }
+  for ($i = 0; 10000 > $i; ++$i) {
+      $result = 'Hello World ' . $i . ' test benchmark';
+  }
 warmupIterations: 10
 innerIterations: 100

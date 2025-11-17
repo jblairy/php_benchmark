@@ -18,13 +18,13 @@ phpVersions:
   - php85
 code: |-
   function generateRange()
-          {
-              for ($i = 1; 10000 >= $i; ++$i) {
-                  yield $i;
-              }
-          }
-
-          $sum = 0;
-          foreach (generateRange() as $value) {
-              $sum += $value;
-          }
+  {
+      for ($i = 1; 10000 >= $i; ++$i) {
+          yield $i;
+      }
+  }
+  
+  $sum = 0;
+  foreach (generateRange() as $value) {
+      $sum += $value;
+  }
