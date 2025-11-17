@@ -16,7 +16,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   for ($i = -50000; 50000 > $i; ++$i) {
               $result = abs($i);
           }

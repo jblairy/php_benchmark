@@ -20,7 +20,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   function incrementByValue($value) {
       return $value + 1;
   }

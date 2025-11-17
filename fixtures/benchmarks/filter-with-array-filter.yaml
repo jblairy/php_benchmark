@@ -11,7 +11,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   $data = range(1, 10000);
 
           array_filter($data, fn ($item): bool => 0 === $item % 2);

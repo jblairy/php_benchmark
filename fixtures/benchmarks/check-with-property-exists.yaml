@@ -16,7 +16,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   $obj = new stdClass();
           $obj->value = 123;
 

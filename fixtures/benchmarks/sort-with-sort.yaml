@@ -16,7 +16,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   for ($i = 0; 1000 > $i; ++$i) {
               $data = range(1, 1000);
               shuffle($data);

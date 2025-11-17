@@ -19,7 +19,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   define('MY_CONSTANT', 42);
 
   for ($i = 0; $i < 100000; $i++) {

@@ -20,7 +20,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   function double($x) { return $x * 2; }
   function addFive($x) { return $x + 5; }
   function square($x) { return $x * $x; }

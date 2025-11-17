@@ -21,7 +21,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   for ($i = 0; 10000 > $i; ++$i) {
               $divisor = 0 === $i % 10 ? 1 : $i;
               $result = 0 !== $divisor ? 100 / $divisor : 0;

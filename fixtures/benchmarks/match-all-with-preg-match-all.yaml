@@ -16,7 +16,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   $text = 'Numbers: 123, 456, 789, 012, 345';
 
           for ($i = 0; 50000 > $i; ++$i) {

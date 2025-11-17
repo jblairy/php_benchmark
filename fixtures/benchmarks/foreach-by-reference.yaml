@@ -16,7 +16,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   $data = range(1, 10000);
 
           foreach ($data as &$value) {

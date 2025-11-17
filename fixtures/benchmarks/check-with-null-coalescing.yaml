@@ -15,7 +15,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   $data = ['key1' => 'value1', 'key2' => null, 'key3' => 'value3'];
 
           for ($i = 0; 100000 > $i; ++$i) {

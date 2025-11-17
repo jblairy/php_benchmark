@@ -10,7 +10,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   $func = (fn ($x): int|float => $x * 2);
 
           for ($i = 0; 100000 > $i; ++$i) {

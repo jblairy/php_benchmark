@@ -16,7 +16,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   $original = new stdClass();
           $original->value = 123;
           $original->name = 'test';

@@ -16,7 +16,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   $haystack = array_flip(range(1, 1000));
 
           for ($i = 0; 10000 > $i; ++$i) {

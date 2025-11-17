@@ -16,7 +16,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   $data = [
               'name' => 'John Doe',
               'email' => 'john@example.com',

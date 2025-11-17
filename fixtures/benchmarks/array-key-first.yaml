@@ -17,7 +17,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   $array = range(1, 1000);
   for ($i = 0; $i < 10000; $i++) {
       $firstKey = array_key_first($array);

@@ -16,7 +16,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   for ($i = 0; 10000 > $i; ++$i) {
               $result = @(100 / (0 === $i % 10 ? 1 : $i));
           }

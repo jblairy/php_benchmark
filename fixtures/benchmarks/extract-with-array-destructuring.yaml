@@ -14,7 +14,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   $data = [1, 2, 3];
 
           for ($i = 0; 100000 > $i; ++$i) {

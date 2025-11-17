@@ -16,7 +16,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   for ($i = 1; 100000 > $i; ++$i) {
               $result = (int) (100 / ($i % 50 + 1));
           }

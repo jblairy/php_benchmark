@@ -11,7 +11,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   $data = [];
           for ($i = 0; 1000 > $i; ++$i) {
               $data[] = ['id' => $i, 'name' => 'User' . $i, 'email' => 'user' . $i . '@test.com'];

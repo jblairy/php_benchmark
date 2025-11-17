@@ -16,7 +16,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   function generateRange()
           {
               for ($i = 1; 10000 >= $i; ++$i) {

@@ -16,7 +16,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   ob_start();
           for ($i = 0; 1000 > $i; ++$i) {
               echo 'Line ' . $i . "\n";

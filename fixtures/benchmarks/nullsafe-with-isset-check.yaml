@@ -20,7 +20,7 @@ phpVersions:
   - php83
   - php84
   - php85
-code: |
+code: |-
   class User {
       public $profile = null;
   }
