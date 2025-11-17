@@ -1,0 +1,12 @@
+// Import Highlight.js GitHub Dark theme
+@import url('https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css');
+
+// Override specific styles for our needs
+.hljs {
+    background: #0d1117 !important;
+    color: #c9d1d9 !important;
+    padding: 1.2rem !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+}
