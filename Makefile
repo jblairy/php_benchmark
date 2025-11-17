@@ -1,4 +1,4 @@
-.PHONY: up start run fixtures db.reset db.refresh phpcsfixer phpcsfixer-fix phpstan quality phpmd phparkitect infection assets.refresh trans.compile trans.update dev.up dev.build dev.down dev.restart dev.logs dev.status dev.run prod.up prod.build prod.down prod.restart prod.logs prod.status prod.run ci.up ci.build ci.down ci.logs ci.test ci.quality calibrate calibrate-force calibrate-force-dry
+.PHONY: up start run fixtures db.reset db.refresh phpcsfixer phpcsfixer-fix phpstan quality phpmd phparkitect infection assets.refresh trans.compile trans.update dev.up dev.build dev.down dev.restart dev.logs dev.status dev.run prod.up prod.build prod.down prod.restart prod.logs prod.status prod.run ci.up ci.build ci.down ci.logs ci.test ci.quality calibrate calibrate-force calibrate-force-dry queue.clear queue.status
 
 # Default: Use dev environment
 up:
@@ -272,3 +272,28 @@ trans.compile:
 # Update translations: extract new keys from templates and compile
 trans.update: trans.compile
 	@echo "✅ Translations updated and compiled"
+
+# Clear Redis queue (remove all pending messages)
+# Useful to stop benchmark execution or clear failed jobs
+queue.clear:
+	@echo "🗑️  Clearing Redis queue..."
+	@docker-compose -f docker-compose.dev.yml exec redis redis-cli FLUSHDB
+	@echo "✅ Redis queue cleared"
+	@echo "💡 Restart messenger workers to apply: make dev.restart"
+
+# Show Redis queue status
+# Displays number of keys, memory usage, and basic stats
+queue.status:
+	@echo "📊 Redis Queue Status:"
+	@echo ""
+	@echo "🔢 Keys in database:"
+	@docker-compose -f docker-compose.dev.yml exec redis redis-cli DBSIZE
+	@echo ""
+	@echo "💾 Memory usage:"
+	@docker-compose -f docker-compose.dev.yml exec redis redis-cli INFO memory | grep -E "used_memory_human|used_memory_peak_human"
+	@echo ""
+	@echo "📈 Statistics:"
+	@docker-compose -f docker-compose.dev.yml exec redis redis-cli INFO stats | grep -E "total_commands_processed|instantaneous_ops_per_sec"
+	@echo ""
+	@echo "📋 Sample keys:"
+	@docker-compose -f docker-compose.dev.yml exec redis redis-cli KEYS "*" | head -10
