@@ -23,7 +23,7 @@ RUN install-php-extensions \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Install docker-compose for benchmark execution
-RUN curl -L https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose \
+RUN curl -L https://github.com/docker/compose/releases/download/v2.37.1/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose \
     && chmod +x /usr/local/bin/docker-compose
 
 # Configure PHP for development (keep validation active)
