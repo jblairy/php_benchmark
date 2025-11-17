@@ -12,7 +12,7 @@
                 <div class="benchmark-card__header">
                     <div class="benchmark-card__header-top">
                         <div class="benchmark-card__category-badge">{{ this.category }}</div>
-                        <button type="button" 
+                        <button type="button"
                                 class="benchmark-card__toggle-button"
                                 data-action="click->toggle#toggle"
                                 data-toggle-target="button"
@@ -46,7 +46,8 @@
                         <span class="benchmark-card__code-label">Code testé</span>
                         <span class="benchmark-card__code-lang">PHP</span>
                     </div>
-                    <pre class="benchmark-card__code"><code>{{ this.sourceCode }}</code></pre>
+                    <pre class="benchmark-card__code"
+                         data-controller="syntax-highlighter"><code>{{ this.sourceCode }}</code></pre>
                 </div>
                 {% endif %}
 
@@ -74,13 +75,13 @@
                             {{ 'categories.performance'|trans }}
                         </td>
                     </tr>
-                    
+
                     {# p50 #}
                     <tr class="benchmark-card__table-row">
                         <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="p50">
                             <span class="metric-label">{{ 'metrics.p50.label'|trans }}</span>
-                            <button type="button" 
-                                    class="metric-tooltip" 
+                            <button type="button"
+                                    class="metric-tooltip"
                                     data-controller="tooltip"
                                     data-tooltip-text-value="{{ 'metrics.p50.description'|trans }}"
                                     data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
@@ -105,8 +106,8 @@
                     <tr class="benchmark-card__table-row">
                         <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="min">
                             <span class="metric-label">{{ 'metrics.min.label'|trans }}</span>
-                            <button type="button" 
-                                    class="metric-tooltip" 
+                            <button type="button"
+                                    class="metric-tooltip"
                                     data-controller="tooltip"
                                     data-tooltip-text-value="{{ 'metrics.min.description'|trans }}"
                                     data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
@@ -131,8 +132,8 @@
                     <tr class="benchmark-card__table-row">
                         <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="max">
                             <span class="metric-label">{{ 'metrics.max.label'|trans }}</span>
-                            <button type="button" 
-                                    class="metric-tooltip" 
+                            <button type="button"
+                                    class="metric-tooltip"
                                     data-controller="tooltip"
                                     data-tooltip-text-value="{{ 'metrics.max.description'|trans }}"
                                     data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
@@ -157,8 +158,8 @@
                     <tr class="benchmark-card__table-row">
                         <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="p90">
                             <span class="metric-label">{{ 'metrics.p90.label'|trans }}</span>
-                            <button type="button" 
-                                    class="metric-tooltip" 
+                            <button type="button"
+                                    class="metric-tooltip"
                                     data-controller="tooltip"
                                     data-tooltip-text-value="{{ 'metrics.p90.description'|trans }}"
                                     data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
@@ -183,8 +184,8 @@
                     <tr class="benchmark-card__table-row">
                         <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="p95">
                             <span class="metric-label">{{ 'metrics.p95.label'|trans }}</span>
-                            <button type="button" 
-                                    class="metric-tooltip" 
+                            <button type="button"
+                                    class="metric-tooltip"
                                     data-controller="tooltip"
                                     data-tooltip-text-value="{{ 'metrics.p95.description'|trans }}"
                                     data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
@@ -209,8 +210,8 @@
                     <tr class="benchmark-card__table-row">
                         <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="p99">
                             <span class="metric-label">{{ 'metrics.p99.label'|trans }}</span>
-                            <button type="button" 
-                                    class="metric-tooltip" 
+                            <button type="button"
+                                    class="metric-tooltip"
                                     data-controller="tooltip"
                                     data-tooltip-text-value="{{ 'metrics.p99.description'|trans }}"
                                     data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
@@ -242,8 +243,8 @@
                     <tr class="benchmark-card__table-row">
                         <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="throughput">
                             <span class="metric-label">{{ 'metrics.throughput.label'|trans }}</span>
-                            <button type="button" 
-                                    class="metric-tooltip" 
+                            <button type="button"
+                                    class="metric-tooltip"
                                     data-controller="tooltip"
                                     data-tooltip-text-value="{{ 'metrics.throughput.description'|trans }}"
                                     data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
@@ -273,8 +274,8 @@
                     <tr class="benchmark-card__table-row">
                         <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="stdDev">
                             <span class="metric-label">{{ 'metrics.std_dev.label'|trans }}</span>
-                            <button type="button" 
-                                    class="metric-tooltip" 
+                            <button type="button"
+                                    class="metric-tooltip"
                                     data-controller="tooltip"
                                     data-tooltip-text-value="{{ 'metrics.std_dev.description'|trans }}"
                                     data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
@@ -300,8 +301,8 @@
                     <tr class="benchmark-card__table-row">
                         <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="cv">
                             <span class="metric-label">{{ 'metrics.cv.label'|trans }}</span>
-                            <button type="button" 
-                                    class="metric-tooltip" 
+                            <button type="button"
+                                    class="metric-tooltip"
                                     data-controller="tooltip"
                                     data-tooltip-text-value="{{ 'metrics.cv.description'|trans }}"
                                     data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
@@ -339,8 +340,8 @@
                     <tr class="benchmark-card__table-row">
                         <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="memoryUsed">
                             <span class="metric-label">{{ 'metrics.memory_used.label'|trans }}</span>
-                            <button type="button" 
-                                    class="metric-tooltip" 
+                            <button type="button"
+                                    class="metric-tooltip"
                                     data-controller="tooltip"
                                     data-tooltip-text-value="{{ 'metrics.memory_used.description'|trans }}"
                                     data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
@@ -363,8 +364,8 @@
                     <tr class="benchmark-card__table-row">
                         <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="memoryPeak">
                             <span class="metric-label">{{ 'metrics.memory_peak.label'|trans }}</span>
-                            <button type="button" 
-                                    class="metric-tooltip" 
+                            <button type="button"
+                                    class="metric-tooltip"
                                     data-controller="tooltip"
                                     data-tooltip-text-value="{{ 'metrics.memory_peak.description'|trans }}"
                                     data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
@@ -394,8 +395,8 @@
                     <tr class="benchmark-card__table-row">
                         <td class="benchmark-card__table-cell benchmark-card__table-cell--metric" data-metric="count">
                             <span class="metric-label">{{ 'metrics.count.label'|trans }}</span>
-                            <button type="button" 
-                                    class="metric-tooltip" 
+                            <button type="button"
+                                    class="metric-tooltip"
                                     data-controller="tooltip"
                                     data-tooltip-text-value="{{ 'metrics.count.description'|trans }}"
                                     data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
