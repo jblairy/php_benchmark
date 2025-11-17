@@ -21,14 +21,14 @@ phpVersions:
   - php84
   - php85
 code: |-
-  class TestClass {
+  $class = new class {
       public static function getValue() {
           return 42;
       }
-  }
+  };
 
   for ($i = 0; $i < 100000; $i++) {
-      $result = TestClass::getValue();
+      $result = $class::getValue();
   }
 warmupIterations: 5
 innerIterations: 27

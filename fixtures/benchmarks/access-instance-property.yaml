@@ -22,11 +22,10 @@ phpVersions:
   - php84
   - php85
 code: |-
-  class TestClass {
+  $obj = new class {
       public $value = 42;
-  }
+  };
 
-  $obj = new TestClass();
   for ($i = 0; $i < 100000; $i++) {
       $result = $obj->value;
   }

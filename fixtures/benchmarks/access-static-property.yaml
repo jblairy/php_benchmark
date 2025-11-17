@@ -21,12 +21,12 @@ phpVersions:
   - php84
   - php85
 code: |-
-  class TestClass {
+  $class = new class {
       public static $value = 42;
-  }
+  };
 
   for ($i = 0; $i < 100000; $i++) {
-      $result = TestClass::$value;
+      $result = $class::$value;
   }
 warmupIterations: 5
 innerIterations: 57

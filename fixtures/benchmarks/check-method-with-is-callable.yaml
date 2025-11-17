@@ -22,13 +22,12 @@ phpVersions:
   - php84
   - php85
 code: |-
-  class TestClass {
+  $obj = new class {
       public function testMethod() {
           return true;
       }
-  }
+  };
 
-  $obj = new TestClass();
   for ($i = 0; $i < 100000; $i++) {
       $exists = is_callable([$obj, 'testMethod']);
   }
