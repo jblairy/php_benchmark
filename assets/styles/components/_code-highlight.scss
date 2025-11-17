@@ -12,26 +12,26 @@ pre.hljs {
     line-height: 1.6;
     white-space: pre;
     tab-size: 4;
-    
+
     // Scrollbar styling
     &::-webkit-scrollbar {
         height: 8px;
     }
-    
+
     &::-webkit-scrollbar-track {
         background: rgba(0, 0, 0, 0.1);
         border-radius: 4px;
     }
-    
+
     &::-webkit-scrollbar-thumb {
         background: rgba(0, 0, 0, 0.3);
         border-radius: 4px;
-        
+
         &:hover {
             background: rgba(0, 0, 0, 0.5);
         }
     }
-    
+
     code {
         white-space: pre;
         word-wrap: normal;
@@ -54,14 +54,13 @@ pre.hljs {
     &.hljs {
         background: none;
         border: none;
-        margin-top: 0.5rem;
     }
 }
 
 // Loading state
 pre[data-controller="syntax-highlighter"] {
     transition: opacity 0.3s ease;
-    
+
     code {
         transition: opacity 0.3s ease;
     }
