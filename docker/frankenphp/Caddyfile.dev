@@ -20,6 +20,6 @@
     
     # Handle PHP files with worker mode (2 workers for development)
     php_server {
-        worker index.php 2
+        worker /app/public/index.php 2
     }
 }
