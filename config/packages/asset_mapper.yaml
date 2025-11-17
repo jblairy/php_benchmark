@@ -3,6 +3,9 @@ framework:
         # The paths to make available to the asset mapper.
         paths:
             - assets/
+        # Exclude SCSS partials (files starting with _) as they are only imported by main SCSS files
+        excluded_patterns:
+            - '*/_*.scss'
         missing_import_mode: strict
 
 when@prod:
